@@ -1,0 +1,21 @@
+[package]
+name = "ozelot"
+version = "0.1.0"
+authors = ["C4K3"]
+description = "Handles everything network related to MCMODERN."
+documentation = "https://c4k3.net/rustdocs/ozelot/ozelot/"
+repository = "https://github.com/C4K3/ozelot/"
+keywords = ["minecraft", "mc", "mcmodern"]
+categories = ["games"]
+license = "CC0"
+
+[dependencies]
+byteorder = "1.0.0"
+netbuf = { git = "https://github.com/tailhook/netbuf" }
+flate2 = "0.2.17"
+lazy_static = "0.2.2"
+reqwest = "0.3.0"
+rustc-serialize = "0.3.22"
+ring = "0.6.2"
+openssl = "0.9.6"
+
