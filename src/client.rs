@@ -82,34 +82,47 @@ impl Client {
     /// This will set auto_handle and hide_handled to true.
     ///
     /// This will return Ok(Client) on receival of a PlayerAbilities packet,
-    /// but note that this particular packet will not be visible to consumers.
-    pub fn connect_unauthenticated(host: &str, port: u16, username: &str) -> io::Result<Self> {
+    /// but note that the PlayerAbilities packet and all packets received before
+    /// it will not be available for consumers. If you need any of those
+    /// packets, you will want to do the authentication manually.
+    ///
+    /// This function will time out after 30 seconds (theoretical absolute worst
+    /// case 60 seconds.)
+    pub fn connect_unauthenticated(host: &str, port: u16, username: &str)
+        -> io::Result<Self> {
+
+        let timeout = time::Instant::now();
         let mut client = Client::connect_tcp(host, port)?;
         client.set_auto_handle(true);
         client.set_hide_handled(true);
-        let handshake = client_send::Handshake::new(PROTOCOL_VERSION, host.to_string(), port, 2);
+        let handshake = client_send::Handshake::new(PROTOCOL_VERSION,
+                                                    host.to_string(),
+                                                    port,
+                                                    2);
         let loginstart = client_send::LoginStart::new(username.to_string());
         client.send(handshake)?;
         client.set_clientstate(ClientState::Login);
         client.send(loginstart)?;
 
         /* Now we wait for the PlayerAbilities packet from the server */
-        'wait: for i in 0..4000 {
-            if i >= 3000 {
-                /* 3000 * 10 msec gives 30 second timeout */
+        'wait: loop {
+            if timeout.elapsed() > time::Duration::new(30, 0) {
                 return io_error!(
                     "Timed out waiting for LoginSuccess/EncryptionRequest");
             }
-            let packets = client.read()?;
-            for packet in &packets {
-                match packet {
-                    &ClientboundPacket::LoginDisconnect(ref p) => {
-                        return io_error!("Got LoginDisconnect, reason: {}",
-                                         p.get_raw_chat());
-                    },
-                    &ClientboundPacket::PlayerAbilities(..) => break 'wait,
-                    _ => (),
-                }
+            client.update_inbuf()?;
+            match client.read_packet()? {
+                Some(ClientboundPacket::LoginDisconnect(ref p)) => {
+                    return io_error!("Got LoginDisconnect, reason: {}",
+                                     p.get_raw_chat());
+                },
+                Some(ClientboundPacket::PlayerAbilities(..)) => break 'wait,
+                Some(ClientboundPacket::EncryptionRequest(..)) => {
+                    return io_error!(
+                        "connect_unauthenticated got EncryptionRequest");
+                },
+                Some(_) => (),
+                None => thread::sleep(time::Duration::from_millis(10)),
             }
         }
 
@@ -128,7 +141,12 @@ impl Client {
     /// This will set auto_handle and hide_handled to true.
     ///
     /// This will return Ok(Client) on receival of a PlayerAbilities packet,
-    /// but note that this particular packet will not be visible to consumers.
+    /// but note that the PlayerAbilities packet and all packets received before
+    /// it will not be available for consumers. If you need any of those
+    /// packets, you will want to do the authentication manually.
+    ///
+    /// This function will time out after 30 seconds (theoretical absolute worst
+    /// case 60 seconds.)
     ///
     /// # Examples
     ///
@@ -144,6 +162,7 @@ impl Client {
                                  username: &str,
                                  uuid: &str) -> io::Result<Self> {
 
+        let timeout = time::Instant::now();
         let mut client = Client::connect_tcp(host, port)?;
         client.set_auto_handle(true);
         client.set_hide_handled(true);
@@ -158,65 +177,59 @@ impl Client {
         client.send(loginstart)?;
 
         /* Here we wait for a LoginSuccess/EncryptionRequest packet */
-        'wait: for i in 0..4000 {
-            if i >= 3000 {
-                /* 3000 * 10 msec gives 30 second timeout */
+        'wait: loop {
+            if timeout.elapsed() > time::Duration::new(30, 0) {
                 return io_error!(
                     "Timed out waiting for LoginSuccess/EncryptionRequest");
             }
-            let packets = client.read()?;
-            for packet in &packets {
-                match packet {
-                    &ClientboundPacket::LoginDisconnect(ref p) => {
-                        return io_error!("Got LoginDisconnect, reason: {}",
-                                         p.get_raw_chat());
-                    },
-                    &ClientboundPacket::LoginSuccess(..) =>
-                        return io_error!("Logged in unauthenticated"),
-                        &ClientboundPacket::EncryptionRequest(ref p) => {
-                            let shared_secret = yggdrasil::create_shared_secret();
+            client.update_inbuf()?;
+            match client.read_packet()? {
+                Some(ClientboundPacket::LoginDisconnect(ref p)) => {
+                    return io_error!("Got LoginDisconnect, reason: {}",
+                                     p.get_raw_chat());
+                },
+                Some(ClientboundPacket::LoginSuccess(..)) =>
+                    return io_error!("Logged in unauthenticated"),
+                Some(ClientboundPacket::EncryptionRequest(ref p)) => {
+                    let shared_secret = yggdrasil::create_shared_secret();
 
-                            yggdrasil::session_join(&access_token,
-                                                    &uuid,
-                                                    p.get_server_id(),
-                                                    &shared_secret,
-                                                    p.get_public_key())?;
+                    yggdrasil::session_join(&access_token,
+                                            &uuid,
+                                            p.get_server_id(),
+                                            &shared_secret,
+                                            p.get_public_key())?;
 
-                            let encryptionresponse
-                                = client_send::EncryptionResponse::new_unencrypted(
-                                    &p.get_public_key(),
-                                    &shared_secret,
-                                    &p.get_verify_token())?;
-                            client.send(encryptionresponse)?;
-                            client.enable_encryption(&shared_secret);
+                    let encryptionresponse
+                        = client_send::EncryptionResponse::new_unencrypted(
+                            &p.get_public_key(),
+                            &shared_secret,
+                            &p.get_verify_token())?;
+                    client.send(encryptionresponse)?;
+                    client.enable_encryption(&shared_secret);
 
-                            break 'wait;
-                        },
-                        _ => (),
-                }
+                    break 'wait;
+                },
+                Some(_) => (),
+                None => thread::sleep(time::Duration::from_millis(10)),
             }
-            thread::sleep(time::Duration::from_millis(10));
         }
 
         /* Now we wait for the PlayerAbilities packet from the server */
-        'wait2: for i in 0..4000 {
-            if i >= 3000 {
-                /* 3000 * 10msec gives 30 second timeout */
+        'wait2: loop {
+            if timeout.elapsed() > time::Duration::new(30, 0) {
                 return io_error!(
-                    "Timed out waiting for PlayerAbilities packet");
+                    "Timed out waiting for LoginSuccess/EncryptionRequest");
             }
-            let packets = client.read()?;
-            for packet in &packets {
-                match packet {
-                    &ClientboundPacket::LoginDisconnect(ref p) => {
-                        return io_error!("Got LoginDisconnect, reason: {}",
-                                         p.get_raw_chat());
-                    },
-                    &ClientboundPacket::PlayerAbilities(..) => break 'wait2,
-                    _ => (),
-                }
+            client.update_inbuf()?;
+            match client.read_packet()? {
+                Some(ClientboundPacket::LoginDisconnect(ref p)) => {
+                    return io_error!("Got LoginDisconnect, reason: {}",
+                                     p.get_raw_chat());
+                },
+                Some(ClientboundPacket::PlayerAbilities(..)) => break 'wait2,
+                Some(_) => (),
+                None => thread::sleep(time::Duration::from_millis(10)),
             }
-            thread::sleep(time::Duration::from_millis(10));
         }
 
         Ok(client)
@@ -285,50 +298,27 @@ impl Client {
     /// During normal back and forth with a server it should return as fast as
     /// possible.
     pub fn read(&mut self) -> io::Result<Vec<ClientboundPacket>> {
-        if let Some(ref mut enc) = self.in_encryption {
-            let mut enc_buf = Buf::new();
-            let n = enc_buf.read_from(&mut self.stream)?;
-            let mut tmp = vec![0; n + 16];
-            let n = match enc.update(&enc_buf[..], &mut tmp) {
-                Ok(x) => x,
-                Err(_) => return io_error!(
-                    "client::read error reading encrypted data"),
-            };
-            self.buf.extend(&tmp[..n]);
-        } else {
-            let _: usize = self.buf.read_from(&mut self.stream)?;
-        }
+        self.update_inbuf()?;
 
         let mut ret = Vec::new();
         loop {
             let packet = self.read_packet()?;
             /* push = whether to push the packet to ret */
-            let push = match packet {
-                Some(ClientboundPacket::LoginSuccess(_))
-                    if self.auto_handle => {
-                        self.set_clientstate(ClientState::Play);
-                        !self.hide_handled
-                    },
-                    Some(ClientboundPacket::SetCompression(ref p))
-                        if self.auto_handle => {
-                            self.compression = Some(*p.get_threshold() as usize);
-                            !self.hide_handled
-                        },
-                        Some(ClientboundPacket::KeepAlive(ref p))
-                            if self.auto_handle => {
-                                let keepalive = client_send::KeepAlive::new(*p.get_id());
-                                self.send(keepalive)?;
-                                !self.hide_handled
-                            },
-                        Some(_) => true,
-                        None => break,
+            let mut push = match &packet {
+                &Some(ClientboundPacket::LoginSuccess(_)) => false,
+                &Some(ClientboundPacket::SetCompression(_)) => false,
+                &Some(ClientboundPacket::KeepAlive(_)) => false,
+                &Some(_) => true,
+                &None => break,
             };
+            if self.hide_handled == false || self.auto_handle == false {
+                push = true;
+            }
 
             if push {
                 ret.push(packet
                          .expect("unreachable packet = None in client.read()"));
             }
-
         }
 
         Ok(ret)
@@ -384,6 +374,24 @@ impl Client {
         self.in_encryption = Some(enc_in);
     }
 
+    /** Update the client's internal read buffer, i.e. try to read from the
+     * TcpStream */
+    fn update_inbuf(&mut self) -> io::Result<()> {
+        if let Some(ref mut enc) = self.in_encryption {
+            let mut enc_buf = Buf::new();
+            let n = enc_buf.read_from(&mut self.stream)?;
+            let mut tmp = vec![0; n + 16];
+            let n = match enc.update(&enc_buf[..], &mut tmp) {
+                Ok(x) => x,
+                Err(_) => return io_error!(
+                    "client::read error reading encrypted data"),
+            };
+            self.buf.extend(&tmp[..n]);
+        } else {
+            let _: usize = self.buf.read_from(&mut self.stream)?;
+        }
+        Ok(())
+    }
 
     /** Read a single packet from the server */
     fn read_packet(&mut self) -> io::Result<Option<ClientboundPacket>> {
@@ -442,6 +450,23 @@ impl Client {
 
         self.buf.consume(len);
         self.packet_len = None;
+
+        if self.auto_handle {
+            match &packet {
+                &ClientboundPacket::LoginSuccess(_) => {
+                    self.set_clientstate(ClientState::Play);
+                },
+                &ClientboundPacket::SetCompression(ref p) => {
+                    self.compression = Some(*p.get_threshold() as usize);
+                },
+                &ClientboundPacket::KeepAlive(ref p) => {
+                    let keepalive = client_send::KeepAlive::new(*p.get_id());
+                    self.send(keepalive)?;
+                },
+                _ => (),
+            }
+        }
+
         Ok(Some(packet))
 
     }
