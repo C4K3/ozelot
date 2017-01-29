@@ -132,7 +132,8 @@ impl Client {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```rust,no_run
+    /// use ozelot::{yggdrasil, Client};
     /// let (access_token, _, username, uuid) = yggdrasil::authenticate("my_email@example.com",
     ///                                                  "my_password").unwrap();
     /// let mut client = Client::connect_authenticated("minecraft.example.com", 25565, &access_token, &username, &uuid).unwrap();

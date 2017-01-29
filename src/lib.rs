@@ -31,7 +31,7 @@
 //! messages, and then echoing back messages that appear not to be written by us
 //! (else we'd get into an infinite loop echoing our own messages.)
 //!
-//! ```
+//! ```rust,no_run
 //! use ozelot::{yggdrasil, Client, client_send, utils};
 //! use ozelot::client_recv::ClientboundPacket;
 //!
@@ -87,7 +87,6 @@ use flate2::Compression;
 
 #[macro_use]
 mod macros;
-
 mod client;
 pub mod yggdrasil;
 pub mod utils;
@@ -95,6 +94,8 @@ pub mod read;
 pub mod write;
 pub mod client_recv;
 pub mod client_send;
+#[cfg(test)]
+mod tests;
 
 pub use client::Client;
 
