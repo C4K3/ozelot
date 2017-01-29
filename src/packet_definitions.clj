@@ -1,4 +1,4 @@
-;;;; This file contains only the definitions for all the packets.
+;;;;;; This file contains only the definitions for all the packets.
 (ns packet-definitions)
 
 (def packets
@@ -269,18 +269,18 @@
    :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID doing the animation" :read "varint"}]}
   {:name "UpdateBlockEntity"
    :id 9
-   :fields [{:name "position" :type "u64"}
+   :fields [{:name "position" :type "(i32, i32, i32)" :getter "Get the (x, y, z) position" :read "position"}
             {:name "action" :type "u8" :getter "Get the action ID being performed"}
             {:name "nbt" :type "Vec<u8>" :getter "Get the raw NBT bytes" :read "bytearray_to_end"}]}
   {:name "BlockAction"
    :id 10
-   :fields [{:name "position" :type "u64"}
+   :fields [{:name "position" :type "(i32, i32, i32)" :getter "Get the (x, y, z) position" :read "position"}
             {:name "action_id" :type "u8" :getter "Get the action ID"}
             {:name "action_param" :type "u8" :getter "Get the action parameter"}
             {:name "block_type" :type "i32" :getter "Get the block type" :read "varint"}]}
   {:name "BlockChange"
    :id 11
-   :fields [{:name "position" :type "u64"}
+   :fields [{:name "position" :type "(i32, i32, i32)" :getter "Get the (x, y, z) position" :read "position"}
             {:name "new_block" :type "i32" :getter "Get the new block state ID for the block" :read "varint"}]}
   ; Implement the BossBar packet
   {:name "ServerDifficulty"
@@ -446,7 +446,7 @@
           {:name "pitch" :type "i8" :getter "Get the (absolute) pitch"}]}
 {:name "OpenSignEditor"
  :id 42
- :fields [{:name "position" :type "u64"}]}
+ :fields [{:name "position" :type "(i32, i32, i32)" :getter "Get the (x, y, z) position" :read "position"}]}
 {:name "PlayerAbilities"
  :id 43
  :fields [{:name "flags" :type "u8"}
@@ -474,7 +474,7 @@
 {:name "UseBed"
  :id 47
  :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID of the player sleeping" :read "varint"}
-          {:name "position" :type "u64"}]}
+          {:name "position" :type "(i32, i32, i32)" :getter "Get the (x, y, z) position" :read "position"}]}
 {:name "DestroyEntities"
  :id 48
  :fields [{:name "entity_ids" :type "Vec<i32>" :getter "Get the list of entity IDs that have been destroyed" :read "prefixed_varintarray"}]}
@@ -561,7 +561,7 @@
           {:name "value" :type "Option<i32>" :getter "Get the score to be displayed if this packet is updating a score, else `None`"}]}
 {:name "SpawnPosition"
  :id 67
- :fields [{:name "position" :type "u64"}]}
+ :fields [{:name "position" :type "(i32, i32, i32)" :getter "Get the position" :read "position"}]}
 {:name "TimeUpdate"
  :id 68
  :fields [{:name "world_age" :type "i64" :getter "Get the world's age in ticks"}

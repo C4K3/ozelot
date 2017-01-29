@@ -63,3 +63,15 @@ fn varint() {
     read_and_write!(-1, &[255, 255, 255, 255, 15], read_varint, write_varint);
 }
 
+#[test]
+fn position() {
+    read_and_write!((0, 63, 0), &[0, 0, 0, 0, 0xfc, 0, 0, 0],
+                    read_position, write_position);
+    read_and_write!((32374, 72, 29283),
+                    &[0x00, 0x1f, 0x9d, 0x81, 0x20, 0x00, 0x72, 0x63],
+                    read_position, write_position);
+    read_and_write!((-32374, -72, 29283),
+                    &[0xff, 0xe0, 0x62, 0xbe, 0xe0, 0x00, 0x72, 0x63],
+                    read_position, write_position);
+}
+

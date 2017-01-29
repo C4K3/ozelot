@@ -844,7 +844,7 @@ impl BlockBreakAnimation {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct UpdateBlockEntity {
-    position: u64,
+    position: (i32, i32, i32),
     action: u8,
     nbt: Vec<u8>,
 }
@@ -852,11 +852,16 @@ pub struct UpdateBlockEntity {
 impl UpdateBlockEntity {
     fn new<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateBlockEntity(UpdateBlockEntity {
-            position: read_u64(r)?,
+            position: read_position(r)?,
             action: read_u8(r)?,
             nbt: read_bytearray_to_end(r)?,
         }))
     }
+    /// Get the (x, y, z) position
+    pub fn get_position(&self) -> &(i32, i32, i32) {
+        &self.position
+    }
+
     /// Get the action ID being performed
     pub fn get_action(&self) -> &u8 {
         &self.action
@@ -871,7 +876,7 @@ impl UpdateBlockEntity {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct BlockAction {
-    position: u64,
+    position: (i32, i32, i32),
     action_id: u8,
     action_param: u8,
     block_type: i32,
@@ -880,12 +885,17 @@ pub struct BlockAction {
 impl BlockAction {
     fn new<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockAction(BlockAction {
-            position: read_u64(r)?,
+            position: read_position(r)?,
             action_id: read_u8(r)?,
             action_param: read_u8(r)?,
             block_type: read_varint(r)?,
         }))
     }
+    /// Get the (x, y, z) position
+    pub fn get_position(&self) -> &(i32, i32, i32) {
+        &self.position
+    }
+
     /// Get the action ID
     pub fn get_action_id(&self) -> &u8 {
         &self.action_id
@@ -905,17 +915,22 @@ impl BlockAction {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct BlockChange {
-    position: u64,
+    position: (i32, i32, i32),
     new_block: i32,
 }
 
 impl BlockChange {
     fn new<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockChange(BlockChange {
-            position: read_u64(r)?,
+            position: read_position(r)?,
             new_block: read_varint(r)?,
         }))
     }
+    /// Get the (x, y, z) position
+    pub fn get_position(&self) -> &(i32, i32, i32) {
+        &self.position
+    }
+
     /// Get the new block state ID for the block
     pub fn get_new_block(&self) -> &i32 {
         &self.new_block
@@ -1706,15 +1721,20 @@ impl ClientboundVehicleMove {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct OpenSignEditor {
-    position: u64,
+    position: (i32, i32, i32),
 }
 
 impl OpenSignEditor {
     fn new<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
         Ok(ClientboundPacket::OpenSignEditor(OpenSignEditor {
-            position: read_u64(r)?,
+            position: read_position(r)?,
         }))
     }
+    /// Get the (x, y, z) position
+    pub fn get_position(&self) -> &(i32, i32, i32) {
+        &self.position
+    }
+
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1833,19 +1853,24 @@ impl PlayerPositionAndLook {
 #[derive(Debug, PartialEq, Clone)]
 pub struct UseBed {
     entity_id: i32,
-    position: u64,
+    position: (i32, i32, i32),
 }
 
 impl UseBed {
     fn new<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
         Ok(ClientboundPacket::UseBed(UseBed {
             entity_id: read_varint(r)?,
-            position: read_u64(r)?,
+            position: read_position(r)?,
         }))
     }
     /// Get the entity ID of the player sleeping
     pub fn get_entity_id(&self) -> &i32 {
         &self.entity_id
+    }
+
+    /// Get the (x, y, z) position
+    pub fn get_position(&self) -> &(i32, i32, i32) {
+        &self.position
     }
 
 }
@@ -2302,15 +2327,20 @@ pub struct UpdateScore {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct SpawnPosition {
-    position: u64,
+    position: (i32, i32, i32),
 }
 
 impl SpawnPosition {
     fn new<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPosition(SpawnPosition {
-            position: read_u64(r)?,
+            position: read_position(r)?,
         }))
     }
+    /// Get the position
+    pub fn get_position(&self) -> &(i32, i32, i32) {
+        &self.position
+    }
+
 }
 
 #[derive(Debug, PartialEq, Clone)]

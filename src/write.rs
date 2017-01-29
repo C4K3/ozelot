@@ -162,3 +162,49 @@ pub fn write_uuid_str_dashes<W: Write>(val: &u128, writer: &mut W)
     write!(writer, "{:08x}-{:04x}-{:04x}-{:04x}-{:012x}", a, b, c, d, e)
 }
 
+/// Write a position as described on wiki.vg, i.e. x/y/z encoded as an u64
+///
+/// # Panics
+///
+/// Panics if X, Y or Z is out of range. X and Z are given 26 bits, and Y is
+/// given 12 bits, if the given values are too big to be represented with that
+/// amount of memory, will panic.
+pub fn write_position<W: Write>(pos: &(i32, i32, i32), writer: &mut W)
+-> io::Result<()> {
+    let &(x, y, z) = pos;
+    let x = if x >= 0 {
+        x as u64
+    } else {
+        (x + (1 << 26)) as u64
+    };
+
+    let y = if y >= 0 {
+        y as u64
+    } else {
+        (y + (1 << 12)) as u64
+    };
+
+    let z = if z >= 0 {
+        z as u64
+    } else {
+        (z + (1 << 26)) as u64
+    };
+
+    if x & (!0x3ffffff) != 0 {
+        panic!("write_position: X is out of range");
+    }
+
+    if y & (!0xfff) != 0 {
+        panic!("write_position: Y is out of range");
+    }
+
+    if z & (!0x3ffffff) != 0 {
+        panic!("write_position: Z is out of range");
+    }
+
+    let val = ((x & 0x3ffffff) << 38)
+        | ((y & 0xfff) << 26)
+        | (z & 0x3ffffff);
+    write_u64(&val, writer)
+}
+

@@ -175,3 +175,21 @@ pub fn read_bytearray_to_end<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
     Ok(tmp)
 }
 
+/// Read a position as described on wiki.vg, i.e. x/y/z given as an u64
+pub fn read_position<R: Read>(reader: &mut R) -> io::Result<(i32, i32, i32)> {
+    let val = read_u64(reader)?;
+    let mut x = (val >> 38) as i32;
+    let mut y = ((val >> 26) & 0xfff) as i32;
+    let mut z = (val & 0x3ffffff) as i32;
+    if x >= 1 << 25 {
+        x -= 1 << 26;
+    }
+    if y >= 1 << 11 {
+        y -= 1 << 12;
+    }
+    if z >= 2 << 25 {
+        z -= 1 << 26;
+    }
+    Ok((x, y, z))
+}
+
