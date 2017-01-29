@@ -374,9 +374,13 @@ impl Client {
         self.in_encryption = Some(enc_in);
     }
 
-    /** Update the client's internal read buffer, i.e. try to read from the
-     * TcpStream */
-    fn update_inbuf(&mut self) -> io::Result<()> {
+    /// Read from the TcpStream and update the incoming buffer.
+    ///
+    /// This is the only way to actually read from the TcpStream. Unless you
+    /// know for sure you need to call this, then you do not need to call this.
+    /// I.e. if you're just using client.read(), then you do not need to call
+    /// this function.
+    pub fn update_inbuf(&mut self) -> io::Result<()> {
         if let Some(ref mut enc) = self.in_encryption {
             let mut enc_buf = Buf::new();
             let n = enc_buf.read_from(&mut self.stream)?;
@@ -393,8 +397,16 @@ impl Client {
         Ok(())
     }
 
-    /** Read a single packet from the server */
-    fn read_packet(&mut self) -> io::Result<Option<ClientboundPacket>> {
+    /// Read a single packet from the internal buffer.
+    ///
+    /// This is only really useful if you want finegrained control over the
+    /// processing of packets, or if you want to manually authenticate with
+    /// the server. In most cases, you'll want to just call client.read().
+    ///
+    /// You MUST be sure that client.update_inbuf() has been called before this,
+    /// this function will not attempt to read from the TcpStream, only from the
+    /// internal buffer.
+    pub fn read_packet(&mut self) -> io::Result<Option<ClientboundPacket>> {
         if let None = self.packet_len {
             self.read_length()?;
         }
