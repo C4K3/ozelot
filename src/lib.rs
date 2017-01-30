@@ -70,20 +70,16 @@
 //!     }
 //! }
 //! ```
-extern crate netbuf;
 extern crate byteorder;
 extern crate flate2;
-extern crate ring;
 #[macro_use]
 extern crate lazy_static;
+extern crate netbuf;
+extern crate openssl;
 extern crate reqwest; /* Holy fuck the dependencies needed just to make 2
                          HTTP POST requests ... */
+extern crate ring;
 extern crate rustc_serialize;
-extern crate openssl;
-
-use std::io;
-
-use flate2::Compression;
 
 #[macro_use]
 mod macros;
@@ -98,6 +94,10 @@ pub mod client_send;
 mod tests;
 
 pub use client::Client;
+
+use std::io;
+
+use flate2::Compression;
 
 const COMPRESSION_LEVEL: Compression = Compression::Default;
 /// The protocol version supported by this version of ozelot

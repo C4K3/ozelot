@@ -1,9 +1,9 @@
 //! Tests the serialization of the various datatypes, i.e. the files read.rs
 //! and write.rs
-use std::io::Cursor;
-
 use read::*;
 use write::*;
+
+use std::io::Cursor;
 
 /// Given a value, the same correctly encoded, and a reader and write function
 /// for that type of value, test that the reader and writer create values that

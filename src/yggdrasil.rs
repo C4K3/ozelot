@@ -5,8 +5,8 @@
 //! requests, but not all of them are implemented here yet. It also contains
 //! a few utility functions that may be needed.
 use std::fmt::Write;
-use std::io;
 use std::io::Read;
+use std::io;
 
 use ring::digest;
 use ring::rand::SystemRandom;

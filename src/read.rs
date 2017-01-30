@@ -1,11 +1,11 @@
 //! Functions for deserializing datatypes used by the protocol
-use std::io;
+use u128;
+
 use std::io::Read;
+use std::io;
 use std::string;
 
 use byteorder::{ReadBytesExt, BigEndian};
-
-use u128;
 
 /// Read a single bool from the Reader
 pub fn read_bool<R: Read>(reader: &mut R) -> io::Result<bool> {

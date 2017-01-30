@@ -3,8 +3,8 @@
 //! See the Serverbound sections on http://wiki.vg/Protocol for information
 //! about each of the packets.
 
-use {ClientState, Sendable, yggdrasil, u128};
 use write::*;
+use {ClientState, Sendable, yggdrasil, u128};
 
 use std::io;
 

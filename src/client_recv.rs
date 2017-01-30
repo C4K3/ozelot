@@ -6,13 +6,13 @@
 //! The goal is also to add a bunch of useful helper functions to the packets,
 //! if you feel such a function is missing, open an issue.
 
-use {ClientState, u128};
 use read::*;
+use {ClientState, u128};
 
-use std::io;
-use std::io::Read;
-use std::ops::Deref;
 use std::collections::BTreeMap;
+use std::io::Read;
+use std::io;
+use std::ops::Deref;
 
 /* See packets.clj for information about this include */
 include!("./.client_recv.generated.rs");

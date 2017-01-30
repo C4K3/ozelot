@@ -1,19 +1,19 @@
-use {ClientState, Sendable, client_send, yggdrasil, PROTOCOL_VERSION};
 use client_recv::ClientboundPacket;
-use write::write_varint;
 use read::read_varint;
+use write::write_varint;
+use {ClientState, Sendable, client_send, yggdrasil, PROTOCOL_VERSION};
 
-use std::{thread, time, io};
 use std::io::{Write, Cursor};
 use std::net::Shutdown;
 use std::net::TcpStream;
 use std::ops::Deref;
+use std::{thread, time, io};
 
 use netbuf::Buf;
 
-use flate2;
 use flate2::Compress;
 use flate2::read::ZlibDecoder;
+use flate2;
 
 use openssl::symm;
 
