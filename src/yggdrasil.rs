@@ -8,9 +8,8 @@ use std::fmt::Write;
 use std::io::Read;
 use std::io;
 
-use ring::digest;
-use ring::rand::SystemRandom;
-
+use openssl::hash::{Hasher, MessageDigest};
+use openssl::rand;
 use openssl::rsa::{Rsa, PKCS1_PADDING};
 
 use reqwest::Client;
@@ -18,14 +17,14 @@ use reqwest::header::ContentType;
 
 use rustc_serialize::json::Json;
 
-lazy_static! {
-    static ref RANDOM: SystemRandom = SystemRandom::new();
-}
-
 /// Create a shared secret as used by yggdrasil
+///
+/// # Panics
+///
+/// Panics if there's an error generating the random bytes.
 pub fn create_shared_secret() -> [u8; 16] {
     let mut ret = [0; 16];
-    match RANDOM.fill(&mut ret) {
+    match rand::rand_bytes(&mut ret) {
         Ok(()) => (),
         Err(_) => {
             panic!("yggdrasil.create_shared_secret encountered an error");
@@ -155,12 +154,16 @@ pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> io::Result<Vec<u8>> {
 fn sha1(server_id: &str, shared_secret: &[u8], server_public_key: &[u8])
     -> String {
 
-    let mut ctx = digest::Context::new(&digest::SHA1);
-    ctx.update(server_id.as_bytes());
-    ctx.update(shared_secret);
-    ctx.update(server_public_key);
-    let mut digest = Vec::new();
-    digest.extend_from_slice(ctx.finish().as_ref());
+    let mut hash = Hasher::new(MessageDigest::sha1())
+        .expect("yggdrasil::sha1 error creating hasher");
+    hash.update(server_id.as_bytes())
+        .expect("yggdrasil::sha1 error updating hash");
+    hash.update(shared_secret)
+        .expect("yggdrasil::sha1 error updating hash");
+    hash.update(server_public_key)
+        .expect("yggdrasil::sha1 error updating hash");
+    let mut digest = hash.finish()
+        .expect("yggdrasil::sha1 error calculating hash");
 
     let mut tmp = String::new();
     let mut negative = false;
@@ -211,7 +214,6 @@ fn sha1(server_id: &str, shared_secret: &[u8], server_public_key: &[u8])
             ret.push(character);
         }
     }
-
     ret
 }
 

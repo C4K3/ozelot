@@ -72,13 +72,10 @@
 //! ```
 extern crate byteorder;
 extern crate flate2;
-#[macro_use]
-extern crate lazy_static;
 extern crate netbuf;
 extern crate openssl;
 extern crate reqwest; /* Holy fuck the dependencies needed just to make 2
                          HTTP POST requests ... */
-extern crate ring;
 extern crate rustc_serialize;
 
 #[macro_use]
