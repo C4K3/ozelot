@@ -8,7 +8,7 @@ use std::fmt::Write;
 use std::io::Read;
 use std::io;
 
-use openssl::hash::{Hasher, MessageDigest};
+use openssl::hash::{self, MessageDigest};
 use openssl::rand;
 use openssl::rsa::{Rsa, PKCS1_PADDING};
 
@@ -104,7 +104,7 @@ pub fn session_join(access_token: &str,
     -> io::Result<()> {
 
     let client = Client::new().expect("Error creating reqwest client");
-    let hash = sha1(server_id, shared_secret, server_public_key);
+    let hash = post_sha1(server_id, shared_secret, server_public_key);
     let payload = format!("{{\"accessToken\":\"{}\",\"selectedProfile\":\"{}\",\"serverId\":\"{}\"}}",
                           access_token,
                           uuid,
@@ -129,7 +129,8 @@ pub fn session_join(access_token: &str,
     Ok(())
 }
 
-/// Given a public key in DER format (the format you get it in in the EncryptionRequest packet), and some data, RSA encrypt the data
+/// Given a public key in DER format (the format you get it in in the
+/// EncryptionRequest packet), and some data, RSA encrypt the data
 ///
 /// For use with the EncryptionResponse packet.
 pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> io::Result<Vec<u8>> {
@@ -150,20 +151,21 @@ pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> io::Result<Vec<u8>> {
     Ok(ret)
 }
 
-/// Calculate the sha1 for the client to use to authenticate with yggdrasil
-fn sha1(server_id: &str, shared_secret: &[u8], server_public_key: &[u8])
+/// Given the server_id, shared_secret and server's public key, calculate the
+/// sha1 that is to be used for posting to Mojang
+fn post_sha1(server_id: &str, shared_secret: &[u8], server_public_key: &[u8])
     -> String {
 
-    let mut hash = Hasher::new(MessageDigest::sha1())
-        .expect("yggdrasil::sha1 error creating hasher");
-    hash.update(server_id.as_bytes())
-        .expect("yggdrasil::sha1 error updating hash");
-    hash.update(shared_secret)
-        .expect("yggdrasil::sha1 error updating hash");
-    hash.update(server_public_key)
-        .expect("yggdrasil::sha1 error updating hash");
-    let mut digest = hash.finish()
-        .expect("yggdrasil::sha1 error calculating hash");
+    let mut tmp = server_id.as_bytes().to_vec();
+    tmp.extend(shared_secret);
+    tmp.extend(server_public_key);
+    sha1(&tmp)
+}
+
+/// Calculate a Minecraft-style sha1
+fn sha1(data: &[u8]) -> String {
+    let mut digest = hash::hash(MessageDigest::sha1(), data)
+        .expect("yggdrasil::sha1 error");
 
     let mut tmp = String::new();
     let mut negative = false;
@@ -215,5 +217,19 @@ fn sha1(server_id: &str, shared_secret: &[u8], server_public_key: &[u8])
         }
     }
     ret
+}
+
+#[cfg(test)]
+mod test {
+
+    #[test]
+    fn sha1() {
+        assert_eq!(super::sha1("Ozelot".as_bytes()),
+                   "5cfe44b70ee91ccccdb05b1ab8b328d5d8632cbf");
+        assert_eq!(super::sha1("Cactus".as_bytes()),
+                   "-43468c66aebd37d40b99237799da0772d04308");
+        assert_eq!(super::sha1("Bobcat".as_bytes()),
+                   "-da0143edc7918223fcc86951a195a5212c77c3f");
+    }
 }
 
