@@ -1,7 +1,7 @@
 [package]
 name = "ozelot"
 version = "0.1.0"
-authors = ["C4K3"]
+authors = ["C4K3 <crates.io@c4k3.net>"]
 description = "Handles everything network related to MCMODERN."
 documentation = "https://c4k3.net/rustdocs/ozelot/ozelot/"
 repository = "https://github.com/C4K3/ozelot/"
