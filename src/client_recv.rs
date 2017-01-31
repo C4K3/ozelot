@@ -229,3 +229,22 @@ impl Title {
     }
 }
 
+impl PlayerAbilities {
+    /// Get whether the player is invulnerable
+    pub fn is_invulnerable(&self) -> bool {
+        (self.flags & 0x01) != 0
+    }
+    /// Get whether the player is flying
+    pub fn is_flying(&self) -> bool {
+        (self.flags & 0x02) != 0
+    }
+    /// Get whether the player is allowed to fly
+    pub fn allow_flying(&self) -> bool {
+        (self.flags & 0x04) != 0
+    }
+    /// Get whether player is in creative mode
+    pub fn is_creative(&self) -> bool {
+        (self.flags & 0x08) != 0
+    }
+}
+
