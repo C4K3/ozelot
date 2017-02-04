@@ -2554,15 +2554,22 @@ impl EntityTeleport {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct EntityProperties {
+    entity_id: i32,
     data: Vec<u8>,
 }
 
 impl EntityProperties {
     fn new<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityProperties(EntityProperties {
+            entity_id: read_varint(r)?,
             data: read_bytearray_to_end(r)?,
         }))
     }
+    /// Get the entity ID
+    pub fn get_entity_id(&self) -> &i32 {
+        &self.entity_id
+    }
+
     /// Get the raw data for this packet. This library does not attempt to parse the packet
     pub fn get_data(&self) -> &Vec<u8> {
         &self.data

@@ -601,7 +601,8 @@
           {:name "on_ground" :type "bool" :getter "Get whether the entity is now on the ground"}]}
 {:name "EntityProperties"
  :id 74
- :fields [{:name "data" :type "Vec<u8>" :getter "Get the raw data for this packet. This library does not attempt to parse the packet" :read "bytearray_to_end"}]}
+ :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID" :read "varint"}
+          {:name "data" :type "Vec<u8>" :getter "Get the raw data for this packet. This library does not attempt to parse the packet" :read "bytearray_to_end"}]}
 {:name "EntityEffect"
  :id 75
  :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID" :read "varint"}
