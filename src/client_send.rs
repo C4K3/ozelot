@@ -3,25 +3,42 @@
 //! See the Serverbound sections on http://wiki.vg/Protocol for information
 //! about each of the packets.
 
+use read::*;
 use write::*;
-use {ClientState, Sendable, yggdrasil, u128};
+use connection::Packet;
+use {ClientState, u128, yggdrasil};
 
+use std::io::Read;
 use std::io;
 
 /* See packets.clj for information about this include */
-include!("./.client_send.generated.rs");
+include!("./.serverbound-enum.generated.rs");
+include!("./.serverbound-packets.generated.rs");
+
+/* Now come to the manual definitions of packets that don't fit into the
+ * code generation */
+
+impl StatusRequest {
+    fn to_u8(&self) -> io::Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&StatusRequest::get_packet_id(), &mut ret)?;
+        Ok(ret)
+    }
+    fn deserialize<R: Read>(_: &mut R) -> io::Result<ServerboundPacket> {
+        Ok(ServerboundPacket::StatusRequest(StatusRequest { }))
+    }
+}
 
 impl TabComplete {
-    #[inline(always)]
-    fn to_u8_custom(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> io::Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&TabComplete::get_id(), &mut ret)?;
+        write_varint(&TabComplete::get_packet_id(), &mut ret)?;
         write_String(&self.text, &mut ret)?;
         write_bool(&self.assume_command, &mut ret)?;
         match self.looked_at_block {
             Some(x) => {
                 write_bool(&true, &mut ret)?;
-                write_u64(&x, &mut ret)?;
+                write_position(&x, &mut ret)?;
             },
             None => {
                 write_bool(&false, &mut ret)?;
@@ -29,13 +46,28 @@ impl TabComplete {
         }
         Ok(ret)
     }
+    fn deserialize<R: Read>(r: &mut R) -> io::Result<ServerboundPacket> {
+        let text = read_String(r)?;
+        let assume_command = read_bool(r)?;
+        let has_position = read_bool(r)?;
+        let looked_at_block = if has_position {
+            Some(read_position(r)?)
+        } else {
+            None
+        };
+
+        Ok(ServerboundPacket::TabComplete(TabComplete {
+            text: text,
+            assume_command: assume_command,
+            looked_at_block: looked_at_block,
+        }))
+    }
 }
 
 impl UseEntity {
-    #[inline(always)]
-    fn to_u8_custom(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> io::Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&UseEntity::get_id(), &mut ret)?;
+        write_varint(&UseEntity::get_packet_id(), &mut ret)?;
         write_varint(&self.target, &mut ret)?;
         write_varint(&self.action, &mut ret)?;
         match self.action {
@@ -64,6 +96,28 @@ impl UseEntity {
         }
         Ok(ret)
     }
+    fn deserialize<R: Read>(r: &mut R) -> io::Result<ServerboundPacket> {
+        let target = read_varint(r)?;
+        let action = read_varint(r)?;
+
+        let location = if action == 2 {
+            Some((read_f32(r)?, read_f32(r)?, read_f32(r)?))
+        } else {
+            None
+        };
+
+        let hand = if action == 0 || action == 1 {
+            Some(read_varint(r)?)
+        } else {
+            None
+        };
+        Ok(ServerboundPacket::UseEntity(UseEntity {
+            target: target,
+            action: action,
+            location: location,
+            hand: hand,
+        }))
+    }
 }
 
 impl EncryptionResponse {
@@ -71,11 +125,12 @@ impl EncryptionResponse {
     /// and verify token, and the server's public key in DER format.
     pub fn new_unencrypted(key: &[u8],
                            shared_secret: &[u8],
-                           verify_token: &[u8]) -> io::Result<Self> {
-        let ss_encrypted = yggdrasil::rsa_encrypt(key, shared_secret)?;
-        let verify_encrypted = yggdrasil::rsa_encrypt(key, verify_token)?;
+                           verify_token: &[u8])
+        -> io::Result<ServerboundPacket> {
+            let ss_encrypted = yggdrasil::rsa_encrypt(key, shared_secret)?;
+            let verify_encrypted = yggdrasil::rsa_encrypt(key, verify_token)?;
 
-        Ok(EncryptionResponse::new(ss_encrypted, verify_encrypted))
-    }
+            Ok(EncryptionResponse::new(ss_encrypted, verify_encrypted))
+        }
 }
 

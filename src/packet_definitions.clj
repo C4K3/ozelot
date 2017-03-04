@@ -13,6 +13,7 @@
     "Status"
     [{:name "StatusRequest"
       :id 0
+      :automatic-serialize false
       :fields  []}
      {:name "StatusPing"
       :id 1
@@ -31,10 +32,10 @@
       :fields [{:name "id" :type "i32" :read"varint"}]}
      {:name "TabComplete"
       :id 1
-      :make-fn-to-u8 false
+      :automatic-serialize false
       :fields [{:name "text" :type "String"}
                {:name "assume_command" :type "bool"}
-               {:name "looked_at_block" :type "Option<u64>"}]}
+               {:name "looked_at_block" :type "Option<(i32, i32, i32)>"}]}
      {:name "ChatMessage"
       :id 2
       :fields [{:name "message" :type "String"}]}
@@ -75,7 +76,7 @@
                {:name "data" :type "Vec<u8>" :read "bytearray"}]}
      {:name "UseEntity"
       :id 10
-      :make-fn-to-u8 false
+      :automatic-serialize false
       :fields [{:name "target" :type "i32" :read "varint"}
                {:name "action" :type "i32" :read "varint"}
                {:name "location" :type "Option<(f32, f32, f32)>"}
@@ -124,7 +125,7 @@
      {:name "PlayerDigging"
       :id 19
       :fields [{:name "status" :type "i32" :read "varint"}
-               {:name "location" :type "u64"}
+               {:name "location" :type "(i32, i32, i32)" :read "position"}
                {:name "face" :type "u8"}]}
 {:name "EntityAction"
  :id 20
@@ -148,7 +149,7 @@
           {:name "slot" :type "Vec<u8>" :read "bytearray"}]}
 {:name "UpdateSign"
  :id 25
- :fields [{:name "location" :type "u64"}
+ :fields [{:name "location" :type "(i32, i32, i32)" :read "position"}
           {:name "line1" :type "String"}
           {:name "line2" :type "String"}
           {:name "line3" :type "String"}
@@ -161,7 +162,7 @@
  :fields [{:name "target" :type "u128" :read "uuid"}]}
 {:name "PlayerBlockPlacement"
  :id 28
- :fields [{:name "location" :type "u64"}
+ :fields [{:name "location" :type "(i32, i32, i32)" :read "position"}
           {:name "face" :type "i32" :read "varint"}
           {:name "hand" :type "i32" :read "varint"}
           {:name "x" :type "f32"}
@@ -213,9 +214,9 @@
   {:name "SpawnExperienceOrb"
    :id 1
    :fields [{:name "entity_id" :type "i32" :getter "Get the ID of the orb" :read "varint"}
-            {:name "x" :type "u64" :getter "Get the X coordinate"}
-            {:name "y" :type "u64" :getter "Get the Y coordinate"}
-            {:name "z" :type "u64" :getter "Get the Z coordinate"}
+            {:name "x" :type "f64" :getter "Get the X coordinate"}
+            {:name "y" :type "f64" :getter "Get the Y coordinate"}
+            {:name "z" :type "f64" :getter "Get the Z coordinate"}
             {:name "count" :type "i16" :getter "Get the amount of experience this orb will reward"}]}
   {:name "SpawnGlobalEntity"
    :id 2
@@ -244,7 +245,7 @@
    :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID of the painting" :read "varint"}
             {:name "uuid" :type "u128" :getter "Get the UUID of the painting" :read "uuid"}
             {:name "title" :type "String" :getter "Get the title of the painting"}
-            {:name "center_location" :type "u64"}
+            {:name "center_location" :type "(i32, i32, i32)" :read "position"}
             {:name "direction" :type "u8" :getter "The direction in which the painting faces"}]}
   {:name "SpawnPlayer"
    :id 5
@@ -262,7 +263,7 @@
             {:name "animation" :type "u8" :getter "Get the byte ID for what kind of animation it is"}]}
   {:name "Statistics"
    :id 7
-   :make-fn-new false
+   :automatic-serialize false
    :fields  [{:name "values" :type "BTreeMap<String, i32>" :getter "Get the statistics, with the key being the name of the statistic and the value being the value."}]}
   {:name "BlockBreakAnimation"
    :id 8
@@ -282,13 +283,13 @@
    :id 11
    :fields [{:name "position" :type "(i32, i32, i32)" :getter "Get the (x, y, z) position" :read "position"}
             {:name "new_block" :type "i32" :getter "Get the new block state ID for the block" :read "varint"}]}
-  ; Implement the BossBar packet
+  ;FIXME Implement the BossBar packet
   {:name "ServerDifficulty"
    :id 13
    :fields [{:name "difficulty" :type "u8" :getter "Get the difficulty"}]}
   {:name "ClientboundTabComplete"
    :id 14
-   :make-fn-new false
+   :automatic-serialize false
    :fields [{:name "matches" :type "Vec<String>" :getter "Get the matches"}]}
   {:name "ChatMessage"
    :id 15
@@ -296,7 +297,7 @@
             {:name "position" :type "u8" :getter "Get the position of the chat message"}]}
   {:name "MultiBlockChange"
    :id 16
-   :make-fn-new false
+   :automatic-serialize false
    :fields [{:name "chunk_x" :type "i32" :getter "Get the chunk X coordinate"}
             {:name "chunk_z" :type "i32" :getter "Get the chunk Z coordinate"}
             {:name "changes" :type "Vec<(u8, u8, u8, i32)>" :getter "Get the changes as a vector, in the form of Vec<(x, y, z, new_block_state)>, where the x, y, z are relative to the chunk."}]}
@@ -310,7 +311,7 @@
  :fields [{:name "window_id" :type "u8" :getter "Get the window ID"}]}
 {:name "OpenWindow"
  :id 19
- :make-fn-new false
+ :automatic-serialize false
  :fields [{:name "window_id" :type "u8" :getter "Get the window ID"}
           {:name "window_type" :type "String" :getter "Get the window type"}
           {:name "window_title" :type "String" :getter "Get the raw JSON of the window title"}
@@ -356,7 +357,7 @@
           {:name "status" :type "u8" :getter "Get the status of the entity"}]}
 {:name "Explosion"
  :id 28
- :make-fn-new false
+ :automatic-serialize false
  :fields [{:name "x" :type "f32" :getter "Get the X coordinate"}
           {:name "y" :type "f32" :getter "Get the Y coordinate"}
           {:name "z" :type "f32" :getter "Get the Z coordinate"}
@@ -382,12 +383,12 @@
 {:name "Effect"
  :id 33
  :fields [{:name "effect_id" :type "i32" :getter "Get the ID of the effect"}
-          {:name "location" :type "u64"}
+          {:name "location" :type "(i32, i32, i32)" :read "position"}
           {:name "data" :type "i32" :getter "Get the data for this effect"}
           {:name "disable_relative_volume" :type "bool" :getter "Get whether to disable relative volume"}]}
 {:name "Particle"
  :id 34
- :make-fn-new false
+ :automatic-serialize false
  :fields [{:name "particle_id" :type "i32" :getter "Get the particle ID"}
           {:name "use_long_distance" :type "bool" :getter "Get whether to use long distance (65536) instead of short (256)"}
           {:name "x" :type "f32" :getter "Get the X coordinate"}
@@ -454,7 +455,7 @@
           {:name "fov" :type "f32" :getter "Get the player's field of view modifier"}]}
 {:name "CombatEvent"
  :id 44
- :make-fn-new false
+ :automatic-serialize false
  :fields [{:name "event" :type "i32"}
           {:name "duration_playerid" :type "Option<i32>"}
           {:name "entity_id" :type "Option<i32>" :getter "Get the entity ID if packet action is 'end combat' or 'entity dead'"}
@@ -540,7 +541,7 @@
           {:name "saturation" :type "f32" :getter "Get the saturation level"}]}
 {:name "ScoreboardObjective"
  :id 63
- :make-fn-new false
+ :automatic-serialize false
  :fields [{:name "name" :type "String" :getter "Get the name for the object"}
           {:name "mode" :type "u8" :getter "Get the raw mode enum integer"}
           {:name "value" :type "Option<String>" :getter "Get the text to be displayed"}
@@ -554,7 +555,7 @@
  :fields [{:name "data" :type "Vec<u8>" :getter "Get the raw data, this library does not attempt to parse this packet." :read "bytearray_to_end"}]}
 {:name "UpdateScore"
  :id 66
- :make-fn-new false
+ :automatic-serialize false
  :fields [{:name "name" :type "String" :getter "Get the name of the score to be updated"}
           {:name "action" :type "u8" :getter "Get the action being performed"}
           {:name "objective_name" :type "String" :getter "Get the name of the objective the score belongs to"}
@@ -568,7 +569,7 @@
           {:name "time_of_day" :type "i64" :getter "Get the current time in ticks (0 is sunrise, 6000 is noon, ...)"}]}
 {:name "Title"
  :id 69
- :make-fn-new false
+ :automatic-serialize false
  :fields [{:name "action" :type "i32" :getter "Get the raw action enum integer"}
           {:name "text" :type "Option<String>" :getter "Get the title/subtitle/action bar text if action is set title/subtitle/action bar in raw json"}
           {:name "times" :type "Option<(i32, i32, i32)>" :getter "If action is 'set times and display' get `Some((fade_in, stay, fade_out))` else get `None`"}]}

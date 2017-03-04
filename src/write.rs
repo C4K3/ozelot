@@ -133,6 +133,12 @@ pub fn write_bytearray<W: Write>(val: &Vec<u8>, writer: &mut W)
     writer.write_all(val)
 }
 
+/// Alias for write_bytearray
+pub fn write_bytearray_to_end<W: Write>(val: &Vec<u8>, writer: &mut W)
+-> io::Result<()> {
+    write_bytearray(val, writer)
+}
+
 /// Write a uuid (u128) in raw format, i.e. as 16 bytes
 pub fn write_uuid<W: Write>(val: &u128, writer: &mut W) -> io::Result<()> {
     let &u128(x, y) = val;

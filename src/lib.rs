@@ -83,6 +83,7 @@ extern crate rustc_serialize;
 #[macro_use]
 mod macros;
 mod client;
+mod connection;
 pub mod yggdrasil;
 pub mod utils;
 pub mod read;
@@ -94,7 +95,7 @@ mod tests;
 
 pub use client::Client;
 
-use std::io;
+use std::fmt;
 
 use flate2::Compression;
 
@@ -116,11 +117,14 @@ pub enum ClientState {
     Login,
     Play,
 }
-
-/// Trait for structs/packets that can be sent over the network connection
-pub trait Sendable {
-    fn to_u8(&self) -> io::Result<Vec<u8>>;
-    fn get_state() -> ClientState;
-    fn get_id() -> i32;
+impl fmt::Display for ClientState {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match self {
+            &ClientState::Handshake => "Handshake",
+            &ClientState::Status => "Status",
+            &ClientState::Login => "Login",
+            &ClientState::Play => "Play",
+        })
+    }
 }
 

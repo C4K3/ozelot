@@ -175,6 +175,11 @@ pub fn read_bytearray_to_end<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
     Ok(tmp)
 }
 
+/// Alias for read_bytearray_to_end
+pub fn read_bytearray<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
+    read_bytearray_to_end(reader)
+}
+
 /// Read a position as described on wiki.vg, i.e. x/y/z given as an u64
 pub fn read_position<R: Read>(reader: &mut R) -> io::Result<(i32, i32, i32)> {
     let val = read_u64(reader)?;
