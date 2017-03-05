@@ -1,7 +1,7 @@
-use client_recv::ClientboundPacket;
-use client_send::ServerboundPacket;
+use clientbound::ClientboundPacket;
+use serverbound::ServerboundPacket;
 use connection::Connection;
-use {ClientState, client_send, yggdrasil, PROTOCOL_VERSION};
+use {ClientState, serverbound, yggdrasil, PROTOCOL_VERSION};
 
 use std::{thread, time, io};
 
@@ -49,11 +49,11 @@ impl Client {
             let mut client = Client::connect_tcp(host, port)?;
             client.set_auto_handle(true);
             client.set_hide_handled(true);
-            let handshake = client_send::Handshake::new(PROTOCOL_VERSION,
+            let handshake = serverbound::Handshake::new(PROTOCOL_VERSION,
                                                         host.to_string(),
                                                         port,
                                                         2);
-            let loginstart = client_send::LoginStart::new(username.to_string());
+            let loginstart = serverbound::LoginStart::new(username.to_string());
             client.send(handshake)?;
             client.set_clientstate(ClientState::Login);
             client.send(loginstart)?;
@@ -120,12 +120,12 @@ impl Client {
         let mut client = Client::connect_tcp(host, port)?;
         client.set_auto_handle(true);
         client.set_hide_handled(true);
-        let handshake = client_send::Handshake::new(
+        let handshake = serverbound::Handshake::new(
             PROTOCOL_VERSION,
             host.to_string(),
             port,
             2);
-        let loginstart = client_send::LoginStart::new(username.to_string());
+        let loginstart = serverbound::LoginStart::new(username.to_string());
         client.send(handshake)?;
         client.set_clientstate(ClientState::Login);
         client.send(loginstart)?;
@@ -154,7 +154,7 @@ impl Client {
                                                 p.get_public_key())?;
 
                         let encryptionresponse
-                            = client_send::EncryptionResponse::new_unencrypted(
+                            = serverbound::EncryptionResponse::new_unencrypted(
                                 &p.get_public_key(),
                                 &shared_secret,
                                 &p.get_verify_token())?;
@@ -302,7 +302,7 @@ impl Client {
                     self.enable_compression(*p.get_threshold() as usize);
                 },
                 &Some(ClientboundPacket::KeepAlive(ref p)) => {
-                    let keepalive = client_send::KeepAlive::new(*p.get_id());
+                    let keepalive = serverbound::KeepAlive::new(*p.get_id());
                     self.send(keepalive)?;
                 },
                 _ => (),

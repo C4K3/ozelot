@@ -34,8 +34,8 @@
 //! (else we'd get into an infinite loop echoing our own messages.)
 //!
 //! ```rust,no_run
-//! use ozelot::{yggdrasil, Client, client_send, utils};
-//! use ozelot::client_recv::ClientboundPacket;
+//! use ozelot::{yggdrasil, Client, serverbound, utils};
+//! use ozelot::clientbound::ClientboundPacket;
 //!
 //! let (access_token, _, username, uuid) = yggdrasil::authenticate("my_email@example.com", "my_password").unwrap();
 //!
@@ -62,7 +62,7 @@
 //!                  *
 //!                  * Note that this echoes back the raw chat message, that is
 //!                  * playername and everything, and also non-chat messages. */
-//!                 let response = client_send::ChatMessage::new(msg);
+//!                 let response = serverbound::ChatMessage::new(msg);
 //!                 client.send(response).unwrap();
 //!             }
 //!         },
@@ -88,8 +88,8 @@ pub mod yggdrasil;
 pub mod utils;
 pub mod read;
 pub mod write;
-pub mod client_recv;
-pub mod client_send;
+pub mod clientbound;
+pub mod serverbound;
 #[cfg(test)]
 mod tests;
 
