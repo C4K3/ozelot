@@ -41,7 +41,19 @@ impl Handshake {
             next_state: next_state,
         })
     }
-
+    /// Get the client's protocol version
+    pub fn get_protocol_version(&self) -> &i32 {
+        &self.protocol_version
+    }    /// Get the hostname of the server the client connected to
+    pub fn get_server_address(&self) -> &String {
+        &self.server_address
+    }    /// Get the port of the server the client connected to
+    pub fn get_server_port(&self) -> &u16 {
+        &self.server_port
+    }    /// Get the next state
+    pub fn get_next_state(&self) -> &i32 {
+        &self.next_state
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -88,7 +100,10 @@ impl StatusPing {
             id: id,
         })
     }
-
+    /// Get the id
+    pub fn get_id(&self) -> &u64 {
+        &self.id
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -118,7 +133,10 @@ impl LoginStart {
             name: name,
         })
     }
-
+    /// Get the player's claimed username
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -152,7 +170,13 @@ impl EncryptionResponse {
             verify_token: verify_token,
         })
     }
-
+    /// Get the (raw encrypted) shared secret
+    pub fn get_shared_secret(&self) -> &Vec<u8> {
+        &self.shared_secret
+    }    /// Get the (raw encrypted) verify token
+    pub fn get_verify_token(&self) -> &Vec<u8> {
+        &self.verify_token
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -182,7 +206,10 @@ impl TeleportConfirm {
             id: id,
         })
     }
-
+    /// Get the teleport id
+    pub fn get_id(&self) -> &i32 {
+        &self.id
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -205,7 +232,16 @@ impl TabComplete {
             looked_at_block: looked_at_block,
         })
     }
-
+    /// Get the text
+    pub fn get_text(&self) -> &String {
+        &self.text
+    }    /// Get whether the server should parse the text even if it doesn't start with a /
+    pub fn get_assume_command(&self) -> &bool {
+        &self.assume_command
+    }    /// Get the position of the block being looked at (if any)
+    pub fn get_looked_at_block(&self) -> &Option<(i32, i32, i32)> {
+        &self.looked_at_block
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -235,7 +271,10 @@ impl ChatMessage {
             message: message,
         })
     }
-
+    /// Get the chat message (not json)
+    pub fn get_message(&self) -> &String {
+        &self.message
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -265,7 +304,10 @@ impl ClientStatus {
             action: action,
         })
     }
-
+    /// Get the action ID varint enum
+    pub fn get_action(&self) -> &i32 {
+        &self.action
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -315,7 +357,25 @@ impl ClientSettings {
             main_hand: main_hand,
         })
     }
-
+    /// Get the client's locale
+    pub fn get_locale(&self) -> &String {
+        &self.locale
+    }    /// Get the client's view distance in chunks
+    pub fn get_view_distance(&self) -> &u8 {
+        &self.view_distance
+    }    /// Get the client's chat mode as varint enum
+    pub fn get_chat_mode(&self) -> &i32 {
+        &self.chat_mode
+    }    /// Get whether the player has chat colors enabled
+    pub fn get_chat_colors(&self) -> &bool {
+        &self.chat_colors
+    }    /// Get the displayed skin parts as a raw bit mask
+    pub fn get_displayed_skin_parts(&self) -> &u8 {
+        &self.displayed_skin_parts
+    }    /// Get the player's main hand as a varint enum
+    pub fn get_main_hand(&self) -> &i32 {
+        &self.main_hand
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -353,7 +413,16 @@ impl ConfirmTransaction {
             accepted: accepted,
         })
     }
-
+    /// Get the window id
+    pub fn get_window_id(&self) -> &u8 {
+        &self.window_id
+    }    /// Get the action number
+    pub fn get_id(&self) -> &i16 {
+        &self.id
+    }    /// Get whether the action was accepted
+    pub fn get_accepted(&self) -> &bool {
+        &self.accepted
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -387,7 +456,13 @@ impl EnchantItem {
             enchantment: enchantment,
         })
     }
-
+    /// Get the window id
+    pub fn get_window_id(&self) -> &u8 {
+        &self.window_id
+    }    /// Get the position of the chosen enchantment
+    pub fn get_enchantment(&self) -> &i8 {
+        &self.enchantment
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -437,7 +512,25 @@ impl ClickWindow {
             slot: slot,
         })
     }
-
+    /// Get the window id
+    pub fn get_window_id(&self) -> &u8 {
+        &self.window_id
+    }    /// Get the clicked slot number
+    pub fn get_slot_id(&self) -> &i16 {
+        &self.slot_id
+    }    /// Get the button clicked byte enum
+    pub fn get_button(&self) -> &i8 {
+        &self.button
+    }    /// Get the action number id
+    pub fn get_id(&self) -> &i16 {
+        &self.id
+    }    /// Get the action/mode
+    pub fn get_mode(&self) -> &i32 {
+        &self.mode
+    }    /// Get the raw unprocessed slot data
+    pub fn get_slot(&self) -> &Vec<u8> {
+        &self.slot
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -467,7 +560,10 @@ impl CloseWindow {
             window_id: window_id,
         })
     }
-
+    /// Get the window id
+    pub fn get_window_id(&self) -> &u8 {
+        &self.window_id
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -501,7 +597,13 @@ impl PluginMessage {
             data: data,
         })
     }
-
+    /// Get the channel
+    pub fn get_channel(&self) -> &String {
+        &self.channel
+    }    /// Get the data
+    pub fn get_data(&self) -> &Vec<u8> {
+        &self.data
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -526,7 +628,19 @@ impl UseEntity {
             hand: hand,
         })
     }
-
+    /// Get the target eid
+    pub fn get_target(&self) -> &i32 {
+        &self.target
+    }    /// Get the action type varint enum
+    pub fn get_action(&self) -> &i32 {
+        &self.action
+    }    /// Get the target location (if any)
+    pub fn get_location(&self) -> &Option<(f32, f32, f32)> {
+        &self.location
+    }    /// Get the hand used as a varint enum (if any)
+    pub fn get_hand(&self) -> &Option<i32> {
+        &self.hand
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -556,7 +670,10 @@ impl KeepAlive {
             id: id,
         })
     }
-
+    /// Get the keep alive ID
+    pub fn get_id(&self) -> &i32 {
+        &self.id
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -598,7 +715,19 @@ impl PlayerPosition {
             on_ground: on_ground,
         })
     }
-
+    /// Get the X coordinate
+    pub fn get_x(&self) -> &f64 {
+        &self.x
+    }    /// Get the Y coordinate (feet)
+    pub fn get_y(&self) -> &f64 {
+        &self.y
+    }    /// Get the Z coordinate
+    pub fn get_z(&self) -> &f64 {
+        &self.z
+    }    /// Get whether on the ground
+    pub fn get_on_ground(&self) -> &bool {
+        &self.on_ground
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -648,7 +777,25 @@ impl PlayerPositionAndLook {
             on_ground: on_ground,
         })
     }
-
+    /// Get the X coordinate
+    pub fn get_x(&self) -> &f64 {
+        &self.x
+    }    /// Get the Y coordinate
+    pub fn get_y(&self) -> &f64 {
+        &self.y
+    }    /// Get the Z coordinate
+    pub fn get_z(&self) -> &f64 {
+        &self.z
+    }    /// Get the yaw
+    pub fn get_yaw(&self) -> &f32 {
+        &self.yaw
+    }    /// Get the pitch
+    pub fn get_pitch(&self) -> &f32 {
+        &self.pitch
+    }    /// Get whether on the ground
+    pub fn get_on_ground(&self) -> &bool {
+        &self.on_ground
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -686,7 +833,16 @@ impl PlayerLook {
             on_ground: on_ground,
         })
     }
-
+    /// Get the yaw
+    pub fn get_yaw(&self) -> &f32 {
+        &self.yaw
+    }    /// Get the pitch
+    pub fn get_pitch(&self) -> &f32 {
+        &self.pitch
+    }    /// Get whether on the ground
+    pub fn get_on_ground(&self) -> &bool {
+        &self.on_ground
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -716,7 +872,10 @@ impl Player {
             on_ground: on_ground,
         })
     }
-
+    /// Get whether on the ground
+    pub fn get_on_ground(&self) -> &bool {
+        &self.on_ground
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -762,7 +921,22 @@ impl VehicleMove {
             pitch: pitch,
         })
     }
-
+    /// Get the (absolute) X coordinate
+    pub fn get_x(&self) -> &f64 {
+        &self.x
+    }    /// Get the (absolute) Y coordinate
+    pub fn get_y(&self) -> &f64 {
+        &self.y
+    }    /// Get the (absolute) Z coordinate
+    pub fn get_z(&self) -> &f64 {
+        &self.z
+    }    /// Get the (absolute) yaw
+    pub fn get_yaw(&self) -> &f32 {
+        &self.yaw
+    }    /// Get the (absolute) pitch
+    pub fn get_pitch(&self) -> &f32 {
+        &self.pitch
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -796,7 +970,13 @@ impl SteerBoat {
             left: left,
         })
     }
-
+    /// Get whether the right paddle is turning
+    pub fn get_right(&self) -> &bool {
+        &self.right
+    }    /// Get whether the left paddle is turning
+    pub fn get_left(&self) -> &bool {
+        &self.left
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -834,7 +1014,16 @@ impl PlayerAbilities {
             walking_speed: walking_speed,
         })
     }
-
+    /// Get the raw player abilities bit mask
+    pub fn get_flags(&self) -> &u8 {
+        &self.flags
+    }    /// Get the player's flying speed
+    pub fn get_flying_speed(&self) -> &f32 {
+        &self.flying_speed
+    }    /// Get the player's walking speed
+    pub fn get_walking_speed(&self) -> &f32 {
+        &self.walking_speed
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -872,7 +1061,16 @@ impl PlayerDigging {
             face: face,
         })
     }
-
+    /// Get the status as a raw varint enum
+    pub fn get_status(&self) -> &i32 {
+        &self.status
+    }    /// Get the location of the block
+    pub fn get_location(&self) -> &(i32, i32, i32) {
+        &self.location
+    }    /// Get the face of the block being hit as a raw byte enum
+    pub fn get_face(&self) -> &u8 {
+        &self.face
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -910,7 +1108,16 @@ impl EntityAction {
             jump_boost: jump_boost,
         })
     }
-
+    /// Get the player's eid
+    pub fn get_entity_id(&self) -> &i32 {
+        &self.entity_id
+    }    /// Get the action as a raw varint enum
+    pub fn get_action(&self) -> &i32 {
+        &self.action
+    }    /// Get the jump boost, used if the player is riding a horse
+    pub fn get_jump_boost(&self) -> &i32 {
+        &self.jump_boost
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -948,7 +1155,16 @@ impl SteerVehicle {
             flags: flags,
         })
     }
-
+    /// Get the sideways movement, positiev is to the left of the player
+    pub fn get_sideways(&self) -> &f32 {
+        &self.sideways
+    }    /// Get the forward movement
+    pub fn get_forward(&self) -> &f32 {
+        &self.forward
+    }    /// Get the raw flags byte enum
+    pub fn get_flags(&self) -> &u8 {
+        &self.flags
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -978,7 +1194,10 @@ impl ResourcePackStatus {
             result: result,
         })
     }
-
+    /// Get the result as a raw varint enum
+    pub fn get_result(&self) -> &i32 {
+        &self.result
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1008,7 +1227,10 @@ impl HeldItemChange {
             slot: slot,
         })
     }
-
+    /// Get the slot the player has selected
+    pub fn get_slot(&self) -> &i16 {
+        &self.slot
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1042,7 +1264,13 @@ impl CreativeInventoryAction {
             slot: slot,
         })
     }
-
+    /// Get the inventory slot number
+    pub fn get_slot_id(&self) -> &i16 {
+        &self.slot_id
+    }    /// Get the raw unprocessed slot data
+    pub fn get_slot(&self) -> &Vec<u8> {
+        &self.slot
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1088,7 +1316,22 @@ impl UpdateSign {
             line4: line4,
         })
     }
-
+    /// Get the block coordinates
+    pub fn get_location(&self) -> &(i32, i32, i32) {
+        &self.location
+    }    /// Get line 1
+    pub fn get_line1(&self) -> &String {
+        &self.line1
+    }    /// Get line 2
+    pub fn get_line2(&self) -> &String {
+        &self.line2
+    }    /// Get line 3
+    pub fn get_line3(&self) -> &String {
+        &self.line3
+    }    /// Get line 4
+    pub fn get_line4(&self) -> &String {
+        &self.line4
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1118,7 +1361,10 @@ impl Animation {
             hand: hand,
         })
     }
-
+    /// Get which arm was used as a raw varint enum
+    pub fn get_hand(&self) -> &i32 {
+        &self.hand
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1148,7 +1394,10 @@ impl Spectate {
             target: target,
         })
     }
-
+    /// Get the uuid of the selected target
+    pub fn get_target(&self) -> &u128 {
+        &self.target
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1198,7 +1447,25 @@ impl PlayerBlockPlacement {
             z: z,
         })
     }
-
+    /// Get the location of the placed block
+    pub fn get_location(&self) -> &(i32, i32, i32) {
+        &self.location
+    }    /// Get the face of the block as a raw varint enum
+    pub fn get_face(&self) -> &i32 {
+        &self.face
+    }    /// Get the hand from which the block was placed as a raw varint enum
+    pub fn get_hand(&self) -> &i32 {
+        &self.hand
+    }    /// Get the X position of the crosshair on the block
+    pub fn get_x(&self) -> &f32 {
+        &self.x
+    }    /// Get the Y position of the crosshair on the block
+    pub fn get_y(&self) -> &f32 {
+        &self.y
+    }    /// Get the Z position of the crosshair on the block
+    pub fn get_z(&self) -> &f32 {
+        &self.z
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -1228,6 +1495,9 @@ impl UseItem {
             hand: hand,
         })
     }
-
+    /// Get which hand contained the used item as a raw varint enum
+    pub fn get_hand(&self) -> &i32 {
+        &self.hand
+    }
 }
 
