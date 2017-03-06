@@ -9,7 +9,7 @@
       :fields [{:name "protocol_version" :type "i32" :read "varint" :getter "Get the client's protocol version"}
                {:name "server_address" :type "String" :getter "Get the hostname of the server the client connected to"}
                {:name "server_port" :type "u16" :getter "Get the port of the server the client connected to"}
-               {:name "next_state" :type "i32" :read "varint" :getter "Get the next state"}]}];FIXME add a function to get the next state as a ClientState
+               {:name "next_state" :type "i32" :read "varint" :getter "Get the next state"}]}]
     "Status"
     [{:name "StatusRequest"
       :id 0

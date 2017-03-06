@@ -18,6 +18,17 @@ include!("./.serverbound-packets.generated.rs");
 /* Now come to the manual definitions of packets that don't fit into the
  * code generation */
 
+impl Handshake {
+    /// Get the next state as a ClientState, if the value is valid
+    pub fn get_next_clientstate(&self) -> Option<ClientState> {
+        match self.next_state {
+            1 => Some(ClientState::Status),
+            2 => Some(ClientState::Login),
+            _ => None,
+        }
+    }
+}
+
 impl StatusRequest {
     fn to_u8(&self) -> io::Result<Vec<u8>> {
         let mut ret = Vec::new();
