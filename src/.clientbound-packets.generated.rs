@@ -938,6 +938,39 @@ impl BlockChange {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct BossBar {
+    data: Vec<u8>,
+}
+
+impl BossBar {
+    fn get_packet_id() -> i32 {
+        12
+    }
+    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+        Ok(ClientboundPacket::BossBar(BossBar {
+            data: read_bytearray_to_end(r)?,
+
+        }))
+    }
+    fn to_u8(&self) -> io::Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&BossBar::get_packet_id(), &mut ret)?;
+        write_bytearray_to_end(&self.data, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(data: Vec<u8>) -> ClientboundPacket {
+        ClientboundPacket::BossBar(BossBar {
+            data: data,
+        })
+    }
+    /// Get the raw data from this packet. Parsing this is very dependent on the specific client, and doing so would be out of scope for this library, therefore parsing this packet is left to the user of the library.
+    pub fn get_data(&self) -> &Vec<u8> {
+        &self.data
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct ServerDifficulty {
     difficulty: u8,
 }

@@ -283,7 +283,9 @@
    :id 11
    :fields [{:name "position" :type "(i32, i32, i32)" :getter "Get the (x, y, z) position" :read "position"}
             {:name "new_block" :type "i32" :getter "Get the new block state ID for the block" :read "varint"}]}
-  ;FIXME Implement the BossBar packet
+  {:name "BossBar"
+   :id 12
+   :fields [{:name "data" :type "Vec<u8>" :getter "Get the raw data from this packet. Parsing this is very dependent on the specific client, and doing so would be out of scope for this library, therefore parsing this packet is left to the user of the library." :read "bytearray_to_end"}]}
   {:name "ServerDifficulty"
    :id 13
    :fields [{:name "difficulty" :type "u8" :getter "Get the difficulty"}]}
