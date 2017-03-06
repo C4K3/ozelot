@@ -11,6 +11,8 @@ use {ClientState, u128, yggdrasil};
 use std::io::Read;
 use std::io;
 
+use openssl::rsa::Rsa;
+
 /* See packets.clj for information about this include */
 include!("./.serverbound-enum.generated.rs");
 include!("./.serverbound-packets.generated.rs");
@@ -26,6 +28,15 @@ impl Handshake {
             2 => Some(ClientState::Login),
             _ => None,
         }
+    }
+}
+
+impl EncryptionResponse {
+    pub fn get_decrypted_shared_secret(&self, key: &Rsa) -> io::Result<Vec<u8>> {
+        yggdrasil::rsa_decrypt(key, &self.shared_secret)
+    }
+    pub fn get_decrypted_verify_token(&self, key: &Rsa) -> io::Result<Vec<u8>> {
+        yggdrasil::rsa_decrypt(key, &self.verify_token)
     }
 }
 

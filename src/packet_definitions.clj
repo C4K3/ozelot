@@ -24,7 +24,7 @@
       :fields [{:name "name" :type "String" :getter "Get the player's claimed username"}]}
      {:name "EncryptionResponse"
       :id 1
-      :fields  [{:name "shared_secret" :type "Vec<u8>" :read "prefixed_bytearray" :getter "Get the (raw encrypted) shared secret"}; FIXME Implement functions for getting the unencrypted data
+      :fields  [{:name "shared_secret" :type "Vec<u8>" :read "prefixed_bytearray" :getter "Get the (raw encrypted) shared secret"}
                 {:name "verify_token" :type "Vec<u8>" :read "prefixed_bytearray" :getter "Get the (raw encrypted) verify token"}]}]
     "Play"
     [{:name "TeleportConfirm"
