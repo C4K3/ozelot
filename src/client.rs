@@ -1,9 +1,9 @@
 use clientbound::ClientboundPacket;
 use serverbound::ServerboundPacket;
 use connection::Connection;
-use {ClientState, serverbound, yggdrasil, PROTOCOL_VERSION};
+use {ClientState, PROTOCOL_VERSION, serverbound, yggdrasil};
 
-use std::{thread, time, io};
+use std::{io, thread, time};
 
 /// Represents a single client connection to a Server.
 pub struct Client {
@@ -17,10 +17,10 @@ impl Client {
     /// packets manually to authenticate and so on.
     pub fn connect_tcp(host: &str, port: u16) -> io::Result<Self> {
         Ok(Client {
-            conn: Connection::connect_tcp(host, port)?,
-            auto_handle: false,
-            hide_handled: false,
-        })
+               conn: Connection::connect_tcp(host, port)?,
+               auto_handle: false,
+               hide_handled: false,
+           })
     }
 
     /// Attempt to connect to the server at the given host and port,
@@ -42,46 +42,46 @@ impl Client {
     ///
     /// This function will time out after 30 seconds (theoretical absolute worst
     /// case 60 seconds.)
-    pub fn connect_unauthenticated(host: &str, port: u16, username: &str)
-        -> io::Result<Self> {
+    pub fn connect_unauthenticated(host: &str,
+                                   port: u16,
+                                   username: &str)
+                                   -> io::Result<Self> {
 
-            let timeout = time::Instant::now();
-            let mut client = Client::connect_tcp(host, port)?;
-            client.set_auto_handle(true);
-            client.set_hide_handled(true);
-            let handshake = serverbound::Handshake::new(PROTOCOL_VERSION,
-                                                        host.to_string(),
-                                                        port,
-                                                        2);
-            let loginstart = serverbound::LoginStart::new(username.to_string());
-            client.send(handshake)?;
-            client.set_clientstate(ClientState::Login);
-            client.send(loginstart)?;
+        let timeout = time::Instant::now();
+        let mut client = Client::connect_tcp(host, port)?;
+        client.set_auto_handle(true);
+        client.set_hide_handled(true);
+        let handshake = serverbound::Handshake::new(PROTOCOL_VERSION,
+                                                    host.to_string(),
+                                                    port,
+                                                    2);
+        let loginstart = serverbound::LoginStart::new(username.to_string());
+        client.send(handshake)?;
+        client.set_clientstate(ClientState::Login);
+        client.send(loginstart)?;
 
-            /* Now we wait for the PlayerAbilities packet from the server */
-            'wait: loop {
-                if timeout.elapsed() > time::Duration::new(30, 0) {
-                    return io_error!(
-                        "Timed out waiting for LoginSuccess/EncryptionRequest");
-                }
-                client.update_inbuf()?;
-                match client.read_packet()? {
-                    Some(ClientboundPacket::LoginDisconnect(ref p)) => {
-                        return io_error!("Got LoginDisconnect, reason: {}",
-                                         p.get_raw_chat());
-                    },
-                    Some(ClientboundPacket::PlayerAbilities(..)) => break 'wait,
-                    Some(ClientboundPacket::EncryptionRequest(..)) => {
-                        return io_error!(
-                            "connect_unauthenticated got EncryptionRequest");
-                    },
-                    Some(_) => (),
-                    None => thread::sleep(time::Duration::from_millis(10)),
-                }
+        /* Now we wait for the PlayerAbilities packet from the server */
+        'wait: loop {
+            if timeout.elapsed() > time::Duration::new(30, 0) {
+                return io_error!("Timed out waiting for LoginSuccess/EncryptionRequest");
             }
-
-            Ok(client)
+            client.update_inbuf()?;
+            match client.read_packet()? {
+                Some(ClientboundPacket::LoginDisconnect(ref p)) => {
+                    return io_error!("Got LoginDisconnect, reason: {}",
+                                     p.get_raw_chat());
+                },
+                Some(ClientboundPacket::PlayerAbilities(..)) => break 'wait,
+                Some(ClientboundPacket::EncryptionRequest(..)) => {
+                    return io_error!("connect_unauthenticated got EncryptionRequest");
+                },
+                Some(_) => (),
+                None => thread::sleep(time::Duration::from_millis(10)),
+            }
         }
+
+        Ok(client)
+    }
 
     /// Authenticate with Mojang, and then connect to the server at the
     /// given host and port. In most cases this is what you will want to use
@@ -106,25 +106,25 @@ impl Client {
     ///
     /// ```rust,no_run
     /// use ozelot::{yggdrasil, Client};
-    /// let (access_token, _, username, uuid) = yggdrasil::authenticate("my_email@example.com",
-    ///                                                  "my_password").unwrap();
-    /// let mut client = Client::connect_authenticated("minecraft.example.com", 25565, &access_token, &username, &uuid).unwrap();
+    /// let (access_token, _, username, uuid) = yggdrasil::authenticate("my_email@example.com", "my_password").unwrap();
+    /// let mut client = Client::connect_authenticated("minecraft.example.com",
+    /// 25565, &access_token, &username, &uuid).unwrap();
     /// ```
     pub fn connect_authenticated(host: &str,
                                  port: u16,
                                  access_token: &str,
                                  username: &str,
-                                 uuid: &str) -> io::Result<Self> {
+                                 uuid: &str)
+                                 -> io::Result<Self> {
 
         let timeout = time::Instant::now();
         let mut client = Client::connect_tcp(host, port)?;
         client.set_auto_handle(true);
         client.set_hide_handled(true);
-        let handshake = serverbound::Handshake::new(
-            PROTOCOL_VERSION,
-            host.to_string(),
-            port,
-            2);
+        let handshake = serverbound::Handshake::new(PROTOCOL_VERSION,
+                                                    host.to_string(),
+                                                    port,
+                                                    2);
         let loginstart = serverbound::LoginStart::new(username.to_string());
         client.send(handshake)?;
         client.set_clientstate(ClientState::Login);
@@ -133,8 +133,7 @@ impl Client {
         /* Here we wait for a LoginSuccess/EncryptionRequest packet */
         'wait: loop {
             if timeout.elapsed() > time::Duration::new(30, 0) {
-                return io_error!(
-                    "Timed out waiting for LoginSuccess/EncryptionRequest");
+                return io_error!("Timed out waiting for LoginSuccess/EncryptionRequest");
             }
             client.update_inbuf()?;
             match client.read_packet()? {
@@ -142,37 +141,35 @@ impl Client {
                     return io_error!("Got LoginDisconnect, reason: {}",
                                      p.get_raw_chat());
                 },
-                Some(ClientboundPacket::LoginSuccess(..)) =>
-                    return io_error!("Logged in unauthenticated"),
-                    Some(ClientboundPacket::EncryptionRequest(ref p)) => {
-                        let shared_secret = yggdrasil::create_shared_secret();
+                Some(ClientboundPacket::LoginSuccess(..)) => return io_error!("Logged in unauthenticated"),
+                Some(ClientboundPacket::EncryptionRequest(ref p)) => {
+                    let shared_secret = yggdrasil::create_shared_secret();
 
-                        yggdrasil::session_join(&access_token,
-                                                &uuid,
-                                                p.get_server_id(),
-                                                &shared_secret,
-                                                p.get_public_key())?;
+                    yggdrasil::session_join(&access_token,
+                                            &uuid,
+                                            p.get_server_id(),
+                                            &shared_secret,
+                                            p.get_public_key())?;
 
-                        let encryptionresponse
+                    let encryptionresponse
                             = serverbound::EncryptionResponse::new_unencrypted(
                                 &p.get_public_key(),
                                 &shared_secret,
                                 &p.get_verify_token())?;
-                        client.send(encryptionresponse)?;
-                        client.enable_encryption(&shared_secret);
+                    client.send(encryptionresponse)?;
+                    client.enable_encryption(&shared_secret);
 
-                        break 'wait;
-                    },
-                    Some(_) => (),
-                    None => thread::sleep(time::Duration::from_millis(10)),
+                    break 'wait;
+                },
+                Some(_) => (),
+                None => thread::sleep(time::Duration::from_millis(10)),
             }
         }
 
         /* Now we wait for the PlayerAbilities packet from the server */
         'wait2: loop {
             if timeout.elapsed() > time::Duration::new(30, 0) {
-                return io_error!(
-                    "Timed out waiting for PlayerAbilities packet");
+                return io_error!("Timed out waiting for PlayerAbilities packet");
             }
             client.update_inbuf()?;
             match client.read_packet()? {
@@ -232,7 +229,7 @@ impl Client {
     /// SetCompression packets. Most clients won't need to manually deal with
     /// these.
     pub fn set_auto_handle(&mut self, new: bool) {
-        self.auto_handle= new;
+        self.auto_handle = new;
     }
 
     /// Whether or not to hide packets that have been handled by ozelot from the
@@ -311,6 +308,4 @@ impl Client {
 
         Ok(packet)
     }
-
 }
-

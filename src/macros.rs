@@ -7,4 +7,3 @@ macro_rules! io_error {
                                   format!($fmtstr, $( $args ),* )));
     };
 }
-

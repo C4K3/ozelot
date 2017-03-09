@@ -10,7 +10,7 @@ use std::io;
 
 use openssl::hash::{self, MessageDigest};
 use openssl::rand;
-use openssl::rsa::{Rsa, PKCS1_PADDING, Padding};
+use openssl::rsa::{PKCS1_PADDING, Padding, Rsa};
 
 use reqwest::Client;
 use reqwest::header::ContentType;
@@ -38,14 +38,16 @@ pub fn create_shared_secret() -> [u8; 16] {
 /// Conduct yggdrasil authentication with Mojang, if successful returns
 /// (accessToken, clientToken, username, uuid)
 #[allow(non_snake_case)]
-pub fn authenticate(login: &str, password: &str)
-    -> io::Result<(String, String, String, String)> {
+pub fn authenticate(login: &str,
+                    password: &str)
+                    -> io::Result<(String, String, String, String)> {
 
-        let client = Client::new().expect("Error creating reqwest client");
-        let payload = format!("{{\"agent\":{{\"name\":\"Minecraft\",\"version\":1}},\
+    let client = Client::new().expect("Error creating reqwest client");
+    let payload = format!("{{\"agent\":{{\"name\":\"Minecraft\",\"version\":1}},\
     \"username\":\"{}\",\
     \"password\":\"{}\"}}",
-    login, password);
+                          login,
+                          password);
     let res = client.post("https://authserver.mojang.com/authenticate")
         .header(ContentType::json())
         .body(payload)
@@ -53,13 +55,14 @@ pub fn authenticate(login: &str, password: &str)
 
     let mut res = match res {
         Ok(x) => x,
-        Err(e) => return io_error!(
-            "Got yggdrasil::authenticate error sending http request, {:?}", e),
+        Err(e) => {
+            return io_error!("Got yggdrasil::authenticate error sending http request, {:?}",
+                             e)
+        },
     };
 
     if !res.status().is_success() {
-        return io_error!(
-            "yggdrasil::authenticate got non-200 response for server, likely wrong username/password");
+        return io_error!("yggdrasil::authenticate got non-200 response for server, likely wrong username/password");
     }
 
     let mut tmp = String::new();
@@ -70,28 +73,23 @@ pub fn authenticate(login: &str, password: &str)
     };
     let accessToken = match data.find("accessToken") {
         Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!(
-            "client::authenticate did not contain accessToken"),
+        _ => return io_error!("client::authenticate did not contain accessToken"),
     };
     let clientToken = match data.find("accessToken") {
         Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!(
-            "client::authenticate did not contain clientToken"),
+        _ => return io_error!("client::authenticate did not contain clientToken"),
     };
     let data = match data.find("selectedProfile") {
         Some(x) => x,
-        None => return io_error!(
-            "client::authenticate did not contain selectedProfile"),
+        None => return io_error!("client::authenticate did not contain selectedProfile"),
     };
     let uuid = match data.find("id") {
         Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!(
-            "client::authenticate did not contain uuid"),
+        _ => return io_error!("client::authenticate did not contain uuid"),
     };
     let username = match data.find("name") {
         Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!(
-            "client::authenticate did not contain name"),
+        _ => return io_error!("client::authenticate did not contain name"),
     };
     Ok((accessToken, clientToken, username, uuid))
 }
@@ -99,11 +97,11 @@ pub fn authenticate(login: &str, password: &str)
 /// Post the join to Mojang, must be done immediately before sending
 /// the EncryptionResponse. This does not receive a response.
 pub fn session_join(access_token: &str,
-                 uuid: &str,
-                 server_id: &str,
-                 shared_secret: &[u8],
-                 server_public_key: &[u8])
-    -> io::Result<()> {
+                    uuid: &str,
+                    server_id: &str,
+                    shared_secret: &[u8],
+                    server_public_key: &[u8])
+                    -> io::Result<()> {
 
     let client = Client::new().expect("Error creating reqwest client");
     let hash = post_sha1(server_id, shared_secret, server_public_key);
@@ -112,21 +110,21 @@ pub fn session_join(access_token: &str,
                           uuid,
                           hash);
 
-    let res = client.post(
-        "https://sessionserver.mojang.com/session/minecraft/join")
+    let res = client.post("https://sessionserver.mojang.com/session/minecraft/join")
         .header(ContentType::json())
         .body(payload)
         .send();
 
     let res = match res {
         Ok(x) => x,
-        Err(e) => return io_error!(
-            "Got yggdrasil::session_join error sending http request, {:?}", e),
+        Err(e) => {
+            return io_error!("Got yggdrasil::session_join error sending http request, {:?}",
+                             e)
+        },
     };
 
     if !res.status().is_success() {
-        return io_error!(
-            "yggdrasil::session_join got non-200 response for server");
+        return io_error!("yggdrasil::session_join got non-200 response for server");
     }
     Ok(())
 }
@@ -158,8 +156,10 @@ pub fn rsa_key_binary(key: &Rsa) -> Vec<u8> {
 pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> io::Result<Vec<u8>> {
     let key = match Rsa::public_key_from_der(pubkey) {
         Ok(x) => x,
-        Err(e) => return io_error!(
-            "rsa_encrypt: Got error trying to read public key: {:?}", e),
+        Err(e) => {
+            return io_error!("rsa_encrypt: Got error trying to read public key: {:?}",
+                             e)
+        },
     };
 
     let mut ret = vec![0; 128];
@@ -177,7 +177,8 @@ pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> io::Result<Vec<u8>> {
 /// decrypted must be able to fit within 128 bytes.
 pub fn rsa_decrypt(key: &Rsa, data: &[u8]) -> io::Result<Vec<u8>> {
     if data.len() != 128 {
-        return io_error!("yggdrasil::rsa_decrypt passed data was {}, not 16 bytes long", data.len());
+        return io_error!("yggdrasil::rsa_decrypt passed data was {}, not 16 bytes long",
+                         data.len());
     }
 
     let mut ret = vec![0; 128];
@@ -193,8 +194,10 @@ pub fn rsa_decrypt(key: &Rsa, data: &[u8]) -> io::Result<Vec<u8>> {
 
 /// Given the server_id, shared_secret and server's public key, calculate the
 /// sha1 that is to be used for posting to Mojang
-fn post_sha1(server_id: &str, shared_secret: &[u8], server_public_key: &[u8])
-    -> String {
+fn post_sha1(server_id: &str,
+             shared_secret: &[u8],
+             server_public_key: &[u8])
+             -> String {
 
     let mut tmp = server_id.as_bytes().to_vec();
     tmp.extend(shared_secret);
@@ -204,8 +207,8 @@ fn post_sha1(server_id: &str, shared_secret: &[u8], server_public_key: &[u8])
 
 /// Calculate a Minecraft-style sha1
 fn sha1(data: &[u8]) -> String {
-    let mut digest = hash::hash(MessageDigest::sha1(), data)
-        .expect("yggdrasil::sha1 error");
+    let mut digest =
+        hash::hash(MessageDigest::sha1(), data).expect("yggdrasil::sha1 error");
 
     let mut tmp = String::new();
     let mut negative = false;
@@ -240,7 +243,7 @@ fn sha1(data: &[u8]) -> String {
         }
     }
 
-    /* Now we copy the string a last time, to remove leading zeros and add the
+    /* Now we copy the string a last time, to remove leading zeros and add
      * the leading minus if applicable */
     let mut ret = String::new();
     if negative {
@@ -278,8 +281,52 @@ mod test {
         use std::ops::Deref;
         /* Don't worry, the data and key here were generated specifically for
          * this test */
-        let random_data = [0xd7, 0x0f, 0xe4, 0xdb, 0xbf, 0x8b, 0xca, 0x98, 0x03, 0xf1, 0x5a, 0x5e, 0x19, 0x1b, 0x9c, 0xfe];
-        let key = [48, 130, 2, 93, 2, 1, 0, 2, 129, 129, 0, 165, 142, 222, 16, 232, 164, 176, 243, 229, 48, 68, 247, 171, 149, 34, 247, 217, 61, 36, 28, 168, 234, 195, 78, 187, 143, 161, 154, 174, 59, 132, 34, 123, 186, 68, 66, 218, 181, 131, 20, 240, 218, 116, 19, 236, 144, 131, 145, 125, 206, 197, 61, 50, 61, 173, 92, 186, 206, 96, 102, 89, 143, 15, 20, 116, 105, 29, 15, 93, 5, 68, 181, 106, 122, 39, 86, 166, 174, 113, 21, 95, 195, 103, 236, 31, 67, 51, 74, 17, 91, 234, 150, 253, 155, 7, 26, 7, 162, 206, 12, 77, 28, 82, 80, 44, 197, 145, 13, 90, 71, 233, 29, 28, 68, 101, 194, 95, 108, 9, 221, 160, 158, 120, 32, 234, 81, 57, 185, 2, 3, 1, 0, 1, 2, 129, 129, 0, 134, 165, 46, 205, 169, 167, 103, 146, 180, 47, 17, 168, 44, 15, 218, 164, 160, 53, 45, 141, 113, 131, 156, 220, 7, 134, 196, 243, 188, 8, 3, 106, 216, 29, 161, 46, 142, 25, 89, 70, 74, 172, 32, 3, 164, 61, 212, 3, 27, 194, 114, 127, 86, 192, 250, 161, 147, 252, 12, 66, 177, 75, 188, 2, 163, 167, 51, 11, 237, 143, 223, 246, 227, 248, 244, 35, 11, 252, 193, 223, 43, 142, 102, 232, 74, 111, 244, 13, 171, 30, 19, 106, 105, 47, 224, 213, 173, 188, 107, 79, 73, 99, 220, 159, 185, 185, 125, 97, 216, 183, 64, 146, 240, 231, 85, 197, 41, 81, 164, 158, 33, 170, 54, 17, 69, 179, 38, 1, 2, 65, 0, 213, 65, 118, 227, 240, 116, 200, 65, 30, 238, 176, 145, 174, 66, 78, 91, 70, 204, 29, 135, 199, 14, 224, 225, 236, 148, 235, 81, 28, 35, 44, 138, 146, 246, 216, 123, 214, 73, 56, 129, 213, 130, 131, 225, 1, 166, 95, 69, 194, 2, 250, 109, 175, 80, 137, 161, 21, 229, 233, 83, 189, 130, 67, 113, 2, 65, 0, 198, 189, 243, 108, 224, 96, 21, 114, 7, 68, 28, 42, 99, 214, 114, 43, 63, 215, 241, 168, 113, 212, 255, 201, 146, 93, 37, 99, 35, 66, 32, 148, 166, 92, 244, 86, 14, 105, 84, 59, 81, 190, 3, 57, 127, 17, 167, 77, 73, 184, 231, 180, 251, 157, 201, 150, 201, 247, 24, 28, 182, 191, 166, 201, 2, 65, 0, 158, 189, 23, 17, 126, 184, 127, 35, 178, 49, 188, 47, 4, 134, 136, 170, 250, 221, 15, 18, 53, 131, 6, 180, 69, 21, 104, 192, 60, 112, 150, 68, 36, 55, 40, 87, 173, 223, 92, 247, 144, 5, 145, 195, 24, 38, 78, 126, 175, 118, 230, 16, 101, 82, 78, 208, 32, 107, 190, 45, 190, 63, 203, 145, 2, 64, 67, 160, 6, 224, 153, 72, 152, 131, 128, 109, 112, 152, 11, 248, 192, 72, 111, 36, 239, 153, 189, 130, 24, 183, 98, 18, 71, 210, 128, 0, 212, 77, 64, 126, 136, 181, 111, 153, 239, 139, 111, 185, 20, 39, 208, 81, 21, 120, 123, 9, 107, 238, 109, 95, 183, 100, 147, 188, 124, 123, 232, 195, 53, 225, 2, 64, 56, 181, 224, 132, 112, 99, 183, 125, 253, 25, 5, 145, 81, 200, 103, 12, 131, 16, 199, 182, 63, 7, 54, 35, 71, 240, 64, 15, 153, 1, 137, 114, 102, 203, 151, 8, 211, 57, 198, 209, 93, 106, 31, 219, 216, 77, 2, 17, 220, 117, 173, 70, 56, 86, 160, 240, 131, 39, 20, 122, 81, 79, 140, 104];
+        let random_data = [0xd7, 0x0f, 0xe4, 0xdb, 0xbf, 0x8b, 0xca, 0x98,
+                           0x03, 0xf1, 0x5a, 0x5e, 0x19, 0x1b, 0x9c, 0xfe];
+        let key =
+            [48, 130, 2, 93, 2, 1, 0, 2, 129, 129, 0, 165, 142, 222, 16, 232,
+             164, 176, 243, 229, 48, 68, 247, 171, 149, 34, 247, 217, 61, 36,
+             28, 168, 234, 195, 78, 187, 143, 161, 154, 174, 59, 132, 34, 123,
+             186, 68, 66, 218, 181, 131, 20, 240, 218, 116, 19, 236, 144, 131,
+             145, 125, 206, 197, 61, 50, 61, 173, 92, 186, 206, 96, 102, 89,
+             143, 15, 20, 116, 105, 29, 15, 93, 5, 68, 181, 106, 122, 39, 86,
+             166, 174, 113, 21, 95, 195, 103, 236, 31, 67, 51, 74, 17, 91,
+             234, 150, 253, 155, 7, 26, 7, 162, 206, 12, 77, 28, 82, 80, 44,
+             197, 145, 13, 90, 71, 233, 29, 28, 68, 101, 194, 95, 108, 9, 221,
+             160, 158, 120, 32, 234, 81, 57, 185, 2, 3, 1, 0, 1, 2, 129, 129,
+             0, 134, 165, 46, 205, 169, 167, 103, 146, 180, 47, 17, 168, 44,
+             15, 218, 164, 160, 53, 45, 141, 113, 131, 156, 220, 7, 134, 196,
+             243, 188, 8, 3, 106, 216, 29, 161, 46, 142, 25, 89, 70, 74, 172,
+             32, 3, 164, 61, 212, 3, 27, 194, 114, 127, 86, 192, 250, 161,
+             147, 252, 12, 66, 177, 75, 188, 2, 163, 167, 51, 11, 237, 143,
+             223, 246, 227, 248, 244, 35, 11, 252, 193, 223, 43, 142, 102,
+             232, 74, 111, 244, 13, 171, 30, 19, 106, 105, 47, 224, 213, 173,
+             188, 107, 79, 73, 99, 220, 159, 185, 185, 125, 97, 216, 183, 64,
+             146, 240, 231, 85, 197, 41, 81, 164, 158, 33, 170, 54, 17, 69,
+             179, 38, 1, 2, 65, 0, 213, 65, 118, 227, 240, 116, 200, 65, 30,
+             238, 176, 145, 174, 66, 78, 91, 70, 204, 29, 135, 199, 14, 224,
+             225, 236, 148, 235, 81, 28, 35, 44, 138, 146, 246, 216, 123, 214,
+             73, 56, 129, 213, 130, 131, 225, 1, 166, 95, 69, 194, 2, 250,
+             109, 175, 80, 137, 161, 21, 229, 233, 83, 189, 130, 67, 113, 2,
+             65, 0, 198, 189, 243, 108, 224, 96, 21, 114, 7, 68, 28, 42, 99,
+             214, 114, 43, 63, 215, 241, 168, 113, 212, 255, 201, 146, 93, 37,
+             99, 35, 66, 32, 148, 166, 92, 244, 86, 14, 105, 84, 59, 81, 190,
+             3, 57, 127, 17, 167, 77, 73, 184, 231, 180, 251, 157, 201, 150,
+             201, 247, 24, 28, 182, 191, 166, 201, 2, 65, 0, 158, 189, 23, 17,
+             126, 184, 127, 35, 178, 49, 188, 47, 4, 134, 136, 170, 250, 221,
+             15, 18, 53, 131, 6, 180, 69, 21, 104, 192, 60, 112, 150, 68, 36,
+             55, 40, 87, 173, 223, 92, 247, 144, 5, 145, 195, 24, 38, 78, 126,
+             175, 118, 230, 16, 101, 82, 78, 208, 32, 107, 190, 45, 190, 63,
+             203, 145, 2, 64, 67, 160, 6, 224, 153, 72, 152, 131, 128, 109,
+             112, 152, 11, 248, 192, 72, 111, 36, 239, 153, 189, 130, 24, 183,
+             98, 18, 71, 210, 128, 0, 212, 77, 64, 126, 136, 181, 111, 153,
+             239, 139, 111, 185, 20, 39, 208, 81, 21, 120, 123, 9, 107, 238,
+             109, 95, 183, 100, 147, 188, 124, 123, 232, 195, 53, 225, 2, 64,
+             56, 181, 224, 132, 112, 99, 183, 125, 253, 25, 5, 145, 81, 200,
+             103, 12, 131, 16, 199, 182, 63, 7, 54, 35, 71, 240, 64, 15, 153,
+             1, 137, 114, 102, 203, 151, 8, 211, 57, 198, 209, 93, 106, 31,
+             219, 216, 77, 2, 17, 220, 117, 173, 70, 56, 86, 160, 240, 131,
+             39, 20, 122, 81, 79, 140, 104];
         let key = Rsa::private_key_from_der(&key).unwrap();
         let pubkey = super::rsa_key_binary(&key);
         let encrypted = super::rsa_encrypt(&pubkey, &random_data).unwrap();
@@ -287,4 +334,3 @@ mod test {
         assert_eq!(&random_data, &decrypted.deref());
     }
 }
-

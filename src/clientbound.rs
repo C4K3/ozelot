@@ -41,8 +41,8 @@ impl Statistics {
             tmp.insert(read_String(r)?, read_varint(r)?);
         }
         Ok(ClientboundPacket::Statistics(Statistics {
-            values: tmp,
-        }))
+                                             values: tmp,
+                                         }))
     }
 }
 
@@ -63,8 +63,8 @@ impl ClientboundTabComplete {
             tmp.push(read_String(r)?);
         }
         Ok(ClientboundPacket::ClientboundTabComplete(ClientboundTabComplete {
-            matches: tmp,
-        }))
+                                                         matches: tmp,
+                                                     }))
     }
 }
 
@@ -87,7 +87,8 @@ impl MultiBlockChange {
         let chunk_x = read_i32(r)?;
         let chunk_z = read_i32(r)?;
         let count = read_varint(r)?;
-        let mut tmp: Vec<(u8, u8, u8, i32)> = Vec::with_capacity(count as usize);
+        let mut tmp: Vec<(u8, u8, u8, i32)> = Vec::with_capacity(count as
+                                                                 usize);
         for _ in 0..count {
             let hori_pos = read_u8(r)?;
             let y = read_u8(r)?;
@@ -97,10 +98,10 @@ impl MultiBlockChange {
             tmp.push((x, y, z, block_state));
         }
         Ok(ClientboundPacket::MultiBlockChange(MultiBlockChange {
-            chunk_x: chunk_x,
-            chunk_z: chunk_z,
-            changes: tmp,
-        }))
+                                                   chunk_x: chunk_x,
+                                                   chunk_z: chunk_z,
+                                                   changes: tmp,
+                                               }))
     }
 }
 
@@ -128,12 +129,12 @@ impl OpenWindow {
         };
 
         Ok(ClientboundPacket::OpenWindow(OpenWindow {
-            window_id: window_id,
-            window_type: window_type,
-            window_title: window_title,
-            number_of_slots: number_of_slots,
-            entity_id: entity_id,
-        }))
+                                             window_id: window_id,
+                                             window_type: window_type,
+                                             window_title: window_title,
+                                             number_of_slots: number_of_slots,
+                                             entity_id: entity_id,
+                                         }))
     }
 }
 
@@ -170,15 +171,15 @@ impl Explosion {
         let motion_y = read_f32(r)?;
         let motion_z = read_f32(r)?;
         Ok(ClientboundPacket::Explosion(Explosion {
-            x: x,
-            y: y,
-            z: z,
-            radius: radius,
-            affected_blocks: tmp,
-            motion_x: motion_x,
-            motion_y: motion_y,
-            motion_z: motion_z,
-        }))
+                                            x: x,
+                                            y: y,
+                                            z: z,
+                                            radius: radius,
+                                            affected_blocks: tmp,
+                                            motion_x: motion_x,
+                                            motion_y: motion_y,
+                                            motion_z: motion_z,
+                                        }))
     }
 }
 
@@ -224,19 +225,19 @@ impl Particle {
             _ => None,
         };
         Ok(ClientboundPacket::Particle(Particle {
-            particle_id: particle_id,
-            use_long_distance: long_distance,
-            x: x,
-            y: y,
-            z: z,
-            offset_x: offset_x,
-            offset_y: offset_y,
-            offset_z: offset_z,
-            particle_data: particle_data,
-            count: count,
-            id: id,
-            crack_data: crack_data,
-        }))
+                                           particle_id: particle_id,
+                                           use_long_distance: long_distance,
+                                           x: x,
+                                           y: y,
+                                           z: z,
+                                           offset_x: offset_x,
+                                           offset_y: offset_y,
+                                           offset_z: offset_z,
+                                           particle_data: particle_data,
+                                           count: count,
+                                           id: id,
+                                           crack_data: crack_data,
+                                       }))
     }
 }
 
@@ -263,17 +264,18 @@ impl CombatEvent {
             1 => (Some(read_varint(r)?), Some(read_i32(r)?), None),
             2 => {
                 (Some(read_varint(r)?),
-                Some(read_i32(r)?),
-                Some(read_String(r)?))
+                 Some(read_i32(r)?),
+                 Some(read_String(r)?))
             },
             _ => return io_error!("Invalid event in CombatEvent"),
         };
         Ok(ClientboundPacket::CombatEvent(CombatEvent {
-            event: event,
-            duration_playerid: duration_playerid,
-            entity_id: entity_id,
-            message: message,
-        }))
+                                              event: event,
+                                              duration_playerid:
+                                                  duration_playerid,
+                                              entity_id: entity_id,
+                                              message: message,
+                                          }))
     }
 }
 
@@ -299,11 +301,12 @@ impl ScoreboardObjective {
             _ => (None, None),
         };
         Ok(ClientboundPacket::ScoreboardObjective(ScoreboardObjective {
-            name: name,
-            mode: mode,
-            value: value,
-            objective_type: objective_type,
-        }))
+                                                      name: name,
+                                                      mode: mode,
+                                                      value: value,
+                                                      objective_type:
+                                                          objective_type,
+                                                  }))
     }
 }
 
@@ -328,11 +331,11 @@ impl UpdateScore {
             _ => None,
         };
         Ok(ClientboundPacket::UpdateScore(UpdateScore {
-            name: name,
-            action: action,
-            objective_name: objective_name,
-            value: value,
-        }))
+                                              name: name,
+                                              action: action,
+                                              objective_name: objective_name,
+                                              value: value,
+                                          }))
     }
 }
 
@@ -361,10 +364,10 @@ impl Title {
             _ => None,
         };
         Ok(ClientboundPacket::Title(Title {
-            action: action,
-            text: text,
-            times: times,
-        }))
+                                        action: action,
+                                        text: text,
+                                        times: times,
+                                    }))
     }
 }
 
@@ -386,4 +389,3 @@ impl PlayerAbilities {
         (self.flags & 0x08) != 0
     }
 }
-

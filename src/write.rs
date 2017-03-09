@@ -4,14 +4,14 @@ use u128;
 use std::io;
 use std::io::Write;
 
-use byteorder::{WriteBytesExt, BigEndian};
+use byteorder::{BigEndian, WriteBytesExt};
 
 /* While many of the functions here may seem redundant, keeping them is
  * convenient and consistent. */
 
 /// Write a boolean to the Writer
 pub fn write_bool<W: Write>(val: &bool, writer: &mut W) -> io::Result<()> {
-    if *val{
+    if *val {
         writer.write_all(&[1])
     } else {
         writer.write_all(&[0])
@@ -24,7 +24,7 @@ pub fn write_u8<W: Write>(val: &u8, writer: &mut W) -> io::Result<()> {
 }
 
 /// Write a single i8 to the Writer
-pub fn write_i8<W: Write>(val :&i8, writer: &mut W) -> io::Result<()> {
+pub fn write_i8<W: Write>(val: &i8, writer: &mut W) -> io::Result<()> {
     writer.write_i8(*val)
 }
 
@@ -105,21 +105,23 @@ pub fn write_String<W: Write>(val: &str, writer: &mut W) -> io::Result<()> {
     let string = val.as_bytes();
     let length = val.len() as i32;
 
-    try!(write_varint(&length, writer));
+    write_varint(&length, writer)?;
 
     writer.write_all(string)
 }
 
 /// Write a length-prefixed bytearray, where the length is given as a varint
-pub fn write_prefixed_bytearray<W: Write>(val: &[u8], writer: &mut W)
--> io::Result<()> {
+pub fn write_prefixed_bytearray<W: Write>(val: &[u8],
+                                          writer: &mut W)
+                                          -> io::Result<()> {
     write_varint(&(val.len() as i32), writer)?;
     writer.write_all(val)
 }
 
 /// Write a length-prefixed varint array, where the length is a varint
-pub fn write_prefixed_varintarray<W: Write>(val: &[i32], writer: &mut W)
--> io::Result<()> {
+pub fn write_prefixed_varintarray<W: Write>(val: &[i32],
+                                            writer: &mut W)
+                                            -> io::Result<()> {
     write_varint(&(val.len() as i32), writer)?;
     for x in val {
         write_varint(x, writer)?;
@@ -128,14 +130,16 @@ pub fn write_prefixed_varintarray<W: Write>(val: &[i32], writer: &mut W)
 }
 
 /// Write a bytearray without any length prefix
-pub fn write_bytearray<W: Write>(val: &Vec<u8>, writer: &mut W)
--> io::Result<()> {
+pub fn write_bytearray<W: Write>(val: &Vec<u8>,
+                                 writer: &mut W)
+                                 -> io::Result<()> {
     writer.write_all(val)
 }
 
 /// Alias for write_bytearray
-pub fn write_bytearray_to_end<W: Write>(val: &Vec<u8>, writer: &mut W)
--> io::Result<()> {
+pub fn write_bytearray_to_end<W: Write>(val: &Vec<u8>,
+                                        writer: &mut W)
+                                        -> io::Result<()> {
     write_bytearray(val, writer)
 }
 
@@ -154,8 +158,9 @@ pub fn write_uuid_str<W: Write>(val: &u128, writer: &mut W) -> io::Result<()> {
 }
 
 /// Write a uuid (u128) in hexadecimal string format with dashes
-pub fn write_uuid_str_dashes<W: Write>(val: &u128, writer: &mut W)
--> io::Result<()> {
+pub fn write_uuid_str_dashes<W: Write>(val: &u128,
+                                       writer: &mut W)
+                                       -> io::Result<()> {
     let &u128(x, y) = val;
     /* A uuid in dashes is represented by 5 groups that are 8-4-4-4-12
      * hexadecimal digits each, meaning 32-16-16-16-48 bits each.
@@ -175,8 +180,9 @@ pub fn write_uuid_str_dashes<W: Write>(val: &u128, writer: &mut W)
 /// Panics if X, Y or Z is out of range. X and Z are given 26 bits, and Y is
 /// given 12 bits, if the given values are too big to be represented with that
 /// amount of memory, will panic.
-pub fn write_position<W: Write>(pos: &(i32, i32, i32), writer: &mut W)
--> io::Result<()> {
+pub fn write_position<W: Write>(pos: &(i32, i32, i32),
+                                writer: &mut W)
+                                -> io::Result<()> {
     let &(x, y, z) = pos;
     let x = if x >= 0 {
         x as u64
@@ -208,9 +214,6 @@ pub fn write_position<W: Write>(pos: &(i32, i32, i32), writer: &mut W)
         panic!("write_position: Z is out of range");
     }
 
-    let val = ((x & 0x3ffffff) << 38)
-        | ((y & 0xfff) << 26)
-        | (z & 0x3ffffff);
+    let val = ((x & 0x3ffffff) << 38) | ((y & 0xfff) << 26) | (z & 0x3ffffff);
     write_u64(&val, writer)
 }
-

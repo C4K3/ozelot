@@ -12,8 +12,8 @@ use rustc_serialize::json::Json;
 /// If the input is not valid json.
 pub fn chat_to_str(chat: &str) -> String {
     let mut ret = String::new();
-    let data = Json::from_str(chat)
-        .expect("Invalid json passed to chat_to_str");
+    let data =
+        Json::from_str(chat).expect("Invalid json passed to chat_to_str");
 
     chat_to_str_parse_json(&data, &mut ret);
 
@@ -33,7 +33,6 @@ fn chat_to_str_parse_json(json: &Json, ret: &mut String) {
             }
         },
         Some(ref x) => chat_to_str_parse_json(x, ret),
-        None => ()
+        None => (),
     }
 }
-

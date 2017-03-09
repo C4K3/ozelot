@@ -28,33 +28,35 @@ fn byteorder() {
     read_and_write!(-5, &[255, 251], read_i16, write_i16);
     read_and_write!(65535, &[255, 255], read_u16, write_u16);
     read_and_write!(-9, &[255, 255, 255, 247], read_i32, write_i32);
-    read_and_write!(-2, &[255, 255, 255, 255, 255, 255, 255, 254],
-                    read_i64, write_i64);
+    read_and_write!(-2,
+                    &[255, 255, 255, 255, 255, 255, 255, 254],
+                    read_i64,
+                    write_i64);
     read_and_write!(8898902191272547,
                     &[0x00, 0x1f, 0x9d, 0x81, 0x20, 0x00, 0x72, 0x63],
-                    read_u64, write_u64);
+                    read_u64,
+                    write_u64);
     read_and_write!(7546.57470703125,
                     &[0x45, 0xeb, 0xd4, 0x99],
-                    read_f32, write_f32);
+                    read_f32,
+                    write_f32);
     read_and_write!(7546.5746871564779212349094450473785400390625,
                     &[0x40, 0xbd, 0x7a, 0x93, 0x1e, 0xb2, 0x8e, 0x81],
-                    read_f64, write_f64);
+                    read_f64,
+                    write_f64);
 }
 
 #[test]
 fn string() {
     read_and_write!("ozelot".to_string(),
                     &[6, b'o', b'z', b'e', b'l', b'o', b't'],
-                    read_String, write_String);
+                    read_String,
+                    write_String);
     read_and_write!("オゼロット".to_string(),
-                   &[15,
-                   0xe3, 0x82, 0xaa,
-                   0xe3, 0x82, 0xbc,
-                   0xe3, 0x83, 0xad,
-                   0xe3, 0x83, 0x83,
-                   0xe3, 0x83, 0x88],
-                   read_String,
-                   write_String);
+                    &[15, 0xe3, 0x82, 0xaa, 0xe3, 0x82, 0xbc, 0xe3, 0x83,
+                      0xad, 0xe3, 0x83, 0x83, 0xe3, 0x83, 0x88],
+                    read_String,
+                    write_String);
 }
 
 #[test]
@@ -65,13 +67,16 @@ fn varint() {
 
 #[test]
 fn position() {
-    read_and_write!((0, 63, 0), &[0, 0, 0, 0, 0xfc, 0, 0, 0],
-                    read_position, write_position);
+    read_and_write!((0, 63, 0),
+                    &[0, 0, 0, 0, 0xfc, 0, 0, 0],
+                    read_position,
+                    write_position);
     read_and_write!((32374, 72, 29283),
                     &[0x00, 0x1f, 0x9d, 0x81, 0x20, 0x00, 0x72, 0x63],
-                    read_position, write_position);
+                    read_position,
+                    write_position);
     read_and_write!((-32374, -72, 29283),
                     &[0xff, 0xe0, 0x62, 0xbe, 0xe0, 0x00, 0x72, 0x63],
-                    read_position, write_position);
+                    read_position,
+                    write_position);
 }
-

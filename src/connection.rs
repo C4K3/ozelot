@@ -2,12 +2,12 @@ use ClientState;
 use read::read_varint;
 use write::write_varint;
 
-use std::io::{Write, Read, Cursor};
+use std::io::{Cursor, Read, Write};
 use std::marker::PhantomData;
 use std::net::Shutdown;
 use std::net::TcpStream;
 use std::ops::Deref;
-use std::{time, io};
+use std::{io, time};
 
 use netbuf::Buf;
 
@@ -18,8 +18,10 @@ use flate2;
 use openssl::symm;
 
 /// Trait for the two enums ClientboundPacket and ServerboundPacket
-pub trait Packet : Sized {
-    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> io::Result<Self>;
+pub trait Packet: Sized {
+    fn deserialize<R: Read>(r: &mut R,
+                            state: &ClientState)
+                            -> io::Result<Self>;
     fn get_packet_name(&self) -> &str;
     fn get_clientstate(&self) -> ClientState;
     fn get_id(&self) -> i32;
@@ -84,7 +86,8 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                  * to prefix the packet with length of the compressed data */
                 let mut output = Vec::new();
                 let mut compressor = Compress::new(::COMPRESSION_LEVEL, false);
-                match compressor.compress(&tmp, &mut output,
+                match compressor.compress(&tmp,
+                                          &mut output,
                                           flate2::Flush::Sync) {
                     flate2::Status::Ok => {
                         return io_error!("Got a Status::Ok when trying to compress outgoing packet");
@@ -109,15 +112,14 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             None => {
                 write_varint(&(uncompressed_length as i32), &mut out)?;
                 out.write_all(&tmp)?;
-            }
+            },
         }
 
         if let Some(ref mut enc) = self.out_encryption {
             let mut tmp = vec![0; out.len() + 16];
             let n = match enc.update(&out, &mut tmp) {
                 Ok(x) => x,
-                Err(_) => return io_error!(
-                    "client::send error writing encrypted data"),
+                Err(_) => return io_error!("client::send error writing encrypted data"),
             };
             self.stream.write_all(&tmp[..n])?;
         } else {
@@ -145,18 +147,18 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// It is an error to enable encryption if encryption has already been
     /// enabled.
     pub fn enable_encryption(&mut self, key: &[u8; 16]) {
-        let out_cipher = symm::Crypter::new(
-            symm::Cipher::aes_128_cfb8(),
-            symm::Mode::Encrypt,
-            key,
-            Some(key))
-            .expect("client::enable_encryption error creating cipher");
-        let in_cipher = symm::Crypter::new(
-            symm::Cipher::aes_128_cfb8(),
-            symm::Mode::Decrypt,
-            key,
-            Some(key))
-            .expect("client::enable_encryption error creating cipher");
+        let out_cipher =
+            symm::Crypter::new(symm::Cipher::aes_128_cfb8(),
+                               symm::Mode::Encrypt,
+                               key,
+                               Some(key))
+                    .expect("client::enable_encryption error creating cipher");
+        let in_cipher =
+            symm::Crypter::new(symm::Cipher::aes_128_cfb8(),
+                               symm::Mode::Decrypt,
+                               key,
+                               Some(key))
+                    .expect("client::enable_encryption error creating cipher");
 
         self.out_encryption = Some(out_cipher);
         self.in_encryption = Some(in_cipher);
@@ -183,8 +185,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             let mut tmp = vec![0; n + 16];
             let n = match enc.update(&enc_buf[..], &mut tmp) {
                 Ok(x) => x,
-                Err(_) => return io_error!(
-                    "connection::update_inbuf error reading encrypted data"),
+                Err(_) => return io_error!("connection::update_inbuf error reading encrypted data"),
             };
             self.buf.extend(&tmp[..n]);
         } else {
@@ -249,9 +250,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                         I::deserialize(&mut r, &self.clientstate)?
                     }
                 },
-                None => {
-                    I::deserialize(&mut r, &self.clientstate)?
-                },
+                None => I::deserialize(&mut r, &self.clientstate)?,
             }
         };
 
@@ -304,6 +303,4 @@ impl<I: Packet, O: Packet> Connection<I, O> {
         self.buf.consume(i + 1);
         Ok(())
     }
-
 }
-

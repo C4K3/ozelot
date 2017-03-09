@@ -32,7 +32,9 @@ impl Handshake {
 }
 
 impl EncryptionResponse {
-    pub fn get_decrypted_shared_secret(&self, key: &Rsa) -> io::Result<Vec<u8>> {
+    pub fn get_decrypted_shared_secret(&self,
+                                       key: &Rsa)
+                                       -> io::Result<Vec<u8>> {
         yggdrasil::rsa_decrypt(key, &self.shared_secret)
     }
     pub fn get_decrypted_verify_token(&self, key: &Rsa) -> io::Result<Vec<u8>> {
@@ -47,7 +49,7 @@ impl StatusRequest {
         Ok(ret)
     }
     fn deserialize<R: Read>(_: &mut R) -> io::Result<ServerboundPacket> {
-        Ok(ServerboundPacket::StatusRequest(StatusRequest { }))
+        Ok(ServerboundPacket::StatusRequest(StatusRequest {}))
     }
 }
 
@@ -79,10 +81,10 @@ impl TabComplete {
         };
 
         Ok(ServerboundPacket::TabComplete(TabComplete {
-            text: text,
-            assume_command: assume_command,
-            looked_at_block: looked_at_block,
-        }))
+                                              text: text,
+                                              assume_command: assume_command,
+                                              looked_at_block: looked_at_block,
+                                          }))
     }
 }
 
@@ -134,11 +136,11 @@ impl UseEntity {
             None
         };
         Ok(ServerboundPacket::UseEntity(UseEntity {
-            target: target,
-            action: action,
-            location: location,
-            hand: hand,
-        }))
+                                            target: target,
+                                            action: action,
+                                            location: location,
+                                            hand: hand,
+                                        }))
     }
 }
 
@@ -148,11 +150,10 @@ impl EncryptionResponse {
     pub fn new_unencrypted(key: &[u8],
                            shared_secret: &[u8],
                            verify_token: &[u8])
-        -> io::Result<ServerboundPacket> {
-            let ss_encrypted = yggdrasil::rsa_encrypt(key, shared_secret)?;
-            let verify_encrypted = yggdrasil::rsa_encrypt(key, verify_token)?;
+                           -> io::Result<ServerboundPacket> {
+        let ss_encrypted = yggdrasil::rsa_encrypt(key, shared_secret)?;
+        let verify_encrypted = yggdrasil::rsa_encrypt(key, verify_token)?;
 
-            Ok(EncryptionResponse::new(ss_encrypted, verify_encrypted))
-        }
+        Ok(EncryptionResponse::new(ss_encrypted, verify_encrypted))
+    }
 }
-

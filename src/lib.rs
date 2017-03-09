@@ -37,11 +37,13 @@
 //! use ozelot::{yggdrasil, Client, serverbound, utils};
 //! use ozelot::clientbound::ClientboundPacket;
 //!
-//! let (access_token, _, username, uuid) = yggdrasil::authenticate("my_email@example.com", "my_password").unwrap();
+//! let (access_token, _, username, uuid) =
+//! yggdrasil::authenticate("my_email@example.com", "my_password").unwrap();
 //!
 //! /* By using connect_authenticated, auto_handle will be true and thus ozelot
 //!  * will respond to keepalives automatically */
-//! let mut client = Client::connect_authenticated("minecraft.example.com", 25565,
+//! let mut client = Client::connect_authenticated("minecraft.example.com",
+//! 25565,
 //!                           &access_token, &username, &uuid).unwrap();
 //!
 //! 'main: loop {
@@ -49,7 +51,8 @@
 //!     for packet in packets {
 //!         match packet {
 //!         ClientboundPacket::PlayDisconnect(ref p) => {
-//!             println!("Disconnected, reason: {}", utils::chat_to_str(p.get_reason()));
+//!             println!("Disconnected, reason: {}",
+//!                      utils::chat_to_str(p.get_reason()));
 //!             break 'main;
 //!         },
 //!         ClientboundPacket::ChatMessage(ref p) => {
@@ -119,12 +122,13 @@ pub enum ClientState {
 }
 impl fmt::Display for ClientState {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            &ClientState::Handshake => "Handshake",
-            &ClientState::Status => "Status",
-            &ClientState::Login => "Login",
-            &ClientState::Play => "Play",
-        })
+        write!(f,
+               "{}",
+               match self {
+                   &ClientState::Handshake => "Handshake",
+                   &ClientState::Status => "Status",
+                   &ClientState::Login => "Login",
+                   &ClientState::Play => "Play",
+               })
     }
 }
-

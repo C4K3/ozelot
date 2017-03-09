@@ -5,11 +5,11 @@ use std::io::Read;
 use std::io;
 use std::string;
 
-use byteorder::{ReadBytesExt, BigEndian};
+use byteorder::{BigEndian, ReadBytesExt};
 
 /// Read a single bool from the Reader
 pub fn read_bool<R: Read>(reader: &mut R) -> io::Result<bool> {
-    let byte = try!(read_u8(reader));
+    let byte = read_u8(reader)?;
     match byte {
         0 => Ok(false),
         1 => Ok(true),
@@ -18,8 +18,8 @@ pub fn read_bool<R: Read>(reader: &mut R) -> io::Result<bool> {
 }
 
 /* Many of these functions obviously just duplicate functions from byteorder.
- * I keep them here to keep everything nicely organized, and also to make things
- * easier in the clientbound packet event macros.
+ * I keep them here to keep everything nicely organized, and also to make
+ * things easier in the clientbound packet event macros.
  *
  * Also it ensures that if the MC modern protocol is changed, we can simply
  * change these functions without breaking anything. */
@@ -72,7 +72,7 @@ pub fn read_f64<R: Read>(reader: &mut R) -> io::Result<f64> {
 /// Read a length-prefixed utf-8 String from the Reader
 #[allow(non_snake_case)]
 pub fn read_String<R: Read>(reader: &mut R) -> io::Result<String> {
-    let length = try!(read_varint(reader)) as usize;
+    let length = read_varint(reader)? as usize;
 
     if length > (1 << 16) {
         return io_error!("read_string refusing to read string due to its length");
@@ -92,7 +92,7 @@ pub fn read_varint<R: Read>(reader: &mut R) -> io::Result<i32> {
 
 
     /* First we read the varint as an unsigned int */
-    let mut buf = try!(reader.read_u8());
+    let mut buf = reader.read_u8()?;
     let mut res = (buf & (!msb)) as u64;
 
     let mut i: usize = 0;
@@ -103,7 +103,7 @@ pub fn read_varint<R: Read>(reader: &mut R) -> io::Result<i32> {
         }
 
         i += 1;
-        buf = try!(reader.read_u8());
+        buf = reader.read_u8()?;
         res += ((buf & (!msb)) as u64) * radix;
         radix <<= 7;
     }
@@ -131,7 +131,7 @@ pub fn read_prefixed_bytearray<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
 
 /// Read length-prefixed varint array where the length is given as a varint
 pub fn read_prefixed_varintarray<R: Read>(reader: &mut R)
--> io::Result<Vec<i32>> {
+                                          -> io::Result<Vec<i32>> {
     let length = read_varint(reader)?;
     let mut tmp = Vec::with_capacity(length as usize);
     for _ in 0..length {
@@ -151,9 +151,9 @@ pub fn read_uuid<R: Read>(reader: &mut R) -> io::Result<u128> {
 ///
 /// Either with or without dashes.
 pub fn read_uuid_str<R: Read>(reader: &mut R) -> io::Result<u128> {
-    /* If it's without dashes, then it'll be 32 characters long, else it'll be
-     * 36 characters long, so we read 32 characters first and see if it contains
-     * any dahes */
+    /* If it's without dashes, then it'll be 32 characters long, else it'll
+     * be 36 characters long, so we read 32 characters first and see if it
+     * contains any dahes */
 
     let tmp = read_String(reader)?.replace("-", "");
 
@@ -197,4 +197,3 @@ pub fn read_position<R: Read>(reader: &mut R) -> io::Result<(i32, i32, i32)> {
     }
     Ok((x, y, z))
 }
-
