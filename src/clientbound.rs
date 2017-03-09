@@ -12,6 +12,7 @@ use connection::Packet;
 use {ClientState, u128};
 
 use std::collections::BTreeMap;
+use std::fmt;
 use std::io::Read;
 use std::io;
 use std::ops::Deref;

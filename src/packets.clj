@@ -156,7 +156,14 @@
               (enum-fn-get-state packets packet-type)
               (enum-fn-get-id packets packet-type)
               (enum-fn-to-u8 packets packet-type)
+              "}"
+              "impl fmt::Display for %s {"
+              "    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {"
+              "        write!(f, \"%s of type {}\", self.get_packet_name())"
+              "    }"
               "}")
+    packet-type
+    packet-type
     packet-type))
 
 (spit clientbound-enum-file (enum-impl-packet "ClientboundPacket" clientbound-packets) :append true)

@@ -550,3 +550,8 @@ impl Packet for ClientboundPacket {
         }
     }
 }
+impl fmt::Display for ClientboundPacket {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "ClientboundPacket of type {}", self.get_packet_name())
+    }
+}

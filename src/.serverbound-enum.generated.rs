@@ -270,3 +270,8 @@ impl Packet for ServerboundPacket {
         }
     }
 }
+impl fmt::Display for ServerboundPacket {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "ServerboundPacket of type {}", self.get_packet_name())
+    }
+}

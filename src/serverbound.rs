@@ -8,6 +8,7 @@ use write::*;
 use connection::Packet;
 use {ClientState, u128, yggdrasil};
 
+use std::fmt;
 use std::io::Read;
 use std::io;
 
