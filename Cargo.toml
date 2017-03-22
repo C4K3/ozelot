@@ -10,10 +10,10 @@ categories = ["games"]
 license = "CC0"
 
 [dependencies]
-byteorder = "1.0.0"
-netbuf = { git = "https://github.com/tailhook/netbuf" }
-flate2 = "0.2.17"
-reqwest = "0.3.0"
-rustc-serialize = "0.3.22"
-openssl = "0.9.6"
+byteorder = "1"
+netbuf = "0.4"
+flate2 = "0.2"
+reqwest = "0.4"
+rustc-serialize = "0.3"
+openssl = "0.9"
 
