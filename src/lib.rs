@@ -82,17 +82,26 @@ extern crate openssl;
 extern crate reqwest; /* Holy fuck the dependencies needed just to make 2
                          HTTP POST requests ... */
 extern crate rustc_serialize;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate serde_json;
+#[macro_use]
+extern crate derive_new;
 
 #[macro_use]
 mod macros;
 mod client;
 mod connection;
-pub mod yggdrasil;
-pub mod utils;
-pub mod read;
-pub mod write;
+mod json;
 pub mod clientbound;
+pub mod mojang;
+pub mod read;
 pub mod serverbound;
+pub mod utils;
+pub mod write;
+pub mod yggdrasil;
 #[cfg(test)]
 mod tests;
 

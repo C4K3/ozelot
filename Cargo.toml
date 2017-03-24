@@ -11,9 +11,13 @@ license = "CC0"
 
 [dependencies]
 byteorder = "1"
-netbuf = "0.4"
+derive-new = "0.4"
 flate2 = "0.2"
+netbuf = "0.4"
+openssl = "0.9"
 reqwest = "0.4"
 rustc-serialize = "0.3"
-openssl = "0.9"
+serde = "0.9"
+serde_derive = "0.9"
+serde_json = "0.9"
 
