@@ -15,7 +15,6 @@ use std::collections::BTreeMap;
 use std::fmt;
 use std::io::Read;
 use std::io;
-use std::ops::Deref;
 
 /* See packets.clj for information about this include */
 include!("./.clientbound-enum.generated.rs");
@@ -124,7 +123,7 @@ impl OpenWindow {
         let window_type = read_String(r)?;
         let window_title = read_String(r)?;
         let number_of_slots = read_u8(r)?;
-        let entity_id = match window_type.deref() {
+        let entity_id = match &*window_type {
             "EntityHorse" => Some(read_i32(r)?),
             _ => None,
         };

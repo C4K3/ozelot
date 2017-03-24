@@ -6,7 +6,6 @@ use std::io::{Cursor, Read, Write};
 use std::marker::PhantomData;
 use std::net::Shutdown;
 use std::net::TcpStream;
-use std::ops::Deref;
 use std::{io, time};
 
 use netbuf::Buf;
@@ -57,7 +56,7 @@ pub struct Connection<I: Packet, O: Packet> {
 impl<I: Packet, O: Packet> Connection<I, O> {
     pub fn connect_tcp(host: &str, port: u16) -> io::Result<Self> {
         let conn = Connection {
-            stream: TcpStream::connect(format!("{}:{}", host, port).deref())?,
+            stream: TcpStream::connect(&format!("{}:{}", host, port))?,
             clientstate: ClientState::Handshake,
             buf: Buf::new(),
             packet_len: None,
