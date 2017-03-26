@@ -80,6 +80,8 @@ impl<I: Packet, O: Packet> Connection<I, O> {
         let mut out = Vec::with_capacity(uncompressed_length);
 
         match self.compression {
+            /* Compression is enabled, and the packet length is over the
+             * threshold, thus compress the packet */
             Some(threshold) if uncompressed_length >= threshold => {
                 /* We have to copy all the data again, because we need
                  * to prefix the packet with length of the compressed data */
@@ -101,6 +103,8 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                 write_varint(&(uncompressed_length as i32), &mut out)?;
                 out.write_all(&output)?;
             },
+            /* Compression is enabled, but the packet length is not over the
+             * threshold, thus we don't compress the packet */
             Some(_) => {
                 /* Add 1 to the uncompressed length for the 1 byte it takes
                  * to specify no compression */
@@ -108,6 +112,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                 write_varint(&0, &mut out)?;
                 out.write_all(&tmp)?;
             },
+            /* Compression is not enabled */
             None => {
                 write_varint(&(uncompressed_length as i32), &mut out)?;
                 out.write_all(&tmp)?;
@@ -237,18 +242,21 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             let data = &self.buf[..len];
             let mut r = Cursor::new(data);
 
-            /* This is where we decompress compressed packets and decrypt
-             * encrypted packets */
             match self.compression {
                 Some(_) => {
                     let compressed_length = read_varint(&mut r)?;
                     if compressed_length == 0 {
+                        /* Compression is enabled, but the given packet
+                         * is not compressed */
                         I::deserialize(&mut r, &self.clientstate)?
                     } else {
+                        /* Compression is enabled, and the given packet
+                         * is compressed */
                         let mut r = ZlibDecoder::new(r);
                         I::deserialize(&mut r, &self.clientstate)?
                     }
                 },
+                /* Compression is not enabled */
                 None => I::deserialize(&mut r, &self.clientstate)?,
             }
         };
