@@ -106,7 +106,6 @@ fn sha1(data: &[u8]) -> String {
     let mut digest =
         hash::hash(MessageDigest::sha1(), data).expect("yggdrasil::sha1 error");
 
-    let mut tmp = String::new();
     let mut negative = false;
 
     if digest[0] >= 128 {
@@ -126,33 +125,28 @@ fn sha1(data: &[u8]) -> String {
                 break;
             }
         }
-
-        for byte in &digest {
-            write!(&mut tmp, "{:02x}", byte)
-                .expect("yggdrasil.sha1 failed writing to string");
-        }
-
-    } else {
-        for byte in &digest {
-            write!(&mut tmp, "{:02x}", byte)
-                .expect("yggdrasil.sha1 failed writing to string");
-        }
     }
 
-    /* Now we copy the string a last time, to remove leading zeros and add
-     * the leading minus if applicable */
     let mut ret = String::new();
     if negative {
-        write!(&mut ret, "-").expect("yggdrasil.sha1 failed writing to string");
+        write!(&mut ret, "-").expect("yggdrasil.sha1 failed writing to String");
     }
 
     let mut non_zero = false;
-    for character in tmp.chars() {
-        if character != '0' {
+    for byte in &digest {
+        if *byte >= 16 {
             non_zero = true;
+        } else if non_zero == false && *byte > 0 {
+            /* If the value is 0 < n < 16, we write the second (hexa)decimal
+             * in it, but the first is 0 so is omitted */
+            write!(&mut ret, "{:x}", byte)
+                .expect("yggdrasil.sha1 failed writing to String");
+            non_zero = true;
+            continue;
         }
         if non_zero {
-            ret.push(character);
+            write!(&mut ret, "{:02x}", byte)
+                .expect("yggdrasil.sha1 failed writing to String");
         }
     }
     ret
