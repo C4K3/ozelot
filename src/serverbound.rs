@@ -1,4 +1,4 @@
-//! Contains all packets that can be sent by an ozelot client
+//! Contains all serverbound packets
 //!
 //! See the Serverbound sections on http://wiki.vg/Protocol for information
 //! about each of the packets.
