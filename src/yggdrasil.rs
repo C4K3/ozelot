@@ -1,25 +1,15 @@
-//! For interacting with the Yggdrasil API
-//!
-//! The idea is to have everything necessary for yggdrasil, see
-//! http://wiki.vg/Authentication for info about the various available
-//! requests, but not all of them are implemented here yet. It also contains
-//! a few utility functions that may be needed.
+//! This provides helper functions for various Yggdrasil/Protocol Encryption
+//! related things.
 use std::fmt::Write;
-use std::io::Read;
 use std::io;
 
 use openssl::hash::{self, MessageDigest};
 use openssl::rand;
 use openssl::rsa::{PKCS1_PADDING, Padding, Rsa};
 
-use reqwest::Client;
-use reqwest::header::ContentType;
-
-use rustc_serialize::json::Json;
-
 const PADDING: Padding = PKCS1_PADDING;
 
-/// Create a shared secret as used by yggdrasil
+/// Create a shared secret as used for protocol encryption
 ///
 /// # Panics
 ///
@@ -33,100 +23,6 @@ pub fn create_shared_secret() -> [u8; 16] {
         },
     }
     ret
-}
-
-/// Conduct yggdrasil authentication with Mojang, if successful returns
-/// (accessToken, clientToken, username, uuid)
-#[allow(non_snake_case)]
-pub fn authenticate(login: &str,
-                    password: &str)
-                    -> io::Result<(String, String, String, String)> {
-
-    let client = Client::new().expect("Error creating reqwest client");
-    let payload = format!("{{\"agent\":{{\"name\":\"Minecraft\",\"version\":1}},\
-    \"username\":\"{}\",\
-    \"password\":\"{}\"}}",
-                          login,
-                          password);
-    let res = client.post("https://authserver.mojang.com/authenticate")
-        .header(ContentType::json())
-        .body(payload)
-        .send();
-
-    let mut res = match res {
-        Ok(x) => x,
-        Err(e) => {
-            return io_error!("Got yggdrasil::authenticate error sending http request, {:?}",
-                             e)
-        },
-    };
-
-    if !res.status().is_success() {
-        return io_error!("yggdrasil::authenticate got non-200 response for server, likely wrong username/password");
-    }
-
-    let mut tmp = String::new();
-    res.read_to_string(&mut tmp)?;
-    let data = match Json::from_str(&tmp) {
-        Ok(x) => x,
-        Err(_) => return io_error!("yggdrasil::authenticate error parsing json"),
-    };
-    let accessToken = match data.find("accessToken") {
-        Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!("client::authenticate did not contain accessToken"),
-    };
-    let clientToken = match data.find("accessToken") {
-        Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!("client::authenticate did not contain clientToken"),
-    };
-    let data = match data.find("selectedProfile") {
-        Some(x) => x,
-        None => return io_error!("client::authenticate did not contain selectedProfile"),
-    };
-    let uuid = match data.find("id") {
-        Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!("client::authenticate did not contain uuid"),
-    };
-    let username = match data.find("name") {
-        Some(&Json::String(ref x)) => x.to_string(),
-        _ => return io_error!("client::authenticate did not contain name"),
-    };
-    Ok((accessToken, clientToken, username, uuid))
-}
-
-/// Post the join to Mojang, must be done immediately before sending
-/// the EncryptionResponse. This does not receive a response.
-pub fn session_join(access_token: &str,
-                    uuid: &str,
-                    server_id: &str,
-                    shared_secret: &[u8],
-                    server_public_key: &[u8])
-                    -> io::Result<()> {
-
-    let client = Client::new().expect("Error creating reqwest client");
-    let hash = post_sha1(server_id, shared_secret, server_public_key);
-    let payload = format!("{{\"accessToken\":\"{}\",\"selectedProfile\":\"{}\",\"serverId\":\"{}\"}}",
-                          access_token,
-                          uuid,
-                          hash);
-
-    let res = client.post("https://sessionserver.mojang.com/session/minecraft/join")
-        .header(ContentType::json())
-        .body(payload)
-        .send();
-
-    let res = match res {
-        Ok(x) => x,
-        Err(e) => {
-            return io_error!("Got yggdrasil::session_join error sending http request, {:?}",
-                             e)
-        },
-    };
-
-    if !res.status().is_success() {
-        return io_error!("yggdrasil::session_join got non-200 response for server");
-    }
-    Ok(())
 }
 
 /// Generate an RSA key as used by MC.
@@ -194,10 +90,10 @@ pub fn rsa_decrypt(key: &Rsa, data: &[u8]) -> io::Result<Vec<u8>> {
 
 /// Given the server_id, shared_secret and server's public key, calculate the
 /// sha1 that is to be used for posting to Mojang
-fn post_sha1(server_id: &str,
-             shared_secret: &[u8],
-             server_public_key: &[u8])
-             -> String {
+pub fn post_sha1(server_id: &str,
+                 shared_secret: &[u8],
+                 server_public_key: &[u8])
+                 -> String {
 
     let mut tmp = server_id.as_bytes().to_vec();
     tmp.extend(shared_secret);

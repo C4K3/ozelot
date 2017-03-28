@@ -4,35 +4,31 @@
 //! and cache what you can.
 //!
 //! In general, you may want to read [wiki.vg/Mojang
-//! API](http://wiki.vg/Mojang_API) for further documentation about the
+//! API](http://wiki.vg/Mojang_API),
+//! [wiki.vg/Authentication](http://wiki.vg/Authentication) and
+//! [wiki.vg/Protocol
+//! Encryption](http://wiki.vg/Protocol_Encryption#Authentication) for further
+//! documentation about the
 //! requests and their responses.
 //!
-//! Is missing the requests that require authentication.
+//! Also contains some helper functions used for authentication.
 
 pub use json::*;
+pub use yggdrasil::{create_shared_secret, generate_rsa_key, rsa_key_binary};
+use yggdrasil;
 
 use std::io::{self, Read};
 
-use reqwest::Client;
+use reqwest::{self, Client};
 use reqwest::header::ContentType;
 
 use serde_json;
 
-/// Trait for structs that represent requests to the Mojang API
-pub trait APIRequest {
-    type Response;
-
-    fn perform(&self) -> io::Result<Self::Response>;
-    fn get_endpoint() -> String;
-}
-
 /// Make a request to check the status of the Mojang APIs
 #[derive(Debug, new)]
 pub struct APIStatus();
-impl APIRequest for APIStatus {
-    type Response = APIStatusResponse;
-
-    fn perform(&self) -> io::Result<APIStatusResponse> {
+impl APIStatus {
+    pub fn perform(&self) -> io::Result<APIStatusResponse> {
         let res = get_request(&Self::get_endpoint())?;
         /* Flatten the list, and turn it into an object.
          * For some reason this response is given in a really weird way, and
@@ -44,8 +40,6 @@ impl APIRequest for APIStatus {
                               "")
             .replace('[', "{")
             .replace(']', "}");
-        // Ok(serde_json::from_str(&get_request(&Self::get_endpoint())?).
-        // unwrap())
         Ok(serde_json::from_str(&res).unwrap())
     }
 
@@ -67,13 +61,8 @@ pub struct NameToUUID {
     username: String,
     at: Option<i64>,
 }
-impl APIRequest for NameToUUID {
-    type Response = NameUUID;
-
-    fn get_endpoint() -> String {
-        "https://api.mojang.com/users/profiles/minecraft/".to_string()
-    }
-    fn perform(&self) -> io::Result<NameUUID> {
+impl NameToUUID {
+    pub fn perform(&self) -> io::Result<NameUUID> {
         let url = match self.at {
             Some(x) => {
                 format!("https://api.mojang.com/users/profiles/minecraft/{}?at={}",
@@ -97,13 +86,8 @@ impl APIRequest for NameToUUID {
 pub struct UUIDToHistory {
     uuid: String,
 }
-impl APIRequest for UUIDToHistory {
-    type Response = Vec<NameHistory>;
-
-    fn get_endpoint() -> String {
-        "https://api.mojang.com/user/profiles/{}/names".to_string()
-    }
-    fn perform(&self) -> io::Result<Vec<NameHistory>> {
+impl UUIDToHistory {
+    pub fn perform(&self) -> io::Result<Vec<NameHistory>> {
         let url = format!("https://api.mojang.com/user/profiles/{}/names",
                           self.uuid);
         let res = get_request(&url)?;
@@ -118,13 +102,11 @@ impl APIRequest for UUIDToHistory {
 pub struct PlayernamesToUUIDs {
     usernames: Vec<String>,
 }
-impl APIRequest for PlayernamesToUUIDs {
-    type Response = Vec<NameUUID>;
-
+impl PlayernamesToUUIDs {
     fn get_endpoint() -> String {
         "https://api.mojang.com/profiles/minecraft".to_string()
     }
-    fn perform(&self) -> io::Result<Self::Response> {
+    pub fn perform(&self) -> io::Result<Vec<NameUUID>> {
         let body = serde_json::to_string(&self.usernames).unwrap();
         println!("body: {}", body);
         let res = post_request(&Self::get_endpoint(), &body)?;
@@ -155,14 +137,8 @@ pub struct UUIDToProfile {
     /// Whether you want the response signed by the yggdrasil private key
     signed: bool,
 }
-impl APIRequest for UUIDToProfile {
-    type Response = Profile;
-
-    fn get_endpoint() -> String {
-        "https://sessionserver.mojang.com/session/minecraft/profile/"
-            .to_string()
-    }
-    fn perform(&self) -> io::Result<Self::Response> {
+impl UUIDToProfile {
+    pub fn perform(&self) -> io::Result<Profile> {
         let url = if self.signed {
             format!("https://sessionserver.mojang.com/session/minecraft/profile/{}?unsigned=false",
                     self.uuid)
@@ -179,13 +155,11 @@ impl APIRequest for UUIDToProfile {
 /// Get the blocked server's hashes
 #[derive(Debug, new)]
 pub struct BlockedServers();
-impl APIRequest for BlockedServers {
-    type Response = Vec<String>;
-
+impl BlockedServers {
     fn get_endpoint() -> String {
         "https://sessionserver.mojang.com/blockedservers".to_string()
     }
-    fn perform(&self) -> io::Result<Self::Response> {
+    pub fn perform(&self) -> io::Result<Vec<String>> {
         let res: String = get_request(&Self::get_endpoint())?;
         Ok(res.split('\n')
                .filter_map(|e| if !e.is_empty() {
@@ -209,13 +183,11 @@ pub struct Statistics {
     item_sold_cobalt: bool,
     item_sold_scrolls: bool,
 }
-impl APIRequest for Statistics {
-    type Response = StatisticsResponse;
-
+impl Statistics {
     fn get_endpoint() -> String {
         "https://api.mojang.com/orders/statistics".to_string()
     }
-    fn perform(&self) -> io::Result<Self::Response> {
+    pub fn perform(&self) -> io::Result<StatisticsResponse> {
         let mut query: Vec<&str> = Vec::new();
         if self.item_sold_minecraft {
             query.push("item_sold_minecraft");
@@ -278,6 +250,201 @@ impl Statistics {
         }
     }
 }
+
+/* Here begins the authentication requests */
+
+/// Authenticate with Mojang
+#[derive(Debug)]
+pub struct Authenticate {
+    username: String,
+    password: String,
+    clientToken: Option<String>,
+    requestUser: bool,
+}
+impl Authenticate {
+    fn get_endpoint() -> String {
+        "https://authserver.mojang.com/authenticate".to_string()
+    }
+    pub fn perform(&self) -> io::Result<AuthenticationResponse> {
+        let payload = json!({
+            "agent": {
+                "name": "Minecraft",
+                "version": 1
+            },
+            "username": self.username,
+            "password": self.password,
+            "clientToken": self.clientToken,
+            "requestUser": self.requestUser
+        });
+        let res = post_request(&Self::get_endpoint(), &payload.to_string())?;
+        Ok(serde_json::from_str(&res).unwrap())
+    }
+    pub fn new(username: String, password: String) -> Self {
+        Authenticate {
+            username: username,
+            password: password,
+            clientToken: None,
+            requestUser: false,
+        }
+    }
+}
+
+/// Refresh a valid accessToken
+#[derive(Debug, Serialize, new)]
+pub struct AuthenticateRefresh {
+    accessToken: String,
+    clientToken: String,
+    requestUser: bool,
+}
+impl AuthenticateRefresh {
+    fn get_endpoint() -> String {
+        "https://authserver.mojang.com/refresh".to_string()
+    }
+    pub fn perform(&self) -> io::Result<AuthenticationResponse> {
+        let payload = serde_json::to_string(self).unwrap();
+        let res = post_request(&Self::get_endpoint(), &payload)?;
+        Ok(serde_json::from_str(&res).unwrap())
+    }
+}
+
+/// Validate an existing access token
+#[derive(Debug, new, Serialize)]
+pub struct AuthenticateValidate {
+    accessToken: String,
+    clientToken: Option<String>,
+}
+impl AuthenticateValidate {
+    fn get_endpoint() -> String {
+        "https://authserver.mojang.com/validate".to_string()
+    }
+    pub fn perform(&self) -> io::Result<bool> {
+        let payload = serde_json::to_string(self).unwrap();
+
+        let client = Client::new().expect("Error creating reqwest client");
+        let res = client.post(&Self::get_endpoint())
+            .header(ContentType::json())
+            .body(payload)
+            .send();
+
+        let res = match res {
+            Ok(x) => x,
+            Err(e) => {
+                return io_error!("Error sending POST request to {}: {}", &Self::get_endpoint(), e);
+            },
+        };
+
+        match res.status() {
+            &reqwest::StatusCode::NoContent => Ok(true),
+            &reqwest::StatusCode::Forbidden => Ok(false),
+            _ => io_error!("Got response code {}", res.status()),
+        }
+    }
+}
+
+/// Invalidate an accessToken, using the client username/password
+#[derive(Debug, new, Serialize)]
+pub struct AuthenticateSignout {
+    username: String,
+    password: String,
+}
+impl AuthenticateSignout {
+    fn get_endpoint() -> String {
+        "https://authserver.mojang.com/signout".to_string()
+    }
+    pub fn perform(&self) -> io::Result<()> {
+        let payload = serde_json::to_string(self).unwrap();
+
+        let res = post_request(&Self::get_endpoint(), &payload)?;
+        if res.is_empty() {
+            Ok(())
+        } else {
+            io_error!("AuthenticateSignout got non-empty response")
+        }
+    }
+}
+
+/// Invalidate an accessToken, using the accessToken and a clientToken
+#[derive(Debug, new, Serialize)]
+pub struct AuthenticateInvalidate {
+    accessToken: String,
+    clientToken: String,
+}
+impl AuthenticateInvalidate {
+    fn get_endpoint() -> String {
+        "https://authserver.mojang.com/invalidate".to_string()
+    }
+    pub fn perform(&self) -> io::Result<()> {
+        let payload = serde_json::to_string(self).unwrap();
+
+        let res = post_request(&Self::get_endpoint(), &payload)?;
+        if res.is_empty() {
+            Ok(())
+        } else {
+            io_error!("AuthenticateInvalidate got non-empty response")
+        }
+    }
+}
+
+/// Send a session join message to Mojang, used by clients when connecting to
+/// online servers
+#[derive(Debug, Serialize)]
+pub struct SessionJoin {
+    accessToken: String,
+    /// The player's uuid
+    selectedProfile: String,
+    serverId: String,
+}
+impl SessionJoin {
+    fn get_endpoint() -> String {
+        "https://sessionserver.mojang.com/session/minecraft/join".to_string()
+    }
+    pub fn perform(&self) -> io::Result<()> {
+        let payload = serde_json::to_string(self).unwrap();
+
+        let res = post_request(&Self::get_endpoint(), &payload)?;
+        if res.is_empty() {
+            Ok(())
+        } else {
+            io_error!("SessionJoin got non-empty response")
+        }
+    }
+}
+impl SessionJoin {
+    pub fn new(access_token: String,
+               uuid: String,
+               server_id: &str,
+               shared_secret: &[u8],
+               server_public_key: &[u8])
+               -> Self {
+        let hash =
+            yggdrasil::post_sha1(server_id, shared_secret, server_public_key);
+        SessionJoin {
+            accessToken: access_token,
+            selectedProfile: uuid,
+            serverId: hash,
+        }
+    }
+}
+
+/// Check whether a client has posted a SessionJoin to Mojang, used by servers
+/// for authenticating connecting clients.
+#[derive(Debug)]
+pub struct SessionHasJoined {
+    username: String,
+    serverId: String,
+}
+impl SessionHasJoined {
+    pub fn perform(&self) -> io::Result<SessionHasJoinedResponse> {
+        let url = format!("https://sessionserver.mojang.com/session/minecraft/hasJoined?username={}&serverId={}", self.username, self.serverId);
+        let res = get_request(&url)?;
+        Ok(serde_json::from_str(&res).unwrap())
+    }
+}
+
+
+
+
+
 
 /// Helper function for performing a GET request to the given URL, returning
 /// the response content

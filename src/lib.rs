@@ -34,17 +34,20 @@
 //! (else we'd get into an infinite loop echoing our own messages.)
 //!
 //! ```rust,no_run
-//! use ozelot::{yggdrasil, Client, serverbound, utils};
+//! use ozelot::{mojang, Client, serverbound, utils};
 //! use ozelot::clientbound::ClientboundPacket;
 //!
-//! let (access_token, _, username, uuid) =
-//! yggdrasil::authenticate("my_email@example.com", "my_password").unwrap();
+//! let auth = mojang::Authenticate::new("my_email@example.com".to_string(),
+//!                                      "my_password".to_string())
+//!     .perform().unwrap();
+//!
 //!
 //! /* By using connect_authenticated, auto_handle will be true and thus ozelot
 //!  * will respond to keepalives automatically */
 //! let mut client = Client::connect_authenticated("minecraft.example.com",
-//! 25565,
-//!                           &access_token, &username, &uuid).unwrap();
+//!                                                25565, &auth).unwrap();
+//!
+//! let username = auth.selectedProfile.name;
 //!
 //! 'main: loop {
 //!     let packets = client.read().unwrap();
@@ -94,14 +97,16 @@ extern crate derive_new;
 mod macros;
 mod client;
 mod connection;
+#[allow(non_snake_case)]
 mod json;
+mod yggdrasil;
 pub mod clientbound;
+#[allow(non_snake_case)]
 pub mod mojang;
 pub mod read;
 pub mod serverbound;
 pub mod utils;
 pub mod write;
-pub mod yggdrasil;
 #[cfg(test)]
 mod tests;
 

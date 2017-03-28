@@ -1,6 +1,7 @@
 //! This module contains json serializable structs for use for interaction with
 //! the various Mojang APIs.
 
+/// Contains the status about each of the Mojang APIs
 #[derive(Debug, Deserialize)]
 pub struct APIStatusResponse {
     #[serde(rename="minecraft.net")]
@@ -47,7 +48,9 @@ pub struct Profile {
     pub name: String,
     pub properties: Vec<ProfileProperties>,
 }
-/// Represents the properties part of a Profile response (UUIDToProfile request)
+/// Represents the properties part of a Profile response
+///
+/// Used in the UUIDToProfile and SessionHasJoined requests.
 #[derive(Debug, Deserialize)]
 pub struct ProfileProperties {
     pub name: String,
@@ -55,6 +58,7 @@ pub struct ProfileProperties {
     pub signature: Option<String>,
 }
 
+/// The requested statistics
 #[derive(Debug, Deserialize)]
 #[allow(non_snake_case)]
 pub struct StatisticsResponse {
@@ -63,16 +67,35 @@ pub struct StatisticsResponse {
     pub saleVelocityPerSeconds: f64,
 }
 
-
-
 /// Represents a single historic name for a given account. Used in the
 /// UUIDToHistory request.
 #[derive(Debug, Deserialize)]
 #[allow(non_snake_case)]
 pub struct NameHistory {
-    name: String,
-    changedToAt: Option<u64>,
+    pub name: String,
+    pub changedToAt: Option<u64>,
 }
+
+/// Represents a response to a successful authentication
+#[derive(Debug, Deserialize)]
+pub struct AuthenticationResponse {
+    pub accessToken: String,
+    pub clientToken: Option<String>,
+    pub availableProfiles: Option<Vec<NameUUID>>,
+    pub selectedProfile: NameUUID,
+}
+
+/// Response about whether the client has posted a join to Mojang
+#[derive(Debug, Deserialize)]
+pub struct SessionHasJoinedResponse {
+    /// The uuid
+    id: String,
+    name: String,
+    properties: ProfileProperties,
+}
+
+
+
 
 
 /// For use with Serde default values

@@ -1,7 +1,8 @@
 use clientbound::ClientboundPacket;
 use serverbound::ServerboundPacket;
 use connection::Connection;
-use {ClientState, PROTOCOL_VERSION, serverbound, yggdrasil};
+use {ClientState, PROTOCOL_VERSION, mojang, serverbound};
+use json::AuthenticationResponse;
 
 use std::{io, thread, time};
 
@@ -105,16 +106,17 @@ impl Client {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// use ozelot::{yggdrasil, Client};
-    /// let (access_token, _, username, uuid) = yggdrasil::authenticate("my_email@example.com", "my_password").unwrap();
+    /// use ozelot::{mojang, Client};
+    /// let auth = mojang::Authenticate::new("my_email@example.com".to_string(),
+    ///                                      "my_password".to_string())
+    ///     .perform().unwrap();
     /// let mut client = Client::connect_authenticated("minecraft.example.com",
-    /// 25565, &access_token, &username, &uuid).unwrap();
+    /// 25565,
+    /// &auth).unwrap();
     /// ```
     pub fn connect_authenticated(host: &str,
                                  port: u16,
-                                 access_token: &str,
-                                 username: &str,
-                                 uuid: &str)
+                                 auth: &AuthenticationResponse)
                                  -> io::Result<Self> {
 
         let timeout = time::Instant::now();
@@ -125,7 +127,8 @@ impl Client {
                                                     host.to_string(),
                                                     port,
                                                     2);
-        let loginstart = serverbound::LoginStart::new(username.to_string());
+        let loginstart =
+            serverbound::LoginStart::new(auth.selectedProfile.name.clone());
         client.send(handshake)?;
         client.set_clientstate(ClientState::Login);
         client.send(loginstart)?;
@@ -143,13 +146,13 @@ impl Client {
                 },
                 Some(ClientboundPacket::LoginSuccess(..)) => return io_error!("Logged in unauthenticated"),
                 Some(ClientboundPacket::EncryptionRequest(ref p)) => {
-                    let shared_secret = yggdrasil::create_shared_secret();
+                    let shared_secret = mojang::create_shared_secret();
 
-                    yggdrasil::session_join(&access_token,
-                                            &uuid,
-                                            p.get_server_id(),
-                                            &shared_secret,
-                                            p.get_public_key())?;
+                    mojang::SessionJoin::new(auth.accessToken.clone(),
+                                             auth.selectedProfile.id.clone(),
+                                             p.get_server_id(),
+                                             &shared_secret,
+                                             p.get_public_key()).perform()?;
 
                     let encryptionresponse
                             = serverbound::EncryptionResponse::new_unencrypted(
