@@ -123,7 +123,7 @@ pub const PROTOCOL_VERSION: i32 = 316;
 /// FIXME temporary struct until u128 lands in stable rust, used for uuids
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[allow(non_camel_case_types)]
-pub struct u128(u64, u64);
+pub struct u128(pub u64, pub u64);
 
 /// This tracks which state of play the client is in. The value of this changes
 /// the meaning of the different packet ids.
