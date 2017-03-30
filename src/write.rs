@@ -152,9 +152,9 @@ pub fn write_uuid<W: Write>(val: &u128, writer: &mut W) -> io::Result<()> {
 
 /// Write a uuid (u128) in hexadecimal string format, without dashes
 pub fn write_uuid_str<W: Write>(val: &u128, writer: &mut W) -> io::Result<()> {
-    let &u128(x, y) = val;
-    write!(writer, "{:016x}", x)?;
-    write!(writer, "{:016x}", y)
+    /* The string length */
+    writer.write_all(&[36])?;
+    write_uuid_str_dashes(val, writer)
 }
 
 /// Write a uuid (u128) in hexadecimal string format with dashes
