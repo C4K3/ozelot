@@ -54,9 +54,9 @@ pub struct Connection<I: Packet, O: Packet> {
     out_type: PhantomData<O>,
 }
 impl<I: Packet, O: Packet> Connection<I, O> {
-    pub fn connect_tcp(host: &str, port: u16) -> io::Result<Self> {
+    pub fn from_tcpstream(stream: TcpStream) -> io::Result<Self> {
         let conn = Connection {
-            stream: TcpStream::connect(&format!("{}:{}", host, port))?,
+            stream: stream,
             clientstate: ClientState::Handshake,
             buf: Buf::new(),
             packet_len: None,
@@ -70,10 +70,18 @@ impl<I: Packet, O: Packet> Connection<I, O> {
         /* Set 30 second timeout */
         conn.stream.set_read_timeout(Some(time::Duration::new(30, 0)))?;
         conn.stream.set_write_timeout(Some(time::Duration::new(30, 0)))?;
+        conn.stream.set_nonblocking(true)?;
         Ok(conn)
     }
 
+    pub fn connect_tcp(host: &str, port: u16) -> io::Result<Self> {
+        let stream = TcpStream::connect(&format!("{}:{}", host, port))?;
+        Ok(Connection::from_tcpstream(stream)?)
+    }
+
     /// Send the given packet
+    ///
+    /// Will block until the packet has been sent
     pub fn send(&mut self, packet: O) -> io::Result<()> {
         let tmp = packet.to_u8()?;
         let uncompressed_length = tmp.len();
@@ -125,9 +133,15 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                 Ok(x) => x,
                 Err(_) => return io_error!("client::send error writing encrypted data"),
             };
-            self.stream.write_all(&tmp[..n])?;
+            let mut i = 0;
+            while i < n {
+                i += self.stream.write(&tmp[i..n])?;
+            }
         } else {
-            self.stream.write_all(&out)?;
+            let mut i = 0;
+            while i < out.len() {
+                i += self.stream.write(&out[i..])?;
+            }
         }
 
         Ok(())
@@ -185,7 +199,11 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     pub fn update_inbuf(&mut self) -> io::Result<()> {
         if let Some(ref mut enc) = self.in_encryption {
             let mut enc_buf = Buf::new();
-            let n = enc_buf.read_from(&mut self.stream)?;
+            let n = match enc_buf.read_from(&mut self.stream) {
+                Ok(n) => n,
+                Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => 0,
+                Err(e) => return Err(e),
+            };
             let mut tmp = vec![0; n + 16];
             let n = match enc.update(&enc_buf[..], &mut tmp) {
                 Ok(x) => x,
@@ -193,7 +211,11 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             };
             self.buf.extend(&tmp[..n]);
         } else {
-            let _: usize = self.buf.read_from(&mut self.stream)?;
+            match self.buf.read_from(&mut self.stream) {
+                Ok(_) => (),
+                Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => (),
+                Err(e) => return Err(e),
+            };
         }
         Ok(())
     }
