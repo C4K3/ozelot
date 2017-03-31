@@ -35,8 +35,16 @@ impl Handshake {
 impl EncryptionResponse {
     pub fn get_decrypted_shared_secret(&self,
                                        key: &Rsa)
-                                       -> io::Result<Vec<u8>> {
-        yggdrasil::rsa_decrypt(key, &self.shared_secret)
+                                       -> io::Result<[u8; 16]> {
+        let tmp = yggdrasil::rsa_decrypt(key, &self.shared_secret)?;
+        if tmp.len() != 16 {
+            return io_error!("Decrypted shared secret was not 16 bytes long");
+        }
+        let mut ret = [0; 16];
+        for i in 0..16 {
+            ret[i] = tmp[i];
+        }
+        Ok(ret)
     }
     pub fn get_decrypted_verify_token(&self, key: &Rsa) -> io::Result<Vec<u8>> {
         yggdrasil::rsa_decrypt(key, &self.verify_token)
