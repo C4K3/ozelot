@@ -144,7 +144,9 @@ impl Client {
                     return io_error!("Got LoginDisconnect, reason: {}",
                                      p.get_raw_chat());
                 },
-                Some(ClientboundPacket::LoginSuccess(..)) => return io_error!("Logged in unauthenticated"),
+                Some(ClientboundPacket::LoginSuccess(..)) => {
+                    return io_error!("Logged in unauthenticated")
+                },
                 Some(ClientboundPacket::EncryptionRequest(ref p)) => {
                     let shared_secret = mojang::create_shared_secret();
 
@@ -191,11 +193,7 @@ impl Client {
 
     /// Try to read some packets from the server.
     ///
-    /// This function may in rare circumstances block for up to 30 seconds,
-    /// specifically the timeout for reading the TcpStream is 30 seconds,
-    /// so if the tcp connection is lost, it will block until the timeout.
-    /// During normal back and forth with a server it should return as fast as
-    /// possible.
+    /// This function is nonblocking.
     pub fn read(&mut self) -> io::Result<Vec<ClientboundPacket>> {
         self.update_inbuf()?;
 
@@ -224,6 +222,8 @@ impl Client {
     }
 
     /// Send the given packet to the server that we're connected to.
+    ///
+    /// This function may block.
     pub fn send(&mut self, packet: ServerboundPacket) -> io::Result<()> {
         self.conn.send(packet)
     }
@@ -277,6 +277,8 @@ impl Client {
     /// know for sure you need to call this, then you do not need to call this.
     /// I.e. if you're just using client.read(), then you do not need to call
     /// this function.
+    ///
+    /// This function is nonblocking.
     pub fn update_inbuf(&mut self) -> io::Result<()> {
         self.conn.update_inbuf()
     }
