@@ -91,7 +91,7 @@ pub struct SessionHasJoinedResponse {
     /// The uuid
     id: String,
     name: String,
-    properties: ProfileProperties,
+    properties: Vec<ProfileProperties>,
 }
 
 
