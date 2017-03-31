@@ -99,6 +99,7 @@ mod client;
 mod connection;
 #[allow(non_snake_case)]
 mod json;
+mod server;
 mod yggdrasil;
 pub mod clientbound;
 #[allow(non_snake_case)]
@@ -111,6 +112,7 @@ pub mod write;
 mod tests;
 
 pub use client::Client;
+pub use server::Server;
 
 use std::fmt;
 
