@@ -168,7 +168,6 @@ mod test {
     #[test]
     fn rsa() {
         use openssl::rsa::Rsa;
-        use std::ops::Deref;
         /* Don't worry, the data and key here were generated specifically for
          * this test */
         let random_data = [0xd7, 0x0f, 0xe4, 0xdb, 0xbf, 0x8b, 0xca, 0x98,
@@ -221,6 +220,6 @@ mod test {
         let pubkey = super::rsa_key_binary(&key);
         let encrypted = super::rsa_encrypt(&pubkey, &random_data).unwrap();
         let decrypted = super::rsa_decrypt(&key, &encrypted).unwrap();
-        assert_eq!(&random_data, &decrypted.deref());
+        assert_eq!(&random_data, &*decrypted);
     }
 }
