@@ -186,7 +186,7 @@
    :fields [{:name "raw_chat" :type "String" :getter "Get the raw chat json"}]}
   {:name "EncryptionRequest"
    :id 1
-   :fields [{:name "server_id" :type "String" :getter "Get the server id, currently appears to be unused"}
+   :fields [{:name "server_id" :type "String" :getter "Get the server id"}
             {:name "public_key" :type "Vec<u8>" :getter "Get the public key" :read "prefixed_bytearray"}
             {:name "verify_token" :type "Vec<u8>" :getter "Get the verify token" :read "prefixed_bytearray"}]}
   {:name "LoginSuccess"

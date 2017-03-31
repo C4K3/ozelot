@@ -136,7 +136,7 @@ impl EncryptionRequest {
             verify_token: verify_token,
         })
     }
-    /// Get the server id, currently appears to be unused
+    /// Get the server id
     pub fn get_server_id(&self) -> &String {
         &self.server_id
     }    /// Get the public key
