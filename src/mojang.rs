@@ -112,8 +112,6 @@ impl PlayernamesToUUIDs {
         let res = post_request(&Self::get_endpoint(), &body)?;
         Ok(serde_json::from_str(&res).unwrap())
     }
-}
-impl PlayernamesToUUIDs {
     /// Create a new instance of this request.
     ///
     /// # Panics
@@ -207,8 +205,6 @@ impl Statistics {
         let res = post_request(&Self::get_endpoint(), &payload.to_string())?;
         Ok(serde_json::from_str(&res).unwrap())
     }
-}
-impl Statistics {
     /// Create a new request for requesting the sum of sales of the specified
     /// types.
     ///
@@ -408,8 +404,6 @@ impl SessionJoin {
             io_error!("SessionJoin got non-empty response")
         }
     }
-}
-impl SessionJoin {
     pub fn new(access_token: String,
                uuid: String,
                server_id: &str,
@@ -437,14 +431,22 @@ impl SessionHasJoined {
     pub fn perform(&self) -> io::Result<SessionHasJoinedResponse> {
         let url = format!("https://sessionserver.mojang.com/session/minecraft/hasJoined?username={}&serverId={}", self.username, self.serverId);
         let res = get_request(&url)?;
+        println!("session has joined response: {}", &res);
         Ok(serde_json::from_str(&res).unwrap())
     }
+    pub fn new(username: String,
+               server_id: &str,
+               shared_secret: &[u8],
+               public_key: &[u8])
+               -> Self {
+        let hash =
+            yggdrasil::post_sha1(server_id, shared_secret, public_key);
+        SessionHasJoined {
+            username: username,
+            serverId: hash,
+        }
+    }
 }
-
-
-
-
-
 
 /// Helper function for performing a GET request to the given URL, returning
 /// the response content
