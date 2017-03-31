@@ -144,9 +144,7 @@ impl Client {
                     return io_error!("Got LoginDisconnect, reason: {}",
                                      p.get_raw_chat());
                 },
-                Some(ClientboundPacket::LoginSuccess(..)) => {
-                    return io_error!("Logged in unauthenticated")
-                },
+                Some(ClientboundPacket::LoginSuccess(..)) => return io_error!("Logged in unauthenticated"),
                 Some(ClientboundPacket::EncryptionRequest(ref p)) => {
                     let shared_secret = mojang::create_shared_secret();
 

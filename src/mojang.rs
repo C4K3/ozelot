@@ -439,8 +439,7 @@ impl SessionHasJoined {
                shared_secret: &[u8],
                public_key: &[u8])
                -> Self {
-        let hash =
-            yggdrasil::post_sha1(server_id, shared_secret, public_key);
+        let hash = yggdrasil::post_sha1(server_id, shared_secret, public_key);
         SessionHasJoined {
             username: username,
             serverId: hash,
