@@ -10,18 +10,22 @@
 //! their complex fields serialized by this library, but instead handing the
 //! raw binary data to consumers of this library to parse however they wish.
 //! One example of this is packets that contain NBT data, the packets are read
-//! but the NBT data is not in any way parsed by this library.
-//!
-//! This library currently only supports the client side of the connection,
-//! but servers may be supported in the future as well, since we already have
-//! all the packet definitions.
+//! but the NBT data is not in any way parsed by this library. You'll probably
+//! want to see what the meanings of each of the packets are, which is
+//! documented on [wiki.vg](http://wiki.vg/Main_Page). The [protocol
+//! documentation](http://wiki.vg/Protocol) in particular is likely to be a
+//! necessary companion to using this library.
 //!
 //! Currently the library is entirely synchronous, requiring consumers to handle
 //! concurrency however they wish. It would be cool to add an asynchronous API
 //! though, maybe using mio.
 //!
 //! The library nominally supports every packet used in MCMODERN, but the goal
-//! is still to add lots more helper functions and other useful things.
+//! is still to add lots more helper functions and other useful things. There
+//! are still many errors and inconvenient things in the library, where changes
+//! or helper functions would be good to add. If you find any errors or
+//! suggestions for improvement, no matter how trivial, then post it on the
+//! bugtracker.
 //!
 //! The library does not yet have any stable releases, not because it may
 //! contain bugs (which it certainly does,) but because the API may be
