@@ -7,7 +7,7 @@ documentation = "https://c4k3.net/rustdocs/ozelot/ozelot/"
 repository = "https://github.com/C4K3/ozelot/"
 keywords = ["minecraft", "mc", "mcmodern"]
 categories = ["games"]
-license = "CC0"
+license = "CC0-1.0"
 
 [dependencies]
 byteorder = "1"
