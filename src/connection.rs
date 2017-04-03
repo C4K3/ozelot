@@ -71,6 +71,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
         conn.stream.set_read_timeout(Some(time::Duration::new(30, 0)))?;
         conn.stream.set_write_timeout(Some(time::Duration::new(30, 0)))?;
         conn.stream.set_nonblocking(true)?;
+        conn.stream.set_nodelay(true)?;
         Ok(conn)
     }
 
