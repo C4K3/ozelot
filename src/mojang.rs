@@ -317,7 +317,8 @@ impl AuthenticateValidate {
         let payload = serde_json::to_string(self).unwrap();
 
         let client = Client::new().expect("Error creating reqwest client");
-        let res = client.post(&Self::get_endpoint())
+        let res = client
+            .post(&Self::get_endpoint())
             .header(ContentType::json())
             .body(payload)
             .send();
@@ -473,10 +474,7 @@ fn get_request(url: &str) -> io::Result<String> {
 /// posting the given data to it, and returning the response content.
 fn post_request(url: &str, post: &str) -> io::Result<String> {
     let client = Client::new().expect("Error creating reqwest client");
-    let res = client.post(url)
-        .header(ContentType::json())
-        .body(post)
-        .send();
+    let res = client.post(url).header(ContentType::json()).body(post).send();
 
     let mut res = match res {
         Ok(x) => x,
