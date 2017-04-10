@@ -103,7 +103,7 @@ impl Packet for ClientboundPacket {
             0 => Ok(StatusResponse::deserialize(r)?),
             1 => Ok(StatusPong::deserialize(r)?),
 
-            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
+            _ => bail!("No packet with id {} in state {}", packet_id, state),
             }
         },
         &ClientState::Login => {
@@ -113,7 +113,7 @@ impl Packet for ClientboundPacket {
             2 => Ok(LoginSuccess::deserialize(r)?),
             3 => Ok(SetCompression::deserialize(r)?),
 
-            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
+            _ => bail!("No packet with id {} in state {}", packet_id, state),
             }
         },
         &ClientState::Play => {
@@ -195,7 +195,7 @@ impl Packet for ClientboundPacket {
             74 => Ok(EntityProperties::deserialize(r)?),
             75 => Ok(EntityEffect::deserialize(r)?),
 
-            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
+            _ => bail!("No packet with id {} in state {}", packet_id, state),
             }
         },
 

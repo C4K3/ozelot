@@ -82,7 +82,7 @@
                           (apply str
                                  (for [{name :name id :id} packets]
                                    (format "            %s => Ok(%s::deserialize(r)?),\n" id name)))
-                          "            _ => Err(format!(\"No packet with id {} in state {}\", packet_id, state).into()),"
+                          "            _ => bail!(\"No packet with id {} in state {}\", packet_id, state),"
                           "            }"))
               "        },"
               "")

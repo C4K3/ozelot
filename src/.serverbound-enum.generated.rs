@@ -51,7 +51,7 @@ impl Packet for ServerboundPacket {
             match packet_id {
             0 => Ok(Handshake::deserialize(r)?),
 
-            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
+            _ => bail!("No packet with id {} in state {}", packet_id, state),
             }
         },
         &ClientState::Status => {
@@ -59,7 +59,7 @@ impl Packet for ServerboundPacket {
             0 => Ok(StatusRequest::deserialize(r)?),
             1 => Ok(StatusPing::deserialize(r)?),
 
-            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
+            _ => bail!("No packet with id {} in state {}", packet_id, state),
             }
         },
         &ClientState::Login => {
@@ -67,7 +67,7 @@ impl Packet for ServerboundPacket {
             0 => Ok(LoginStart::deserialize(r)?),
             1 => Ok(EncryptionResponse::deserialize(r)?),
 
-            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
+            _ => bail!("No packet with id {} in state {}", packet_id, state),
             }
         },
         &ClientState::Play => {
@@ -103,7 +103,7 @@ impl Packet for ServerboundPacket {
             28 => Ok(PlayerBlockPlacement::deserialize(r)?),
             29 => Ok(UseItem::deserialize(r)?),
 
-            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
+            _ => bail!("No packet with id {} in state {}", packet_id, state),
             }
         },
 

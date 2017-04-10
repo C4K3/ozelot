@@ -328,7 +328,7 @@ impl AuthenticateValidate {
         match res.status() {
             &reqwest::StatusCode::NoContent => Ok(true),
             &reqwest::StatusCode::Forbidden => Ok(false),
-            _ => Err(format!("Got response code {}", res.status()).into()),
+            _ => bail!("Got response code {}", res.status()),
         }
     }
 }

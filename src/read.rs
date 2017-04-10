@@ -13,7 +13,7 @@ pub fn read_bool<R: Read>(reader: &mut R) -> Result<bool> {
     match byte {
         0 => Ok(false),
         1 => Ok(true),
-        _ => Err(format!("Bool had invalid value {}", byte).into()),
+        _ => bail!("Bool had invalid value {}", byte),
     }
 }
 
