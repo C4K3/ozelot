@@ -41,7 +41,7 @@ impl APIStatus {
                               "")
             .replace('[', "{")
             .replace(']', "}");
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
 
     fn get_endpoint() -> String {
@@ -76,7 +76,7 @@ impl NameToUUID {
             },
         };
         let res = get_request(&url)?;
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
 }
 
@@ -92,7 +92,7 @@ impl UUIDToHistory {
         let url = format!("https://api.mojang.com/user/profiles/{}/names",
                           self.uuid);
         let res = get_request(&url)?;
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
 }
 
@@ -108,10 +108,10 @@ impl PlayernamesToUUIDs {
         "https://api.mojang.com/profiles/minecraft".to_string()
     }
     pub fn perform(&self) -> Result<Vec<NameUUID>> {
-        let body = serde_json::to_string(&self.usernames).unwrap();
+        let body = serde_json::to_string(&self.usernames)?;
         println!("body: {}", body);
         let res = post_request(&Self::get_endpoint(), &body)?;
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
     /// Create a new instance of this request.
     ///
@@ -147,7 +147,7 @@ impl UUIDToProfile {
         };
         let res = get_request(&url)?;
         println!("res: {}", res);
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
 }
 
@@ -204,7 +204,7 @@ impl Statistics {
                                 "metricKeys": query
                             });
         let res = post_request(&Self::get_endpoint(), &payload.to_string())?;
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
     /// Create a new request for requesting the sum of sales of the specified
     /// types.
@@ -274,7 +274,7 @@ impl Authenticate {
             "requestUser": self.requestUser
         });
         let res = post_request(&Self::get_endpoint(), &payload.to_string())?;
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
     pub fn new(username: String, password: String) -> Self {
         Authenticate {
@@ -298,9 +298,9 @@ impl AuthenticateRefresh {
         "https://authserver.mojang.com/refresh".to_string()
     }
     pub fn perform(&self) -> Result<AuthenticationResponse> {
-        let payload = serde_json::to_string(self).unwrap();
+        let payload = serde_json::to_string(self)?;
         let res = post_request(&Self::get_endpoint(), &payload)?;
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
 }
 
@@ -315,7 +315,7 @@ impl AuthenticateValidate {
         "https://authserver.mojang.com/validate".to_string()
     }
     pub fn perform(&self) -> Result<bool> {
-        let payload = serde_json::to_string(self).unwrap();
+        let payload = serde_json::to_string(self)?;
 
         let client = Client::new().expect("Error creating reqwest client");
         let res = client
@@ -344,7 +344,7 @@ impl AuthenticateSignout {
         "https://authserver.mojang.com/signout".to_string()
     }
     pub fn perform(&self) -> Result<()> {
-        let payload = serde_json::to_string(self).unwrap();
+        let payload = serde_json::to_string(self)?;
 
         let res = post_request(&Self::get_endpoint(), &payload)?;
         if res.is_empty() {
@@ -366,7 +366,7 @@ impl AuthenticateInvalidate {
         "https://authserver.mojang.com/invalidate".to_string()
     }
     pub fn perform(&self) -> Result<()> {
-        let payload = serde_json::to_string(self).unwrap();
+        let payload = serde_json::to_string(self)?;
 
         let res = post_request(&Self::get_endpoint(), &payload)?;
         if res.is_empty() {
@@ -391,7 +391,7 @@ impl SessionJoin {
         "https://sessionserver.mojang.com/session/minecraft/join".to_string()
     }
     pub fn perform(&self) -> Result<()> {
-        let payload = serde_json::to_string(self).unwrap();
+        let payload = serde_json::to_string(self)?;
 
         let res = post_request(&Self::get_endpoint(), &payload)?;
         if res.is_empty() {
@@ -428,7 +428,7 @@ impl SessionHasJoined {
         let url = format!("https://sessionserver.mojang.com/session/minecraft/hasJoined?username={}&serverId={}", self.username, self.serverId);
         let res = get_request(&url)?;
         println!("session has joined response: {}", &res);
-        Ok(serde_json::from_str(&res).unwrap())
+        Ok(serde_json::from_str(&res)?)
     }
     pub fn new(username: String,
                server_id: &str,

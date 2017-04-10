@@ -80,7 +80,7 @@ pub fn read_String<R: Read>(reader: &mut R) -> Result<String> {
 
     /* FIXME can we do this without a double copy? */
     let mut buf = vec![0; length];
-    reader.read_exact(&mut buf).unwrap();
+    reader.read_exact(&mut buf)?;
 
     Ok(string::String::from_utf8_lossy(&buf).into_owned())
 }

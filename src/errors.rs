@@ -5,5 +5,6 @@ error_chain! {
         Io(::std::io::Error);
         Openssl(::openssl::error::ErrorStack);
         Reqwest(::reqwest::Error);
+        Serde(::serde_json::Error);
     }
 }
