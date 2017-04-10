@@ -6,15 +6,15 @@
 //! The goal is also to add a bunch of useful helper functions to the packets,
 //! if you feel such a function is missing, open an issue.
 
+use connection::Packet;
+use errors::Result;
 use read::*;
 use write::*;
-use connection::Packet;
 use {ClientState, u128};
 
 use std::collections::BTreeMap;
 use std::fmt;
 use std::io::Read;
-use std::io;
 
 /* See packets.clj for information about this include */
 include!("./.clientbound-enum.generated.rs");
@@ -24,7 +24,7 @@ include!("./.clientbound-packets.generated.rs");
  * packets.clj's code generation */
 
 impl Statistics {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Statistics::get_packet_id(), &mut ret)?;
         write_varint(&(self.values.len() as i32), &mut ret)?;
@@ -34,7 +34,7 @@ impl Statistics {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let count = read_varint(r)?;
         let mut tmp = BTreeMap::new();
         for _ in 0..count {
@@ -47,7 +47,7 @@ impl Statistics {
 }
 
 impl ClientboundTabComplete {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&ClientboundTabComplete::get_packet_id(), &mut ret)?;
         write_varint(&(self.matches.len() as i32), &mut ret)?;
@@ -56,7 +56,7 @@ impl ClientboundTabComplete {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let count = read_varint(r)?;
         let mut tmp = Vec::with_capacity(count as usize);
         for _ in 0..count {
@@ -69,7 +69,7 @@ impl ClientboundTabComplete {
 }
 
 impl MultiBlockChange {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&MultiBlockChange::get_packet_id(), &mut ret)?;
         write_i32(&self.chunk_x, &mut ret)?;
@@ -83,7 +83,7 @@ impl MultiBlockChange {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let chunk_x = read_i32(r)?;
         let chunk_z = read_i32(r)?;
         let count = read_varint(r)?;
@@ -106,7 +106,7 @@ impl MultiBlockChange {
 }
 
 impl OpenWindow {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&OpenWindow::get_packet_id(), &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
@@ -118,7 +118,7 @@ impl OpenWindow {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let window_id = read_u8(r)?;
         let window_type = read_String(r)?;
         let window_title = read_String(r)?;
@@ -139,7 +139,7 @@ impl OpenWindow {
 }
 
 impl Explosion {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Explosion::get_packet_id(), &mut ret)?;
         write_f32(&self.x, &mut ret)?;
@@ -157,7 +157,7 @@ impl Explosion {
         write_f32(&self.motion_z, &mut ret)?;
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let x = read_f32(r)?;
         let y = read_f32(r)?;
         let z = read_f32(r)?;
@@ -184,7 +184,7 @@ impl Explosion {
 }
 
 impl Particle {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Particle::get_packet_id(), &mut ret)?;
         write_i32(&self.particle_id, &mut ret)?;
@@ -205,7 +205,7 @@ impl Particle {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let particle_id = read_i32(r)?;
         let long_distance = read_bool(r)?;
         let x = read_f32(r)?;
@@ -242,7 +242,7 @@ impl Particle {
 }
 
 impl CombatEvent {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&CombatEvent::get_packet_id(), &mut ret)?;
         write_varint(&self.event, &mut ret)?;
@@ -257,7 +257,7 @@ impl CombatEvent {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let event = read_varint(r)?;
         let (duration_playerid, entity_id, message) = match event {
             0 => (None, None, None),
@@ -267,7 +267,7 @@ impl CombatEvent {
                  Some(read_i32(r)?),
                  Some(read_String(r)?))
             },
-            _ => return io_error!("Invalid event in CombatEvent"),
+            _ => bail!("Invalid event in CombatEvent"),
         };
         Ok(ClientboundPacket::CombatEvent(CombatEvent {
                                               event: event,
@@ -280,7 +280,7 @@ impl CombatEvent {
 }
 
 impl ScoreboardObjective {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&ScoreboardObjective::get_packet_id(), &mut ret)?;
         write_String(&self.name, &mut ret)?;
@@ -293,7 +293,7 @@ impl ScoreboardObjective {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let name = read_String(r)?;
         let mode = read_u8(r)?;
         let (value, objective_type) = match mode {
@@ -311,7 +311,7 @@ impl ScoreboardObjective {
 }
 
 impl UpdateScore {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&UpdateScore::get_packet_id(), &mut ret)?;
         write_String(&self.name, &mut ret)?;
@@ -322,7 +322,7 @@ impl UpdateScore {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let name = read_String(r)?;
         let action = read_u8(r)?;
         let objective_name = read_String(r)?;
@@ -340,7 +340,7 @@ impl UpdateScore {
 }
 
 impl Title {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Title::get_packet_id(), &mut ret)?;
         write_varint(&self.action, &mut ret)?;
@@ -353,7 +353,7 @@ impl Title {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ClientboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let action = read_varint(r)?;
         let text = match action {
             0 | 1 | 2 => Some(read_String(r)?),

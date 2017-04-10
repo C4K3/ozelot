@@ -1,10 +1,11 @@
 use clientbound::ClientboundPacket;
-use serverbound::ServerboundPacket;
 use connection::Connection;
-use {ClientState, PROTOCOL_VERSION, mojang, serverbound};
+use errors::Result;
 use json::AuthenticationResponse;
+use serverbound::ServerboundPacket;
+use {ClientState, PROTOCOL_VERSION, mojang, serverbound};
 
-use std::{io, thread, time};
+use std::{thread, time};
 
 /// Represents a single client connection to a Server.
 pub struct Client {
@@ -16,7 +17,7 @@ impl Client {
     /// Attempt open the tcp connection to the given host and port, and
     /// nothing more. If you use this you must then send all subsequent
     /// packets manually to authenticate and so on.
-    pub fn connect_tcp(host: &str, port: u16) -> io::Result<Self> {
+    pub fn connect_tcp(host: &str, port: u16) -> Result<Self> {
         Ok(Client {
                conn: Connection::connect_tcp(host, port)?,
                auto_handle: false,
@@ -46,7 +47,7 @@ impl Client {
     pub fn connect_unauthenticated(host: &str,
                                    port: u16,
                                    username: &str)
-                                   -> io::Result<Self> {
+                                   -> Result<Self> {
 
         let timeout = time::Instant::now();
         let mut client = Client::connect_tcp(host, port)?;
@@ -64,17 +65,16 @@ impl Client {
         /* Now we wait for the PlayerAbilities packet from the server */
         'wait: loop {
             if timeout.elapsed() > time::Duration::new(30, 0) {
-                return io_error!("Timed out waiting for LoginSuccess/EncryptionRequest");
+                bail!("Timed out waiting for LoginSuccess");
             }
             client.update_inbuf()?;
             match client.read_packet()? {
                 Some(ClientboundPacket::LoginDisconnect(ref p)) => {
-                    return io_error!("Got LoginDisconnect, reason: {}",
-                                     p.get_raw_chat());
+                    bail!("Got LoginDisconnect, reason: {}", p.get_raw_chat());
                 },
                 Some(ClientboundPacket::PlayerAbilities(..)) => break 'wait,
                 Some(ClientboundPacket::EncryptionRequest(..)) => {
-                    return io_error!("connect_unauthenticated got EncryptionRequest");
+                    bail!("connect_unauthenticated got EncryptionRequest");
                 },
                 Some(_) => (),
                 None => thread::sleep(time::Duration::from_millis(10)),
@@ -117,7 +117,7 @@ impl Client {
     pub fn connect_authenticated(host: &str,
                                  port: u16,
                                  auth: &AuthenticationResponse)
-                                 -> io::Result<Self> {
+                                 -> Result<Self> {
 
         let timeout = time::Instant::now();
         let mut client = Client::connect_tcp(host, port)?;
@@ -136,15 +136,14 @@ impl Client {
         /* Here we wait for a LoginSuccess/EncryptionRequest packet */
         'wait: loop {
             if timeout.elapsed() > time::Duration::new(30, 0) {
-                return io_error!("Timed out waiting for LoginSuccess/EncryptionRequest");
+                bail!("Timed out waiting for LoginSuccess/EncryptionRequest");
             }
             client.update_inbuf()?;
             match client.read_packet()? {
                 Some(ClientboundPacket::LoginDisconnect(ref p)) => {
-                    return io_error!("Got LoginDisconnect, reason: {}",
-                                     p.get_raw_chat());
+                    bail!("Got LoginDisconnect, reason: {}", p.get_raw_chat());
                 },
-                Some(ClientboundPacket::LoginSuccess(..)) => return io_error!("Logged in unauthenticated"),
+                Some(ClientboundPacket::LoginSuccess(..)) => bail!("Logged in unauthenticated"),
                 Some(ClientboundPacket::EncryptionRequest(ref p)) => {
                     let shared_secret = mojang::create_shared_secret();
 
@@ -172,13 +171,12 @@ impl Client {
         /* Now we wait for the PlayerAbilities packet from the server */
         'wait2: loop {
             if timeout.elapsed() > time::Duration::new(30, 0) {
-                return io_error!("Timed out waiting for PlayerAbilities packet");
+                bail!("Timed out waiting for PlayerAbilities packet");
             }
             client.update_inbuf()?;
             match client.read_packet()? {
                 Some(ClientboundPacket::LoginDisconnect(ref p)) => {
-                    return io_error!("Got LoginDisconnect, reason: {}",
-                                     p.get_raw_chat());
+                    bail!("Got LoginDisconnect, reason: {}", p.get_raw_chat());
                 },
                 Some(ClientboundPacket::PlayerAbilities(..)) => break 'wait2,
                 Some(_) => (),
@@ -192,7 +190,7 @@ impl Client {
     /// Try to read some packets from the server.
     ///
     /// This function is nonblocking.
-    pub fn read(&mut self) -> io::Result<Vec<ClientboundPacket>> {
+    pub fn read(&mut self) -> Result<Vec<ClientboundPacket>> {
         self.update_inbuf()?;
 
         let mut ret = Vec::new();
@@ -222,7 +220,7 @@ impl Client {
     /// Send the given packet to the server that we're connected to.
     ///
     /// This function may block.
-    pub fn send(&mut self, packet: ServerboundPacket) -> io::Result<()> {
+    pub fn send(&mut self, packet: ServerboundPacket) -> Result<()> {
         self.conn.send(packet)
     }
 
@@ -244,7 +242,7 @@ impl Client {
     /// Attempt to close this connection, disconnecting from the server.
     ///
     /// All future sends and reads to this connection will fail.
-    pub fn close(&mut self) -> io::Result<()> {
+    pub fn close(&mut self) -> Result<()> {
         self.conn.close()
     }
 
@@ -277,7 +275,7 @@ impl Client {
     /// this function.
     ///
     /// This function is nonblocking.
-    pub fn update_inbuf(&mut self) -> io::Result<()> {
+    pub fn update_inbuf(&mut self) -> Result<()> {
         self.conn.update_inbuf()
     }
 
@@ -290,7 +288,7 @@ impl Client {
     /// You MUST be sure that client.update_inbuf() has been called before this,
     /// this function will not attempt to read from the TcpStream, only from the
     /// internal buffer.
-    pub fn read_packet(&mut self) -> io::Result<Option<ClientboundPacket>> {
+    pub fn read_packet(&mut self) -> Result<Option<ClientboundPacket>> {
         let packet = self.conn.read_packet()?;
 
         if self.auto_handle {

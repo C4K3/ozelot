@@ -1,9 +1,9 @@
-use clientbound::ClientboundPacket;
-use serverbound::ServerboundPacket;
-use connection::Connection;
 use ClientState;
+use clientbound::ClientboundPacket;
+use connection::Connection;
+use errors::Result;
+use serverbound::ServerboundPacket;
 
-use std::io;
 use std::net::TcpStream;
 
 /// Represents a single client connection, from the point of view of a server
@@ -12,7 +12,7 @@ pub struct Server {
 }
 impl Server {
     /// Create a new connection from an existing TcpStream
-    pub fn from_tcpstream(stream: TcpStream) -> io::Result<Self> {
+    pub fn from_tcpstream(stream: TcpStream) -> Result<Self> {
         Ok(Server {
                conn: Connection::from_tcpstream(stream)?,
            })
@@ -21,7 +21,7 @@ impl Server {
     /// Try to read some packets from the client.
     ///
     /// This function is nonblocking.
-    pub fn read(&mut self) -> io::Result<Vec<ServerboundPacket>> {
+    pub fn read(&mut self) -> Result<Vec<ServerboundPacket>> {
         self.update_inbuf()?;
 
         let mut ret = Vec::new();
@@ -38,14 +38,14 @@ impl Server {
     /// Send the given packet to the client
     ///
     /// This function may block.
-    pub fn send(&mut self, packet: ClientboundPacket) -> io::Result<()> {
+    pub fn send(&mut self, packet: ClientboundPacket) -> Result<()> {
         self.conn.send(packet)
     }
 
     /// Attempt to close this connection, disconnecting the client
     ///
     /// All future sends and reads to this connection will fail.
-    pub fn close(&mut self) -> io::Result<()> {
+    pub fn close(&mut self) -> Result<()> {
         self.conn.close()
     }
 
@@ -78,7 +78,7 @@ impl Server {
     /// this function.
     ///
     /// This function is nonblocking.
-    pub fn update_inbuf(&mut self) -> io::Result<()> {
+    pub fn update_inbuf(&mut self) -> Result<()> {
         self.conn.update_inbuf()
     }
 
@@ -92,7 +92,7 @@ impl Server {
     /// You MUST be sure that server.update_inbuf() has been called before this,
     /// this function will not attempt to read from the TcpStream, only from the
     /// internal buffer.
-    pub fn read_packet(&mut self) -> io::Result<Option<ServerboundPacket>> {
+    pub fn read_packet(&mut self) -> Result<Option<ServerboundPacket>> {
         self.conn.read_packet()
     }
 }

@@ -16,8 +16,9 @@
 pub use json::*;
 pub use yggdrasil::{create_shared_secret, generate_rsa_key, rsa_key_binary};
 use yggdrasil;
+use errors::{Result, ResultExt};
 
-use std::io::{self, Read};
+use std::io::Read;
 
 use reqwest::{self, Client};
 use reqwest::header::ContentType;
@@ -28,7 +29,7 @@ use serde_json;
 #[derive(Debug, new)]
 pub struct APIStatus();
 impl APIStatus {
-    pub fn perform(&self) -> io::Result<APIStatusResponse> {
+    pub fn perform(&self) -> Result<APIStatusResponse> {
         let res = get_request(&Self::get_endpoint())?;
         /* Flatten the list, and turn it into an object.
          * For some reason this response is given in a really weird way, and
@@ -62,7 +63,7 @@ pub struct NameToUUID {
     at: Option<i64>,
 }
 impl NameToUUID {
-    pub fn perform(&self) -> io::Result<NameUUID> {
+    pub fn perform(&self) -> Result<NameUUID> {
         let url = match self.at {
             Some(x) => {
                 format!("https://api.mojang.com/users/profiles/minecraft/{}?at={}",
@@ -87,7 +88,7 @@ pub struct UUIDToHistory {
     uuid: String,
 }
 impl UUIDToHistory {
-    pub fn perform(&self) -> io::Result<Vec<NameHistory>> {
+    pub fn perform(&self) -> Result<Vec<NameHistory>> {
         let url = format!("https://api.mojang.com/user/profiles/{}/names",
                           self.uuid);
         let res = get_request(&url)?;
@@ -106,7 +107,7 @@ impl PlayernamesToUUIDs {
     fn get_endpoint() -> String {
         "https://api.mojang.com/profiles/minecraft".to_string()
     }
-    pub fn perform(&self) -> io::Result<Vec<NameUUID>> {
+    pub fn perform(&self) -> Result<Vec<NameUUID>> {
         let body = serde_json::to_string(&self.usernames).unwrap();
         println!("body: {}", body);
         let res = post_request(&Self::get_endpoint(), &body)?;
@@ -136,7 +137,7 @@ pub struct UUIDToProfile {
     signed: bool,
 }
 impl UUIDToProfile {
-    pub fn perform(&self) -> io::Result<Profile> {
+    pub fn perform(&self) -> Result<Profile> {
         let url = if self.signed {
             format!("https://sessionserver.mojang.com/session/minecraft/profile/{}?unsigned=false",
                     self.uuid)
@@ -157,7 +158,7 @@ impl BlockedServers {
     fn get_endpoint() -> String {
         "https://sessionserver.mojang.com/blockedservers".to_string()
     }
-    pub fn perform(&self) -> io::Result<Vec<String>> {
+    pub fn perform(&self) -> Result<Vec<String>> {
         let res: String = get_request(&Self::get_endpoint())?;
         Ok(res.split('\n')
                .filter_map(|e| if !e.is_empty() {
@@ -185,7 +186,7 @@ impl Statistics {
     fn get_endpoint() -> String {
         "https://api.mojang.com/orders/statistics".to_string()
     }
-    pub fn perform(&self) -> io::Result<StatisticsResponse> {
+    pub fn perform(&self) -> Result<StatisticsResponse> {
         let mut query: Vec<&str> = Vec::new();
         if self.item_sold_minecraft {
             query.push("item_sold_minecraft");
@@ -261,7 +262,7 @@ impl Authenticate {
     fn get_endpoint() -> String {
         "https://authserver.mojang.com/authenticate".to_string()
     }
-    pub fn perform(&self) -> io::Result<AuthenticationResponse> {
+    pub fn perform(&self) -> Result<AuthenticationResponse> {
         let payload = json!({
             "agent": {
                 "name": "Minecraft",
@@ -296,7 +297,7 @@ impl AuthenticateRefresh {
     fn get_endpoint() -> String {
         "https://authserver.mojang.com/refresh".to_string()
     }
-    pub fn perform(&self) -> io::Result<AuthenticationResponse> {
+    pub fn perform(&self) -> Result<AuthenticationResponse> {
         let payload = serde_json::to_string(self).unwrap();
         let res = post_request(&Self::get_endpoint(), &payload)?;
         Ok(serde_json::from_str(&res).unwrap())
@@ -313,7 +314,7 @@ impl AuthenticateValidate {
     fn get_endpoint() -> String {
         "https://authserver.mojang.com/validate".to_string()
     }
-    pub fn perform(&self) -> io::Result<bool> {
+    pub fn perform(&self) -> Result<bool> {
         let payload = serde_json::to_string(self).unwrap();
 
         let client = Client::new().expect("Error creating reqwest client");
@@ -321,19 +322,13 @@ impl AuthenticateValidate {
             .post(&Self::get_endpoint())
             .header(ContentType::json())
             .body(payload)
-            .send();
-
-        let res = match res {
-            Ok(x) => x,
-            Err(e) => {
-                return io_error!("Error sending POST request to {}: {}", &Self::get_endpoint(), e);
-            },
-        };
+            .send()
+            .chain_err(|| format!("Error sending POST request to {}", &Self::get_endpoint()))?;
 
         match res.status() {
             &reqwest::StatusCode::NoContent => Ok(true),
             &reqwest::StatusCode::Forbidden => Ok(false),
-            _ => io_error!("Got response code {}", res.status()),
+            _ => Err(format!("Got response code {}", res.status()).into()),
         }
     }
 }
@@ -348,14 +343,14 @@ impl AuthenticateSignout {
     fn get_endpoint() -> String {
         "https://authserver.mojang.com/signout".to_string()
     }
-    pub fn perform(&self) -> io::Result<()> {
+    pub fn perform(&self) -> Result<()> {
         let payload = serde_json::to_string(self).unwrap();
 
         let res = post_request(&Self::get_endpoint(), &payload)?;
         if res.is_empty() {
             Ok(())
         } else {
-            io_error!("AuthenticateSignout got non-empty response")
+            bail!("AuthenticateSignout got non-empty response");
         }
     }
 }
@@ -370,14 +365,14 @@ impl AuthenticateInvalidate {
     fn get_endpoint() -> String {
         "https://authserver.mojang.com/invalidate".to_string()
     }
-    pub fn perform(&self) -> io::Result<()> {
+    pub fn perform(&self) -> Result<()> {
         let payload = serde_json::to_string(self).unwrap();
 
         let res = post_request(&Self::get_endpoint(), &payload)?;
         if res.is_empty() {
             Ok(())
         } else {
-            io_error!("AuthenticateInvalidate got non-empty response")
+            bail!("AuthenticateInvalidate got non-empty response");
         }
     }
 }
@@ -395,14 +390,14 @@ impl SessionJoin {
     fn get_endpoint() -> String {
         "https://sessionserver.mojang.com/session/minecraft/join".to_string()
     }
-    pub fn perform(&self) -> io::Result<()> {
+    pub fn perform(&self) -> Result<()> {
         let payload = serde_json::to_string(self).unwrap();
 
         let res = post_request(&Self::get_endpoint(), &payload)?;
         if res.is_empty() {
             Ok(())
         } else {
-            io_error!("SessionJoin got non-empty response")
+            bail!("SessionJoin got non-empty response");
         }
     }
     pub fn new(access_token: String,
@@ -429,7 +424,7 @@ pub struct SessionHasJoined {
     serverId: String,
 }
 impl SessionHasJoined {
-    pub fn perform(&self) -> io::Result<SessionHasJoinedResponse> {
+    pub fn perform(&self) -> Result<SessionHasJoinedResponse> {
         let url = format!("https://sessionserver.mojang.com/session/minecraft/hasJoined?username={}&serverId={}", self.username, self.serverId);
         let res = get_request(&url)?;
         println!("session has joined response: {}", &res);
@@ -450,19 +445,15 @@ impl SessionHasJoined {
 
 /// Helper function for performing a GET request to the given URL, returning
 /// the response content
-fn get_request(url: &str) -> io::Result<String> {
+fn get_request(url: &str) -> Result<String> {
     let client = Client::new().expect("Error creating reqwest client");
-    let res = client.get(url).send();
-
-    let mut res = match res {
-        Ok(x) => x,
-        Err(e) => {
-            return io_error!("Error sending GET request to {}: {}", url, e);
-        },
-    };
+    let mut res =
+        client.get(url)
+            .send()
+            .chain_err(|| format!("Error sending GET request to {}", url))?;
 
     if !res.status().is_success() {
-        return io_error!("Got {} response from {}", res.status(), url);
+        bail!("Got {} response from {}", res.status(), url);
     }
 
     let mut ret = String::new();
@@ -472,19 +463,17 @@ fn get_request(url: &str) -> io::Result<String> {
 
 /// Helper function for performing a POST request to the given URL,
 /// posting the given data to it, and returning the response content.
-fn post_request(url: &str, post: &str) -> io::Result<String> {
+fn post_request(url: &str, post: &str) -> Result<String> {
     let client = Client::new().expect("Error creating reqwest client");
-    let res = client.post(url).header(ContentType::json()).body(post).send();
-
-    let mut res = match res {
-        Ok(x) => x,
-        Err(e) => {
-            return io_error!("Error sending POST request to {}: {}", url, e);
-        },
-    };
+    let mut res =
+        client.post(url)
+            .header(ContentType::json())
+            .body(post)
+            .send()
+            .chain_err(|| format!("Error sending POST request to {}", url))?;
 
     if !res.status().is_success() {
-        return io_error!("Got {} response from {}", res.status(), url);
+        bail!("Got {} response from {}", res.status(), url);
     }
 
     let mut ret = String::new();

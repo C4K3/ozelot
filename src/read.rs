@@ -1,19 +1,19 @@
 //! Functions for deserializing datatypes used by the protocol
+use errors::Result;
 use u128;
 
 use std::io::Read;
-use std::io;
 use std::string;
 
 use byteorder::{BigEndian, ReadBytesExt};
 
 /// Read a single bool from the Reader
-pub fn read_bool<R: Read>(reader: &mut R) -> io::Result<bool> {
+pub fn read_bool<R: Read>(reader: &mut R) -> Result<bool> {
     let byte = read_u8(reader)?;
     match byte {
         0 => Ok(false),
         1 => Ok(true),
-        _ => io_error!("Bool had invalid value {}", byte),
+        _ => Err(format!("Bool had invalid value {}", byte).into()),
     }
 }
 
@@ -25,57 +25,57 @@ pub fn read_bool<R: Read>(reader: &mut R) -> io::Result<bool> {
  * change these functions without breaking anything. */
 
 /// Read a single i8 from the Reader
-pub fn read_i8<R: Read>(reader: &mut R) -> io::Result<i8> {
-    reader.read_i8()
+pub fn read_i8<R: Read>(reader: &mut R) -> Result<i8> {
+    Ok(reader.read_i8()?)
 }
 
 /// Read a single u8 from the Reader
-pub fn read_u8<R: Read>(reader: &mut R) -> io::Result<u8> {
-    reader.read_u8()
+pub fn read_u8<R: Read>(reader: &mut R) -> Result<u8> {
+    Ok(reader.read_u8()?)
 }
 
 /// Read a single i16 from the Reader
-pub fn read_i16<R: Read>(reader: &mut R) -> io::Result<i16> {
-    reader.read_i16::<BigEndian>()
+pub fn read_i16<R: Read>(reader: &mut R) -> Result<i16> {
+    Ok(reader.read_i16::<BigEndian>()?)
 }
 
 /// Read a single u16 from the Reader
-pub fn read_u16<R: Read>(reader: &mut R) -> io::Result<u16> {
-    reader.read_u16::<BigEndian>()
+pub fn read_u16<R: Read>(reader: &mut R) -> Result<u16> {
+    Ok(reader.read_u16::<BigEndian>()?)
 }
 
 /// Read a single i32 from the Reader
-pub fn read_i32<R: Read>(reader: &mut R) -> io::Result<i32> {
-    reader.read_i32::<BigEndian>()
+pub fn read_i32<R: Read>(reader: &mut R) -> Result<i32> {
+    Ok(reader.read_i32::<BigEndian>()?)
 }
 
 /// Read a single i64 from the Reader
-pub fn read_i64<R: Read>(reader: &mut R) -> io::Result<i64> {
-    reader.read_i64::<BigEndian>()
+pub fn read_i64<R: Read>(reader: &mut R) -> Result<i64> {
+    Ok(reader.read_i64::<BigEndian>()?)
 }
 
 /// Read a single u64 from the Reader
-pub fn read_u64<R: Read>(reader: &mut R) -> io::Result<u64> {
-    reader.read_u64::<BigEndian>()
+pub fn read_u64<R: Read>(reader: &mut R) -> Result<u64> {
+    Ok(reader.read_u64::<BigEndian>()?)
 }
 
 /// Read a single f32 from the Reader
-pub fn read_f32<R: Read>(reader: &mut R) -> io::Result<f32> {
-    reader.read_f32::<BigEndian>()
+pub fn read_f32<R: Read>(reader: &mut R) -> Result<f32> {
+    Ok(reader.read_f32::<BigEndian>()?)
 }
 
 /// Read a single f64 from the Reader
-pub fn read_f64<R: Read>(reader: &mut R) -> io::Result<f64> {
-    reader.read_f64::<BigEndian>()
+pub fn read_f64<R: Read>(reader: &mut R) -> Result<f64> {
+    Ok(reader.read_f64::<BigEndian>()?)
 }
 
 /// Read a length-prefixed utf-8 String from the Reader
 #[allow(non_snake_case)]
-pub fn read_String<R: Read>(reader: &mut R) -> io::Result<String> {
+pub fn read_String<R: Read>(reader: &mut R) -> Result<String> {
     let length = read_varint(reader)? as usize;
 
     if length > (1 << 16) {
-        return io_error!("read_string refusing to read string due to its length");
+        bail!("read_string refusing to read string due to its length");
     }
 
     /* FIXME can we do this without a double copy? */
@@ -86,7 +86,7 @@ pub fn read_String<R: Read>(reader: &mut R) -> io::Result<String> {
 }
 
 /// Read a Minecraft-style varint, which currently fits into a i32
-pub fn read_varint<R: Read>(reader: &mut R) -> io::Result<i32> {
+pub fn read_varint<R: Read>(reader: &mut R) -> Result<i32> {
     let mut radix: u64 = 128;
     let msb: u8 = 0b10000000; /* Only the MSB set */
 
@@ -98,8 +98,7 @@ pub fn read_varint<R: Read>(reader: &mut R) -> io::Result<i32> {
     let mut i: usize = 0;
     while (buf & msb) != 0 {
         if i >= 5 {
-            return Err(io::Error::new(io::ErrorKind::InvalidData,
-                                      "VarInt is too long"));
+            bail!("VarInt is too long");
         }
 
         i += 1;
@@ -110,8 +109,7 @@ pub fn read_varint<R: Read>(reader: &mut R) -> io::Result<i32> {
 
     /* Now we convert it to signed */
     if res >= 4294967296 {
-        return Err(io::Error::new(io::ErrorKind::InvalidData,
-                                  "Received too large varint"));
+        bail!("Received too large varint");
     }
 
     if res > 2147483647 {
@@ -122,7 +120,7 @@ pub fn read_varint<R: Read>(reader: &mut R) -> io::Result<i32> {
 }
 
 /// Read length-prefixed bytearray where the length is given as a varint
-pub fn read_prefixed_bytearray<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
+pub fn read_prefixed_bytearray<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
     let length = read_varint(reader)?;
     let mut tmp = vec![0; length as usize];
     reader.read_exact(&mut tmp)?;
@@ -130,8 +128,7 @@ pub fn read_prefixed_bytearray<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
 }
 
 /// Read length-prefixed varint array where the length is given as a varint
-pub fn read_prefixed_varintarray<R: Read>(reader: &mut R)
-                                          -> io::Result<Vec<i32>> {
+pub fn read_prefixed_varintarray<R: Read>(reader: &mut R) -> Result<Vec<i32>> {
     let length = read_varint(reader)?;
     let mut tmp = Vec::with_capacity(length as usize);
     for _ in 0..length {
@@ -141,7 +138,7 @@ pub fn read_prefixed_varintarray<R: Read>(reader: &mut R)
 }
 
 /// Read a uuid encoded as 16 bytes
-pub fn read_uuid<R: Read>(reader: &mut R) -> io::Result<u128> {
+pub fn read_uuid<R: Read>(reader: &mut R) -> Result<u128> {
     let a = read_u64(reader)?;
     let b = read_u64(reader)?;
     Ok(u128(a, b))
@@ -150,7 +147,7 @@ pub fn read_uuid<R: Read>(reader: &mut R) -> io::Result<u128> {
 /// Read a uuid encoded as a string
 ///
 /// Either with or without dashes.
-pub fn read_uuid_str<R: Read>(reader: &mut R) -> io::Result<u128> {
+pub fn read_uuid_str<R: Read>(reader: &mut R) -> Result<u128> {
     /* If it's without dashes, then it'll be 32 characters long, else it'll
      * be 36 characters long, so we read 32 characters first and see if it
      * contains any dahes */
@@ -159,29 +156,29 @@ pub fn read_uuid_str<R: Read>(reader: &mut R) -> io::Result<u128> {
 
     let a = match u64::from_str_radix(&tmp[..16], 16) {
         Ok(x) => x,
-        Err(_) => return io_error!("Invalid hex in first half of uuid_str"),
+        Err(_) => bail!("Invalid hex in first half of uuid_str"),
     };
     let b = match u64::from_str_radix(&tmp[16..], 16) {
         Ok(x) => x,
-        Err(_) => return io_error!("Invalid hex in second half of uuid_str"),
+        Err(_) => bail!("Invalid hex in second half of uuid_str"),
     };
     Ok(u128(a, b))
 }
 
 /// Read a bytearray to the end of the reader
-pub fn read_bytearray_to_end<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
+pub fn read_bytearray_to_end<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
     let mut tmp = Vec::new();
     reader.read_to_end(&mut tmp)?;
     Ok(tmp)
 }
 
 /// Alias for read_bytearray_to_end
-pub fn read_bytearray<R: Read>(reader: &mut R) -> io::Result<Vec<u8>> {
+pub fn read_bytearray<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
     read_bytearray_to_end(reader)
 }
 
 /// Read a position as described on wiki.vg, i.e. x/y/z given as an u64
-pub fn read_position<R: Read>(reader: &mut R) -> io::Result<(i32, i32, i32)> {
+pub fn read_position<R: Read>(reader: &mut R) -> Result<(i32, i32, i32)> {
     let val = read_u64(reader)?;
     let mut x = (val >> 38) as i32;
     let mut y = ((val >> 26) & 0xfff) as i32;

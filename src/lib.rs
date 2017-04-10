@@ -96,9 +96,9 @@ extern crate serde_derive;
 extern crate serde_json;
 #[macro_use]
 extern crate derive_new;
-
 #[macro_use]
-mod macros;
+extern crate error_chain;
+
 mod client;
 mod connection;
 #[allow(non_snake_case)]
@@ -106,6 +106,7 @@ mod json;
 mod server;
 mod yggdrasil;
 pub mod clientbound;
+pub mod errors;
 #[allow(non_snake_case)]
 pub mod mojang;
 pub mod read;

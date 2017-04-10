@@ -1,4 +1,5 @@
 use ClientState;
+use errors::{Result, ResultExt};
 use read::read_varint;
 use write::write_varint;
 
@@ -18,13 +19,11 @@ use openssl::symm;
 
 /// Trait for the two enums ClientboundPacket and ServerboundPacket
 pub trait Packet: Sized {
-    fn deserialize<R: Read>(r: &mut R,
-                            state: &ClientState)
-                            -> io::Result<Self>;
+    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self>;
     fn get_packet_name(&self) -> &str;
     fn get_clientstate(&self) -> ClientState;
     fn get_id(&self) -> i32;
-    fn to_u8(&self) -> io::Result<Vec<u8>>;
+    fn to_u8(&self) -> Result<Vec<u8>>;
 }
 
 /// Represents a single MC connection, either as client or server
@@ -54,7 +53,7 @@ pub struct Connection<I: Packet, O: Packet> {
     out_type: PhantomData<O>,
 }
 impl<I: Packet, O: Packet> Connection<I, O> {
-    pub fn from_tcpstream(stream: TcpStream) -> io::Result<Self> {
+    pub fn from_tcpstream(stream: TcpStream) -> Result<Self> {
         let conn = Connection {
             stream: stream,
             clientstate: ClientState::Handshake,
@@ -75,7 +74,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
         Ok(conn)
     }
 
-    pub fn connect_tcp(host: &str, port: u16) -> io::Result<Self> {
+    pub fn connect_tcp(host: &str, port: u16) -> Result<Self> {
         let stream = TcpStream::connect(&format!("{}:{}", host, port))?;
         Ok(Connection::from_tcpstream(stream)?)
     }
@@ -83,7 +82,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// Send the given packet
     ///
     /// Will block until the packet has been sent
-    pub fn send(&mut self, packet: O) -> io::Result<()> {
+    pub fn send(&mut self, packet: O) -> Result<()> {
         let tmp = packet.to_u8()?;
         let uncompressed_length = tmp.len();
         let mut out = Vec::with_capacity(uncompressed_length);
@@ -100,10 +99,10 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                                           &mut output,
                                           flate2::Flush::Sync) {
                     flate2::Status::Ok => {
-                        return io_error!("Got a Status::Ok when trying to compress outgoing packet");
+                        bail!("Got a Status::Ok when trying to compress outgoing packet");
                     },
                     flate2::Status::BufError => {
-                        return io_error!("Got a Status::BufError when trying to compress outgoing packet");
+                        bail!("Got a Status::BufError when trying to compress outgoing packet");
                     },
                     flate2::Status::StreamEnd => (),
                 }
@@ -130,10 +129,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
 
         if let Some(ref mut enc) = self.out_encryption {
             let mut tmp = vec![0; out.len() + 16];
-            let n = match enc.update(&out, &mut tmp) {
-                Ok(x) => x,
-                Err(_) => return io_error!("client::send error writing encrypted data"),
-            };
+            let n = enc.update(&out, &mut tmp).chain_err(|| "connection::send error writing encrypted data")?;
             let mut i = 0;
             while i < n {
                 i += self.stream.write(&tmp[i..n])?;
@@ -152,8 +148,8 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// Attempt to close this connection.
     ///
     /// All future sends and reads to this connection will fail
-    pub fn close(&mut self) -> io::Result<()> {
-        self.stream.shutdown(Shutdown::Both)
+    pub fn close(&mut self) -> Result<()> {
+        Ok(self.stream.shutdown(Shutdown::Both)?)
     }
 
     /// Change the client state of this connection
@@ -197,25 +193,22 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// know for sure you need to call this, then you do not need to call this.
     /// I.e. if you're just using client.read(), then you do not need to call
     /// this function.
-    pub fn update_inbuf(&mut self) -> io::Result<()> {
+    pub fn update_inbuf(&mut self) -> Result<()> {
         if let Some(ref mut enc) = self.in_encryption {
             let mut enc_buf = Buf::new();
             let n = match enc_buf.read_from(&mut self.stream) {
                 Ok(n) => n,
                 Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => 0,
-                Err(e) => return Err(e),
+                Err(e) => bail!(e),
             };
             let mut tmp = vec![0; n + 16];
-            let n = match enc.update(&enc_buf[..], &mut tmp) {
-                Ok(x) => x,
-                Err(_) => return io_error!("connection::update_inbuf error reading encrypted data"),
-            };
+            let n = enc.update(&enc_buf[..], &mut tmp).chain_err(|| "connection::update_inbuf error reading encrypted data")?;
             self.buf.extend(&tmp[..n]);
         } else {
             match self.buf.read_from(&mut self.stream) {
                 Ok(_) => (),
                 Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => (),
-                Err(e) => return Err(e),
+                Err(e) => bail!(e),
             };
         }
         Ok(())
@@ -230,7 +223,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// You MUST be sure that client.update_inbuf() has been called before this,
     /// this function will not attempt to read from the TcpStream, only from the
     /// internal buffer.
-    pub fn read_packet(&mut self) -> io::Result<Option<I>> {
+    pub fn read_packet(&mut self) -> Result<Option<I>> {
         if let None = self.packet_len {
             self.read_length()?;
         }
@@ -241,7 +234,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                 if self.last_read.elapsed() > time::Duration::new(30, 0) {
                     /* If we haven't read anything for 30 seconds, timeout */
                     self.close()?;
-                    return io_error!("Read timeout");
+                    bail!("Read timeout");
                 } else {
                     return Ok(None);
                 }
@@ -253,7 +246,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             if self.last_read.elapsed() > time::Duration::new(30, 0) {
                 /* If we haven't read anything for 30 seconds, timeout */
                 self.close()?;
-                return io_error!("Read timeout");
+                bail!("Read timeout");
             } else {
                 return Ok(None);
             }
@@ -295,7 +288,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
      * encounter any io errors, even if it doesn't read the whole length
      * (for example if the buffer is empty.) It will only consume the length
      * header from the buf if it successfully reads the entire length header */
-    fn read_length(&mut self) -> io::Result<()> {
+    fn read_length(&mut self) -> Result<()> {
         let msb: u8 = 128; /* Only the MSB set */
         let mut i: usize = 0;
 
@@ -314,7 +307,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
 
                 /* A varint can be at most 5 bytes, remember it's nullindexed */
                 if i >= 5 {
-                    return io_error!("Received varint that was too long");
+                    bail!("Received varint that was too long");
                 }
 
                 tmp = match self.buf.get(i) {

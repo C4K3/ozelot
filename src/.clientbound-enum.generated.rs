@@ -91,11 +91,11 @@ pub enum ClientboundPacket {
 }
 
 impl Packet for ClientboundPacket {
-    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> io::Result<Self> {
+    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {
         let packet_id = read_varint(r)?;
         match state {
         &ClientState::Handshake => {
-            io_error!("No packet available in this state")
+            Err("No packet available in this state".into())
 
         },
         &ClientState::Status => {
@@ -103,7 +103,7 @@ impl Packet for ClientboundPacket {
             0 => Ok(StatusResponse::deserialize(r)?),
             1 => Ok(StatusPong::deserialize(r)?),
 
-            _ => io_error!("No packet with id {} in state {}", packet_id, state),
+            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
             }
         },
         &ClientState::Login => {
@@ -113,7 +113,7 @@ impl Packet for ClientboundPacket {
             2 => Ok(LoginSuccess::deserialize(r)?),
             3 => Ok(SetCompression::deserialize(r)?),
 
-            _ => io_error!("No packet with id {} in state {}", packet_id, state),
+            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
             }
         },
         &ClientState::Play => {
@@ -195,7 +195,7 @@ impl Packet for ClientboundPacket {
             74 => Ok(EntityProperties::deserialize(r)?),
             75 => Ok(EntityEffect::deserialize(r)?),
 
-            _ => io_error!("No packet with id {} in state {}", packet_id, state),
+            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
             }
         },
 
@@ -462,7 +462,7 @@ impl Packet for ClientboundPacket {
 
         }
     }
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         match self {
         &ClientboundPacket::StatusResponse(ref x) => x.to_u8(),
         &ClientboundPacket::StatusPong(ref x) => x.to_u8(),

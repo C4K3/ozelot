@@ -44,14 +44,14 @@ pub enum ServerboundPacket {
 }
 
 impl Packet for ServerboundPacket {
-    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> io::Result<Self> {
+    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {
         let packet_id = read_varint(r)?;
         match state {
         &ClientState::Handshake => {
             match packet_id {
             0 => Ok(Handshake::deserialize(r)?),
 
-            _ => io_error!("No packet with id {} in state {}", packet_id, state),
+            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
             }
         },
         &ClientState::Status => {
@@ -59,7 +59,7 @@ impl Packet for ServerboundPacket {
             0 => Ok(StatusRequest::deserialize(r)?),
             1 => Ok(StatusPing::deserialize(r)?),
 
-            _ => io_error!("No packet with id {} in state {}", packet_id, state),
+            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
             }
         },
         &ClientState::Login => {
@@ -67,7 +67,7 @@ impl Packet for ServerboundPacket {
             0 => Ok(LoginStart::deserialize(r)?),
             1 => Ok(EncryptionResponse::deserialize(r)?),
 
-            _ => io_error!("No packet with id {} in state {}", packet_id, state),
+            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
             }
         },
         &ClientState::Play => {
@@ -103,7 +103,7 @@ impl Packet for ServerboundPacket {
             28 => Ok(PlayerBlockPlacement::deserialize(r)?),
             29 => Ok(UseItem::deserialize(r)?),
 
-            _ => io_error!("No packet with id {} in state {}", packet_id, state),
+            _ => Err(format!("No packet with id {} in state {}", packet_id, state).into()),
             }
         },
 
@@ -229,7 +229,7 @@ impl Packet for ServerboundPacket {
 
         }
     }
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         match self {
         &ServerboundPacket::Handshake(ref x) => x.to_u8(),
         &ServerboundPacket::StatusRequest(ref x) => x.to_u8(),

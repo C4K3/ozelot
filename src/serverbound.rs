@@ -3,14 +3,14 @@
 //! See the Serverbound sections on http://wiki.vg/Protocol for information
 //! about each of the packets.
 
+use connection::Packet;
+use errors::Result;
 use read::*;
 use write::*;
-use connection::Packet;
 use {ClientState, u128, yggdrasil};
 
 use std::fmt;
 use std::io::Read;
-use std::io;
 
 use openssl::rsa::Rsa;
 
@@ -33,12 +33,10 @@ impl Handshake {
 }
 
 impl EncryptionResponse {
-    pub fn get_decrypted_shared_secret(&self,
-                                       key: &Rsa)
-                                       -> io::Result<[u8; 16]> {
+    pub fn get_decrypted_shared_secret(&self, key: &Rsa) -> Result<[u8; 16]> {
         let tmp = yggdrasil::rsa_decrypt(key, &self.shared_secret)?;
         if tmp.len() != 16 {
-            return io_error!("Decrypted shared secret was not 16 bytes long");
+            bail!("Decrypted shared secret was not 16 bytes long");
         }
         let mut ret = [0; 16];
         for i in 0..16 {
@@ -46,24 +44,24 @@ impl EncryptionResponse {
         }
         Ok(ret)
     }
-    pub fn get_decrypted_verify_token(&self, key: &Rsa) -> io::Result<Vec<u8>> {
+    pub fn get_decrypted_verify_token(&self, key: &Rsa) -> Result<Vec<u8>> {
         yggdrasil::rsa_decrypt(key, &self.verify_token)
     }
 }
 
 impl StatusRequest {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&StatusRequest::get_packet_id(), &mut ret)?;
         Ok(ret)
     }
-    fn deserialize<R: Read>(_: &mut R) -> io::Result<ServerboundPacket> {
+    fn deserialize<R: Read>(_: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::StatusRequest(StatusRequest {}))
     }
 }
 
 impl TabComplete {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&TabComplete::get_packet_id(), &mut ret)?;
         write_String(&self.text, &mut ret)?;
@@ -79,7 +77,7 @@ impl TabComplete {
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ServerboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         let text = read_String(r)?;
         let assume_command = read_bool(r)?;
         let has_position = read_bool(r)?;
@@ -98,7 +96,7 @@ impl TabComplete {
 }
 
 impl UseEntity {
-    fn to_u8(&self) -> io::Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&UseEntity::get_packet_id(), &mut ret)?;
         write_varint(&self.target, &mut ret)?;
@@ -110,7 +108,7 @@ impl UseEntity {
                     write_f32(&y, &mut ret)?;
                     write_f32(&z, &mut ret)?;
                 } else {
-                    return io_error!("UseEntity had invalid values. Location was None even though action was 2.");
+                    bail!("UseEntity had invalid values. Location was None even though action was 2.");
                 }
             },
             _ => (),
@@ -121,15 +119,14 @@ impl UseEntity {
                 if let Some(x) = self.hand {
                     write_varint(&x, &mut ret)?;
                 } else {
-                    return io_error!("UseEntity had invalid values. Hand was none even though action was {}",
-                                     self.action);
+                    bail!("UseEntity had invalid values. Hand was none even though action was {}", self.action);
                 }
             },
             _ => (),
         }
         Ok(ret)
     }
-    fn deserialize<R: Read>(r: &mut R) -> io::Result<ServerboundPacket> {
+    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         let target = read_varint(r)?;
         let action = read_varint(r)?;
 
@@ -159,7 +156,7 @@ impl EncryptionResponse {
     pub fn new_unencrypted(key: &[u8],
                            shared_secret: &[u8],
                            verify_token: &[u8])
-                           -> io::Result<ServerboundPacket> {
+                           -> Result<ServerboundPacket> {
         let ss_encrypted = yggdrasil::rsa_encrypt(key, shared_secret)?;
         let verify_encrypted = yggdrasil::rsa_encrypt(key, verify_token)?;
 

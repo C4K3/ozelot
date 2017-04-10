@@ -1,7 +1,8 @@
 //! This provides helper functions for various Yggdrasil/Protocol Encryption
 //! related things.
+use errors::{Result, ResultExt};
+
 use std::fmt::Write;
-use std::io;
 
 use openssl::hash::{self, MessageDigest};
 use openssl::rand;
@@ -49,19 +50,12 @@ pub fn rsa_key_binary(key: &Rsa) -> Vec<u8> {
 /// For use with the EncryptionResponse packet.
 ///
 /// The data must be able to fit within 128 bytes encrypted.
-pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> io::Result<Vec<u8>> {
-    let key = match Rsa::public_key_from_der(pubkey) {
-        Ok(x) => x,
-        Err(e) => {
-            return io_error!("rsa_encrypt: Got error trying to read public key: {:?}",
-                             e)
-        },
-    };
-
+pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> Result<Vec<u8>> {
+    let key = Rsa::public_key_from_der(pubkey).chain_err(|| "yggdrasil::rsa_encrypt got error trying to read public key")?;
     let mut ret = vec![0; 128];
     match key.public_encrypt(data, &mut ret, PADDING) {
         Ok(128) => (),
-        _ => return io_error!("yggdrasil::rsa_encrypt error encrypting data"),
+        _ => bail!("yggdrasil::rsa_encrypt error encrypting data"),
     }
 
     Ok(ret)
@@ -71,17 +65,16 @@ pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> io::Result<Vec<u8>> {
 ///
 /// The given data to decrypt must be exactly 128 bytes long, and the data
 /// decrypted must be able to fit within 128 bytes.
-pub fn rsa_decrypt(key: &Rsa, data: &[u8]) -> io::Result<Vec<u8>> {
+pub fn rsa_decrypt(key: &Rsa, data: &[u8]) -> Result<Vec<u8>> {
     if data.len() != 128 {
-        return io_error!("yggdrasil::rsa_decrypt passed data was {}, not 16 bytes long",
-                         data.len());
+        bail!("yggdrasil::rsa_decrypt passed data was {}, not 16 bytes long", data.len());
     }
 
     let mut ret = vec![0; 128];
 
     let len = match key.private_decrypt(data, &mut ret, PADDING) {
         Ok(x) if x <= 128 => x,
-        _ => return io_error!("yggdrasil::rsa_decrypt error decrypting data"),
+        _ => bail!("yggdrasil::rsa_decrypt error decrypting data"),
     };
     ret.truncate(len);
 
