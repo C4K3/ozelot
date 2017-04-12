@@ -448,7 +448,8 @@ impl SessionHasJoined {
 fn get_request(url: &str) -> Result<String> {
     let client = Client::new().expect("Error creating reqwest client");
     let mut res =
-        client.get(url)
+        client
+            .get(url)
             .send()
             .chain_err(|| format!("Error sending GET request to {}", url))?;
 
@@ -466,7 +467,8 @@ fn get_request(url: &str) -> Result<String> {
 fn post_request(url: &str, post: &str) -> Result<String> {
     let client = Client::new().expect("Error creating reqwest client");
     let mut res =
-        client.post(url)
+        client
+            .post(url)
             .header(ContentType::json())
             .body(post)
             .send()

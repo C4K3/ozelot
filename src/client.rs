@@ -151,7 +151,8 @@ impl Client {
                                              auth.selectedProfile.id.clone(),
                                              p.get_server_id(),
                                              &shared_secret,
-                                             p.get_public_key()).perform()?;
+                                             p.get_public_key())
+                            .perform()?;
 
                     let encryptionresponse
                             = serverbound::EncryptionResponse::new_unencrypted(
