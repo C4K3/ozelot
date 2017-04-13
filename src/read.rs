@@ -3,7 +3,6 @@ use errors::Result;
 use u128;
 
 use std::io::Read;
-use std::string;
 
 use byteorder::{BigEndian, ReadBytesExt};
 
@@ -78,11 +77,14 @@ pub fn read_String<R: Read>(reader: &mut R) -> Result<String> {
         bail!("read_string refusing to read string due to its length");
     }
 
-    /* FIXME can we do this without a double copy? */
-    let mut buf = vec![0; length];
-    reader.read_exact(&mut buf)?;
+    let mut ret = String::with_capacity(length);
+    let read = reader.take(length as u64).read_to_string(&mut ret)?;
 
-    Ok(string::String::from_utf8_lossy(&buf).into_owned())
+    if read != length {
+        bail!("read_String expected a string with length {} but was only able to read {} bytes", length, read);
+    }
+
+    Ok(ret)
 }
 
 /// Read a Minecraft-style varint, which currently fits into a i32
