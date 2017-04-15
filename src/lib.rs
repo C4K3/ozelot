@@ -95,8 +95,6 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 #[macro_use]
-extern crate derive_new;
-#[macro_use]
 extern crate error_chain;
 
 mod client;

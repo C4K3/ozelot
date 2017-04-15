@@ -26,7 +26,7 @@ use reqwest::header::ContentType;
 use serde_json;
 
 /// Make a request to check the status of the Mojang APIs
-#[derive(Debug, new)]
+#[derive(Debug)]
 pub struct APIStatus();
 impl APIStatus {
     pub fn perform(&self) -> Result<APIStatusResponse> {
@@ -43,7 +43,9 @@ impl APIStatus {
             .replace(']', "}");
         Ok(serde_json::from_str(&res)?)
     }
-
+    pub fn new() -> Self {
+        APIStatus {}
+    }
     fn get_endpoint() -> String {
         "https://status.mojang.com/check".to_string()
     }
@@ -57,7 +59,7 @@ impl APIStatus {
 ///
 /// If unable to find the player at the given point in time, will return an
 /// error.
-#[derive(Debug, new)]
+#[derive(Debug)]
 pub struct NameToUUID {
     username: String,
     at: Option<i64>,
@@ -78,12 +80,18 @@ impl NameToUUID {
         let res = get_request(&url)?;
         Ok(serde_json::from_str(&res)?)
     }
+    pub fn new(username: String, at: Option<i64>) -> Self {
+        NameToUUID {
+            username: username,
+            at: at,
+        }
+    }
 }
 
 /// A UUID -> Username history request
 ///
 /// The UUID must be given as a string without hyphens.
-#[derive(Debug, new)]
+#[derive(Debug)]
 pub struct UUIDToHistory {
     uuid: String,
 }
@@ -93,6 +101,11 @@ impl UUIDToHistory {
                           self.uuid);
         let res = get_request(&url)?;
         Ok(serde_json::from_str(&res)?)
+    }
+    pub fn new(uuid: String) -> Self {
+        UUIDToHistory {
+            uuid: uuid,
+        }
     }
 }
 
@@ -130,7 +143,7 @@ impl PlayernamesToUUIDs {
 }
 
 /// Represents a UUID -> Profile + Skin and Cape request
-#[derive(Debug, new)]
+#[derive(Debug)]
 pub struct UUIDToProfile {
     uuid: String,
     /// Whether you want the response signed by the yggdrasil private key
@@ -149,10 +162,16 @@ impl UUIDToProfile {
         println!("res: {}", res);
         Ok(serde_json::from_str(&res)?)
     }
+    pub fn new(uuid: String, signed: bool) -> Self {
+        UUIDToProfile {
+            uuid: uuid,
+            signed: signed,
+        }
+    }
 }
 
 /// Get the blocked server's hashes
-#[derive(Debug, new)]
+#[derive(Debug)]
 pub struct BlockedServers();
 impl BlockedServers {
     fn get_endpoint() -> String {
@@ -167,6 +186,9 @@ impl BlockedServers {
                                None
                            })
                .collect())
+    }
+    pub fn new() -> Self {
+        BlockedServers {}
     }
 }
 
@@ -287,7 +309,7 @@ impl Authenticate {
 }
 
 /// Refresh a valid accessToken
-#[derive(Debug, Serialize, new)]
+#[derive(Debug, Serialize)]
 pub struct AuthenticateRefresh {
     accessToken: String,
     clientToken: String,
@@ -302,10 +324,20 @@ impl AuthenticateRefresh {
         let res = post_request(&Self::get_endpoint(), &payload)?;
         Ok(serde_json::from_str(&res)?)
     }
+    pub fn new(accessToken: String,
+               clientToken: String,
+               requestUser: bool)
+               -> Self {
+        AuthenticateRefresh {
+            accessToken: accessToken,
+            clientToken: clientToken,
+            requestUser: requestUser,
+        }
+    }
 }
 
 /// Validate an existing access token
-#[derive(Debug, new, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct AuthenticateValidate {
     accessToken: String,
     clientToken: Option<String>,
@@ -331,10 +363,16 @@ impl AuthenticateValidate {
             _ => bail!("Got response code {}", res.status()),
         }
     }
+    pub fn new(accessToken: String, clientToken: Option<String>) -> Self {
+        AuthenticateValidate {
+            accessToken: accessToken,
+            clientToken: clientToken,
+        }
+    }
 }
 
 /// Invalidate an accessToken, using the client username/password
-#[derive(Debug, new, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct AuthenticateSignout {
     username: String,
     password: String,
@@ -353,10 +391,16 @@ impl AuthenticateSignout {
             bail!("AuthenticateSignout got non-empty response");
         }
     }
+    pub fn new(username: String, password: String) -> Self {
+        AuthenticateSignout {
+            username: username,
+            password: password,
+        }
+    }
 }
 
 /// Invalidate an accessToken, using the accessToken and a clientToken
-#[derive(Debug, new, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct AuthenticateInvalidate {
     accessToken: String,
     clientToken: String,
@@ -373,6 +417,12 @@ impl AuthenticateInvalidate {
             Ok(())
         } else {
             bail!("AuthenticateInvalidate got non-empty response");
+        }
+    }
+    pub fn new(accessToken: String, clientToken: String) -> Self {
+        AuthenticateInvalidate {
+            accessToken: accessToken,
+            clientToken: clientToken,
         }
     }
 }
