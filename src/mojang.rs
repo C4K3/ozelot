@@ -16,12 +16,9 @@
 pub use json::*;
 pub use yggdrasil::{create_shared_secret, generate_rsa_key, rsa_key_binary};
 use yggdrasil;
-use errors::{Result, ResultExt};
+use errors::Result;
 
-use std::io::Read;
-
-use reqwest::{self, Client};
-use reqwest::header::ContentType;
+use curl::easy::{Easy, List};
 
 use serde_json;
 
@@ -346,22 +343,10 @@ impl AuthenticateValidate {
     fn get_endpoint() -> String {
         "https://authserver.mojang.com/validate".to_string()
     }
-    pub fn perform(&self) -> Result<bool> {
+    pub fn perform(&self) -> Result<()> {
         let payload = serde_json::to_string(self)?;
-
-        let client = Client::new().expect("Error creating reqwest client");
-        let res = client
-            .post(&Self::get_endpoint())
-            .header(ContentType::json())
-            .body(payload)
-            .send()
-            .chain_err(|| format!("Error sending POST request to {}", &Self::get_endpoint()))?;
-
-        match res.status() {
-            &reqwest::StatusCode::NoContent => Ok(true),
-            &reqwest::StatusCode::Forbidden => Ok(false),
-            _ => bail!("Got response code {}", res.status()),
-        }
+        let _ = post_request(&Self::get_endpoint(), &payload)?;
+        Ok(())
     }
     pub fn new(accessToken: String, clientToken: Option<String>) -> Self {
         AuthenticateValidate {
@@ -383,13 +368,8 @@ impl AuthenticateSignout {
     }
     pub fn perform(&self) -> Result<()> {
         let payload = serde_json::to_string(self)?;
-
-        let res = post_request(&Self::get_endpoint(), &payload)?;
-        if res.is_empty() {
-            Ok(())
-        } else {
-            bail!("AuthenticateSignout got non-empty response");
-        }
+        let _ = post_request(&Self::get_endpoint(), &payload)?;
+        Ok(())
     }
     pub fn new(username: String, password: String) -> Self {
         AuthenticateSignout {
@@ -411,13 +391,8 @@ impl AuthenticateInvalidate {
     }
     pub fn perform(&self) -> Result<()> {
         let payload = serde_json::to_string(self)?;
-
-        let res = post_request(&Self::get_endpoint(), &payload)?;
-        if res.is_empty() {
-            Ok(())
-        } else {
-            bail!("AuthenticateInvalidate got non-empty response");
-        }
+        let _ = post_request(&Self::get_endpoint(), &payload)?;
+        Ok(())
     }
     pub fn new(accessToken: String, clientToken: String) -> Self {
         AuthenticateInvalidate {
@@ -442,13 +417,8 @@ impl SessionJoin {
     }
     pub fn perform(&self) -> Result<()> {
         let payload = serde_json::to_string(self)?;
-
-        let res = post_request(&Self::get_endpoint(), &payload)?;
-        if res.is_empty() {
-            Ok(())
-        } else {
-            bail!("SessionJoin got non-empty response");
-        }
+        let _ = post_request(&Self::get_endpoint(), &payload)?;
+        Ok(())
     }
     pub fn new(access_token: String,
                uuid: String,
@@ -496,39 +466,40 @@ impl SessionHasJoined {
 /// Helper function for performing a GET request to the given URL, returning
 /// the response content
 fn get_request(url: &str) -> Result<String> {
-    let client = Client::new().expect("Error creating reqwest client");
-    let mut res =
-        client
-            .get(url)
-            .send()
-            .chain_err(|| format!("Error sending GET request to {}", url))?;
-
-    if !res.status().is_success() {
-        bail!("Got {} response from {}", res.status(), url);
+    let mut handle = Easy::new();
+    handle.url(url)?;
+    handle.fail_on_error(true)?;
+    let mut response = Vec::new();
+    {
+        let mut transfer = handle.transfer();
+        transfer.write_function(|data| {
+            response.extend_from_slice(data);
+            Ok(data.len())
+        })?;
+        transfer.perform()?;
     }
-
-    let mut ret = String::new();
-    res.read_to_string(&mut ret)?;
-    Ok(ret)
+    Ok(String::from_utf8(response)?)
 }
 
 /// Helper function for performing a POST request to the given URL,
 /// posting the given data to it, and returning the response content.
 fn post_request(url: &str, post: &str) -> Result<String> {
-    let client = Client::new().expect("Error creating reqwest client");
-    let mut res =
-        client
-            .post(url)
-            .header(ContentType::json())
-            .body(post)
-            .send()
-            .chain_err(|| format!("Error sending POST request to {}", url))?;
-
-    if !res.status().is_success() {
-        bail!("Got {} response from {}", res.status(), url);
+    let mut handle = Easy::new();
+    handle.url(url)?;
+    handle.fail_on_error(true)?;
+    let mut headers = List::new();
+    headers.append("Content-Type: application/json")?;
+    handle.http_headers(headers)?;
+    handle.post_fields_copy(post.as_bytes())?;
+    handle.post(true)?;
+    let mut response = Vec::new();
+    {
+        let mut transfer = handle.transfer();
+        transfer.write_function(|data| {
+            response.extend_from_slice(data);
+            Ok(data.len())
+        })?;
+        transfer.perform()?;
     }
-
-    let mut ret = String::new();
-    res.read_to_string(&mut ret)?;
-    Ok(ret)
+    Ok(String::from_utf8(response)?)
 }

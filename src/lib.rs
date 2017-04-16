@@ -83,11 +83,10 @@
 //! }
 //! ```
 extern crate byteorder;
+extern crate curl;
 extern crate flate2;
 extern crate netbuf;
 extern crate openssl;
-extern crate reqwest; /* Holy fuck the dependencies needed just to make 2
-                         HTTP POST requests ... */
 extern crate rustc_serialize;
 extern crate serde;
 #[macro_use]
