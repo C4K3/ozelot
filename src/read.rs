@@ -1,5 +1,5 @@
 //! Functions for deserializing datatypes used by the protocol
-use errors::Result;
+use errors::{Result, ResultExt};
 use u128;
 
 use std::io::Read;
@@ -150,20 +150,9 @@ pub fn read_uuid<R: Read>(reader: &mut R) -> Result<u128> {
 ///
 /// Either with or without dashes.
 pub fn read_uuid_str<R: Read>(reader: &mut R) -> Result<u128> {
-    /* If it's without dashes, then it'll be 32 characters long, else it'll
-     * be 36 characters long, so we read 32 characters first and see if it
-     * contains any dahes */
-
     let tmp = read_String(reader)?.replace("-", "");
-
-    let a = match u64::from_str_radix(&tmp[..16], 16) {
-        Ok(x) => x,
-        Err(_) => bail!("Invalid hex in first half of uuid_str"),
-    };
-    let b = match u64::from_str_radix(&tmp[16..], 16) {
-        Ok(x) => x,
-        Err(_) => bail!("Invalid hex in second half of uuid_str"),
-    };
+    let a = u64::from_str_radix(&tmp[..16], 16).chain_err(|| "Invalid hex in first half of uuid_str")?;
+    let b = u64::from_str_radix(&tmp[16..], 16).chain_err(|| "Invalid hex in second half of uuid_str")?;
     Ok(u128(a, b))
 }
 
