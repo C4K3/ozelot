@@ -1,33 +1,30 @@
 //! Miscellaneous utility functions
 
-use rustc_serialize::json::Json;
+use errors::Result;
+
+use serde_json::{self, Value};
 
 /// Parses a Chat component (given as json) into a String containing only the
 /// visible plaintext without any formatting.
 ///
 /// FIXME Does not yet work with translate components
-///
-/// # Panics
-///
-/// If the input is not valid json.
-pub fn chat_to_str(chat: &str) -> String {
+pub fn chat_to_str(chat: &str) -> Result<String> {
     let mut ret = String::new();
-    let data =
-        Json::from_str(chat).expect("Invalid json passed to chat_to_str");
+    let data = serde_json::from_str(chat)?;
 
     chat_to_str_parse_json(&data, &mut ret);
 
-    ret
+    Ok(ret)
 }
 
-fn chat_to_str_parse_json(json: &Json, ret: &mut String) {
-    match json.find("text") {
-        Some(&Json::String(ref x)) => ret.push_str(x),
+fn chat_to_str_parse_json(json: &Value, ret: &mut String) {
+    match json.get("text") {
+        Some(&Value::String(ref x)) => ret.push_str(x),
         _ => (),
     }
 
-    match json.find("extra") {
-        Some(&Json::Array(ref x)) => {
+    match json.get("extra") {
+        Some(&Value::Array(ref x)) => {
             for object in x {
                 chat_to_str_parse_json(object, ret);
             }

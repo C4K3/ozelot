@@ -59,11 +59,11 @@
 //!         match packet {
 //!         ClientboundPacket::PlayDisconnect(ref p) => {
 //!             println!("Disconnected, reason: {}",
-//!                      utils::chat_to_str(p.get_reason()));
+//!                      utils::chat_to_str(p.get_reason()).unwrap());
 //!             break 'main;
 //!         },
 //!         ClientboundPacket::ChatMessage(ref p) => {
-//!             let msg = utils::chat_to_str(p.get_chat());
+//!             let msg = utils::chat_to_str(p.get_chat()).unwrap();
 //!             println!("{}", msg);
 //!             if !msg.contains(&username) {
 //!                 /* Since we don't want an infinite loop, we don't echo back
@@ -87,7 +87,6 @@ extern crate curl;
 extern crate flate2;
 extern crate netbuf;
 extern crate openssl;
-extern crate rustc_serialize;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
