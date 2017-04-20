@@ -97,7 +97,7 @@ pub fn post_sha1(server_id: &str,
 /// Calculate a Minecraft-style sha1
 fn sha1(data: &[u8]) -> String {
     let mut digest =
-        hash::hash(MessageDigest::sha1(), data).expect("yggdrasil::sha1 error");
+        hash::hash2(MessageDigest::sha1(), data).expect("yggdrasil::sha1 error");
 
     let mut negative = false;
 
@@ -126,7 +126,7 @@ fn sha1(data: &[u8]) -> String {
     }
 
     let mut non_zero = false;
-    for byte in &digest {
+    for byte in &*digest {
         if *byte >= 16 {
             non_zero = true;
         } else if non_zero == false && *byte > 0 {
