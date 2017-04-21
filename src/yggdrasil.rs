@@ -67,7 +67,7 @@ pub fn rsa_encrypt(pubkey: &[u8], data: &[u8]) -> Result<Vec<u8>> {
 /// decrypted must be able to fit within 128 bytes.
 pub fn rsa_decrypt(key: &Rsa, data: &[u8]) -> Result<Vec<u8>> {
     if data.len() != 128 {
-        bail!("yggdrasil::rsa_decrypt passed data was {}, not 16 bytes long", data.len());
+        bail!("yggdrasil::rsa_decrypt passed data was {}, not 128 bytes long", data.len());
     }
 
     let mut ret = vec![0; 128];
