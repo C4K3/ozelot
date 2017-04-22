@@ -100,7 +100,6 @@ mod connection;
 #[allow(non_snake_case)]
 mod json;
 mod server;
-mod yggdrasil;
 pub mod clientbound;
 pub mod errors;
 #[allow(non_snake_case)]

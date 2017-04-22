@@ -14,9 +14,8 @@
 //! Also contains some helper functions used for authentication.
 
 pub use json::*;
-pub use yggdrasil::{create_shared_secret, generate_rsa_key, rsa_key_binary};
-use yggdrasil;
 use errors::Result;
+use utils;
 
 use curl::easy::{Easy, List};
 
@@ -427,7 +426,7 @@ impl SessionJoin {
                server_public_key: &[u8])
                -> Self {
         let hash =
-            yggdrasil::post_sha1(server_id, shared_secret, server_public_key);
+            utils::post_sha1(server_id, shared_secret, server_public_key);
         SessionJoin {
             accessToken: access_token,
             selectedProfile: uuid,
@@ -455,7 +454,7 @@ impl SessionHasJoined {
                shared_secret: &[u8],
                public_key: &[u8])
                -> Self {
-        let hash = yggdrasil::post_sha1(server_id, shared_secret, public_key);
+        let hash = utils::post_sha1(server_id, shared_secret, public_key);
         SessionHasJoined {
             username: username,
             serverId: hash,

@@ -7,7 +7,7 @@ use connection::Packet;
 use errors::Result;
 use read::*;
 use write::*;
-use {ClientState, u128, yggdrasil};
+use {ClientState, u128, utils};
 
 use std::fmt;
 use std::io::Read;
@@ -34,7 +34,7 @@ impl Handshake {
 
 impl EncryptionResponse {
     pub fn get_decrypted_shared_secret(&self, key: &Rsa) -> Result<[u8; 16]> {
-        let tmp = yggdrasil::rsa_decrypt(key, &self.shared_secret)?;
+        let tmp = utils::rsa_decrypt(key, &self.shared_secret)?;
         if tmp.len() != 16 {
             bail!("Decrypted shared secret was not 16 bytes long");
         }
@@ -45,7 +45,7 @@ impl EncryptionResponse {
         Ok(ret)
     }
     pub fn get_decrypted_verify_token(&self, key: &Rsa) -> Result<Vec<u8>> {
-        yggdrasil::rsa_decrypt(key, &self.verify_token)
+        utils::rsa_decrypt(key, &self.verify_token)
     }
 }
 
@@ -157,8 +157,8 @@ impl EncryptionResponse {
                            shared_secret: &[u8],
                            verify_token: &[u8])
                            -> Result<ServerboundPacket> {
-        let ss_encrypted = yggdrasil::rsa_encrypt(key, shared_secret)?;
-        let verify_encrypted = yggdrasil::rsa_encrypt(key, verify_token)?;
+        let ss_encrypted = utils::rsa_encrypt(key, shared_secret)?;
+        let verify_encrypted = utils::rsa_encrypt(key, verify_token)?;
 
         Ok(EncryptionResponse::new(ss_encrypted, verify_encrypted))
     }

@@ -3,7 +3,7 @@ use connection::Connection;
 use errors::Result;
 use json::AuthenticationResponse;
 use serverbound::ServerboundPacket;
-use {ClientState, PROTOCOL_VERSION, mojang, serverbound};
+use {ClientState, PROTOCOL_VERSION, mojang, serverbound, utils};
 
 use std::{thread, time};
 
@@ -145,7 +145,7 @@ impl Client {
                 },
                 Some(ClientboundPacket::LoginSuccess(..)) => bail!("Logged in unauthenticated"),
                 Some(ClientboundPacket::EncryptionRequest(ref p)) => {
-                    let shared_secret = mojang::create_shared_secret();
+                    let shared_secret = utils::create_shared_secret();
 
                     mojang::SessionJoin::new(auth.accessToken.clone(),
                                              auth.selectedProfile.id.clone(),
