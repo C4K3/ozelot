@@ -143,7 +143,9 @@ impl Client {
                 Some(ClientboundPacket::LoginDisconnect(ref p)) => {
                     bail!("Got LoginDisconnect, reason: {}", p.get_raw_chat());
                 },
-                Some(ClientboundPacket::LoginSuccess(..)) => bail!("Logged in unauthenticated"),
+                Some(ClientboundPacket::LoginSuccess(..)) => {
+                    bail!("Logged in unauthenticated")
+                },
                 Some(ClientboundPacket::EncryptionRequest(ref p)) => {
                     let shared_secret = utils::create_shared_secret();
 

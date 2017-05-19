@@ -165,7 +165,7 @@ pub fn sha1(data: &[u8]) -> String {
             /* If the value is 0 < n < 16, we write the second (hexa)decimal
              * in it, but the first is 0 so is omitted */
             write!(&mut ret, "{:x}", byte)
-                .expect("yggdrasil.sha1 failed writing to String");
+                .expect("yggdrasil.sha1 failed writing to String",);
             non_zero = true;
             continue;
         }

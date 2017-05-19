@@ -99,10 +99,10 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                                           &mut output,
                                           flate2::Flush::Sync) {
                     flate2::Status::Ok => {
-                        bail!("Got a Status::Ok when trying to compress outgoing packet");
+                        bail!("Got a Status::Ok when trying to compress outgoing packet",);
                     },
                     flate2::Status::BufError => {
-                        bail!("Got a Status::BufError when trying to compress outgoing packet");
+                        bail!("Got a Status::BufError when trying to compress outgoing packet",);
                     },
                     flate2::Status::StreamEnd => (),
                 }

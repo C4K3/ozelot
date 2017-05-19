@@ -237,7 +237,7 @@ impl Statistics {
                -> Self {
         if !(item_sold_minecraft | prepaid_card_redeemed_minecraft |
              item_sold_cobalt | item_sold_scrolls) {
-            panic!("You must specify at least one type of sale in the Statistics request");
+            panic!("You must specify at least one type of sale in the Statistics request",);
         }
         Statistics {
             item_sold_minecraft: item_sold_minecraft,
@@ -471,10 +471,11 @@ fn get_request(url: &str) -> Result<String> {
     let mut response = Vec::new();
     {
         let mut transfer = handle.transfer();
-        transfer.write_function(|data| {
-            response.extend_from_slice(data);
-            Ok(data.len())
-        })?;
+        transfer
+            .write_function(|data| {
+                                response.extend_from_slice(data);
+                                Ok(data.len())
+                            })?;
         transfer.perform()?;
     }
     Ok(String::from_utf8(response)?)
@@ -494,10 +495,11 @@ fn post_request(url: &str, post: &str) -> Result<String> {
     let mut response = Vec::new();
     {
         let mut transfer = handle.transfer();
-        transfer.write_function(|data| {
-            response.extend_from_slice(data);
-            Ok(data.len())
-        })?;
+        transfer
+            .write_function(|data| {
+                                response.extend_from_slice(data);
+                                Ok(data.len())
+                            })?;
         transfer.perform()?;
     }
     Ok(String::from_utf8(response)?)

@@ -151,8 +151,10 @@ pub fn read_uuid<R: Read>(reader: &mut R) -> Result<u128> {
 /// Either with or without dashes.
 pub fn read_uuid_str<R: Read>(reader: &mut R) -> Result<u128> {
     let tmp = read_String(reader)?.replace("-", "");
-    let a = u64::from_str_radix(&tmp[..16], 16).chain_err(|| "Invalid hex in first half of uuid_str")?;
-    let b = u64::from_str_radix(&tmp[16..], 16).chain_err(|| "Invalid hex in second half of uuid_str")?;
+    let a = u64::from_str_radix(&tmp[..16], 16)
+        .chain_err(|| "Invalid hex in first half of uuid_str")?;
+    let b = u64::from_str_radix(&tmp[16..], 16)
+        .chain_err(|| "Invalid hex in second half of uuid_str")?;
     Ok(u128(a, b))
 }
 

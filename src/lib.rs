@@ -138,13 +138,11 @@ pub enum ClientState {
 }
 impl fmt::Display for ClientState {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "{}",
-               match self {
-                   &ClientState::Handshake => "Handshake",
-                   &ClientState::Status => "Status",
-                   &ClientState::Login => "Login",
-                   &ClientState::Play => "Play",
-               })
+        write!(f, "{}", match self {
+            &ClientState::Handshake => "Handshake",
+            &ClientState::Status => "Status",
+            &ClientState::Login => "Login",
+            &ClientState::Play => "Play",
+        })
     }
 }
