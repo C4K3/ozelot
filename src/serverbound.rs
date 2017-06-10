@@ -173,9 +173,9 @@ impl CraftingBookData {
             _ => bail!("CraftingBookData got invalid type {}", typee),
         };
         Ok(ServerboundPacket::CraftingBookData(CraftingBookData {
-            displayed_recipe: recipe,
-            crafting_book_status: status,
-        }))
+                                                   displayed_recipe: recipe,
+                                                   crafting_book_status: status,
+                                               }))
     }
 }
 
@@ -200,8 +200,8 @@ impl AdvancementTab {
             _ => bail!("Advancement Tab got invalid action {}", action),
         };
         Ok(ServerboundPacket::AdvancementTab(AdvancementTab {
-            tab_id: tab_id
-        }))
+                                                 tab_id: tab_id,
+                                             }))
     }
 }
 

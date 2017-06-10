@@ -415,12 +415,12 @@ impl UnlockRecipes {
         };
 
         Ok(ClientboundPacket::UnlockRecipes(UnlockRecipes {
-            action,
-            crafting_book_open,
-            filter_craftable,
-            recipes,
-            recipes2
-        }))
+                                                action,
+                                                crafting_book_open,
+                                                filter_craftable,
+                                                recipes,
+                                                recipes2,
+                                            }))
     }
 }
 
@@ -430,7 +430,8 @@ impl SelectAdvancementTab {
         write_varint(&Self::get_packet_id(), &mut ret)?;
         if let Some(ref identifier) = self.identifier {
             if identifier.len() > 32767 {
-                bail!("SelectAdvancementTab identifier is too long, is {} bytes long", identifier.len());
+                bail!("SelectAdvancementTab identifier is too long, is {} bytes long",
+                      identifier.len());
             }
             write_bool(&true, &mut ret)?;
             write_String(identifier, &mut ret)?;
@@ -444,7 +445,8 @@ impl SelectAdvancementTab {
         let identifier = if has_id {
             let tmp = read_String(r)?;
             if tmp.len() > 32767 {
-                bail!("SelectAdvancementTab identifier is too long, is {} bytes long", tmp.len());
+                bail!("SelectAdvancementTab identifier is too long, is {} bytes long",
+                      tmp.len());
             }
             Some(tmp)
         } else {
@@ -452,7 +454,7 @@ impl SelectAdvancementTab {
         };
 
         Ok(ClientboundPacket::SelectAdvancementTab(SelectAdvancementTab {
-            identifier,
-        }))
+                                                       identifier,
+                                                   }))
     }
 }
