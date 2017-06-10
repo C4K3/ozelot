@@ -237,7 +237,7 @@ impl Statistics {
                -> Self {
         if !(item_sold_minecraft | prepaid_card_redeemed_minecraft |
              item_sold_cobalt | item_sold_scrolls) {
-            panic!("You must specify at least one type of sale in the Statistics request",);
+            panic!("You must specify at least one type of sale in the Statistics request");
         }
         Statistics {
             item_sold_minecraft: item_sold_minecraft,
