@@ -2015,6 +2015,39 @@ impl Map {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct Entity {
+    entity_id: i32,
+}
+
+impl Entity {
+    fn get_packet_id() -> i32 {
+        37
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        Ok(ClientboundPacket::Entity(Entity {
+            entity_id: read_varint(r)?,
+
+        }))
+    }
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Entity::get_packet_id(), &mut ret)?;
+        write_varint(&self.entity_id, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(entity_id: i32) -> ClientboundPacket {
+        ClientboundPacket::Entity(Entity {
+            entity_id: entity_id,
+        })
+    }
+    /// Get the entity ID
+    pub fn get_entity_id(&self) -> &i32 {
+        &self.entity_id
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct EntityRelativeMove {
     entity_id: i32,
     x: i16,
@@ -2025,7 +2058,7 @@ pub struct EntityRelativeMove {
 
 impl EntityRelativeMove {
     fn get_packet_id() -> i32 {
-        37
+        38
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityRelativeMove(EntityRelativeMove {
@@ -2088,7 +2121,7 @@ pub struct EntityLookRelativeMove {
 
 impl EntityLookRelativeMove {
     fn get_packet_id() -> i32 {
-        38
+        39
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLookRelativeMove(EntityLookRelativeMove {
@@ -2160,7 +2193,7 @@ pub struct EntityLook {
 
 impl EntityLook {
     fn get_packet_id() -> i32 {
-        39
+        40
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLook(EntityLook {
@@ -2201,39 +2234,6 @@ impl EntityLook {
     }    /// Get whether on the ground
     pub fn get_on_ground(&self) -> &bool {
         &self.on_ground
-    }
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Entity {
-    entity_id: i32,
-}
-
-impl Entity {
-    fn get_packet_id() -> i32 {
-        40
-    }
-    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
-        Ok(ClientboundPacket::Entity(Entity {
-            entity_id: read_varint(r)?,
-
-        }))
-    }
-    fn to_u8(&self) -> Result<Vec<u8>> {
-        let mut ret = Vec::new();
-        write_varint(&Entity::get_packet_id(), &mut ret)?;
-        write_varint(&self.entity_id, &mut ret)?;
-
-        Ok(ret)
-    }
-    pub fn new(entity_id: i32) -> ClientboundPacket {
-        ClientboundPacket::Entity(Entity {
-            entity_id: entity_id,
-        })
-    }
-    /// Get the entity ID
-    pub fn get_entity_id(&self) -> &i32 {
-        &self.entity_id
     }
 }
 
@@ -2552,13 +2552,55 @@ impl UseBed {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct UnlockRecipes {
+    action: i32,
+    crafting_book_open: bool,
+    filter_craftable: bool,
+    recipes: Vec<i32>,
+    recipes2: Vec<i32>,
+}
+
+impl UnlockRecipes {
+    fn get_packet_id() -> i32 {
+        48
+    }
+
+
+    pub fn new_raw(action: i32, crafting_book_open: bool, filter_craftable: bool, recipes: Vec<i32>, recipes2: Vec<i32>) -> ClientboundPacket {
+        ClientboundPacket::UnlockRecipes(UnlockRecipes {
+            action: action,
+            crafting_book_open: crafting_book_open,
+            filter_craftable: filter_craftable,
+            recipes: recipes,
+            recipes2: recipes2,
+        })
+    }
+    /// Get the action enum ID
+    pub fn get_action(&self) -> &i32 {
+        &self.action
+    }    /// Get whether the crafting book shall open when the player opens their inventory
+    pub fn get_crafting_book_open(&self) -> &bool {
+        &self.crafting_book_open
+    }    /// Get whether to filter for only craftable items
+    pub fn get_filter_craftable(&self) -> &bool {
+        &self.filter_craftable
+    }    /// Get all the recipes in list 1
+    pub fn get_recipes(&self) -> &Vec<i32> {
+        &self.recipes
+    }    /// Get all the recipes in list 2. Is empty unless action == 0
+    pub fn get_recipes2(&self) -> &Vec<i32> {
+        &self.recipes2
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct DestroyEntities {
     entity_ids: Vec<i32>,
 }
 
 impl DestroyEntities {
     fn get_packet_id() -> i32 {
-        48
+        49
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DestroyEntities(DestroyEntities {
@@ -2592,7 +2634,7 @@ pub struct RemoveEntityEffect {
 
 impl RemoveEntityEffect {
     fn get_packet_id() -> i32 {
-        49
+        50
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::RemoveEntityEffect(RemoveEntityEffect {
@@ -2629,7 +2671,7 @@ pub struct ResourcePackSend {
 
 impl ResourcePackSend {
     fn get_packet_id() -> i32 {
-        50
+        51
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ResourcePackSend(ResourcePackSend {
@@ -2671,7 +2713,7 @@ pub struct Respawn {
 
 impl Respawn {
     fn get_packet_id() -> i32 {
-        51
+        52
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Respawn(Respawn {
@@ -2723,7 +2765,7 @@ pub struct EntityHeadLook {
 
 impl EntityHeadLook {
     fn get_packet_id() -> i32 {
-        52
+        53
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityHeadLook(EntityHeadLook {
@@ -2756,13 +2798,35 @@ impl EntityHeadLook {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct SelectAdvancementTab {
+    identifier: Option<String>,
+}
+
+impl SelectAdvancementTab {
+    fn get_packet_id() -> i32 {
+        54
+    }
+
+
+    pub fn new_raw(identifier: Option<String>) -> ClientboundPacket {
+        ClientboundPacket::SelectAdvancementTab(SelectAdvancementTab {
+            identifier: identifier,
+        })
+    }
+    /// Get the identifier to switch to. If None, switch to default
+    pub fn get_identifier(&self) -> &Option<String> {
+        &self.identifier
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct WorldBorder {
     data: Vec<u8>,
 }
 
 impl WorldBorder {
     fn get_packet_id() -> i32 {
-        53
+        55
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WorldBorder(WorldBorder {
@@ -2795,7 +2859,7 @@ pub struct Camera {
 
 impl Camera {
     fn get_packet_id() -> i32 {
-        54
+        56
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Camera(Camera {
@@ -2828,7 +2892,7 @@ pub struct ClientboundHeldItemChange {
 
 impl ClientboundHeldItemChange {
     fn get_packet_id() -> i32 {
-        55
+        57
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundHeldItemChange(ClientboundHeldItemChange {
@@ -2862,7 +2926,7 @@ pub struct DisplayScoreboard {
 
 impl DisplayScoreboard {
     fn get_packet_id() -> i32 {
-        56
+        58
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DisplayScoreboard(DisplayScoreboard {
@@ -2902,7 +2966,7 @@ pub struct EntityMetadata {
 
 impl EntityMetadata {
     fn get_packet_id() -> i32 {
-        57
+        59
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityMetadata(EntityMetadata {
@@ -2942,7 +3006,7 @@ pub struct AttachEntity {
 
 impl AttachEntity {
     fn get_packet_id() -> i32 {
-        58
+        60
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::AttachEntity(AttachEntity {
@@ -2984,7 +3048,7 @@ pub struct EntityVelocity {
 
 impl EntityVelocity {
     fn get_packet_id() -> i32 {
-        59
+        61
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityVelocity(EntityVelocity {
@@ -3037,7 +3101,7 @@ pub struct EntityEquipment {
 
 impl EntityEquipment {
     fn get_packet_id() -> i32 {
-        60
+        62
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEquipment(EntityEquipment {
@@ -3084,7 +3148,7 @@ pub struct SetExperience {
 
 impl SetExperience {
     fn get_packet_id() -> i32 {
-        61
+        63
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetExperience(SetExperience {
@@ -3131,7 +3195,7 @@ pub struct UpdateHealth {
 
 impl UpdateHealth {
     fn get_packet_id() -> i32 {
-        62
+        64
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateHealth(UpdateHealth {
@@ -3179,7 +3243,7 @@ pub struct ScoreboardObjective {
 
 impl ScoreboardObjective {
     fn get_packet_id() -> i32 {
-        63
+        65
     }
 
 
@@ -3214,7 +3278,7 @@ pub struct SetPassengers {
 
 impl SetPassengers {
     fn get_packet_id() -> i32 {
-        64
+        66
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetPassengers(SetPassengers {
@@ -3253,7 +3317,7 @@ pub struct Teams {
 
 impl Teams {
     fn get_packet_id() -> i32 {
-        65
+        67
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Teams(Teams {
@@ -3289,7 +3353,7 @@ pub struct UpdateScore {
 
 impl UpdateScore {
     fn get_packet_id() -> i32 {
-        66
+        68
     }
 
 
@@ -3323,7 +3387,7 @@ pub struct SpawnPosition {
 
 impl SpawnPosition {
     fn get_packet_id() -> i32 {
-        67
+        69
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPosition(SpawnPosition {
@@ -3357,7 +3421,7 @@ pub struct TimeUpdate {
 
 impl TimeUpdate {
     fn get_packet_id() -> i32 {
-        68
+        70
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::TimeUpdate(TimeUpdate {
@@ -3398,7 +3462,7 @@ pub struct Title {
 
 impl Title {
     fn get_packet_id() -> i32 {
-        69
+        71
     }
 
 
@@ -3434,7 +3498,7 @@ pub struct SoundEffect {
 
 impl SoundEffect {
     fn get_packet_id() -> i32 {
-        70
+        72
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SoundEffect(SoundEffect {
@@ -3504,7 +3568,7 @@ pub struct PlayerListHeaderFooter {
 
 impl PlayerListHeaderFooter {
     fn get_packet_id() -> i32 {
-        71
+        73
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListHeaderFooter(PlayerListHeaderFooter {
@@ -3545,7 +3609,7 @@ pub struct CollectItem {
 
 impl CollectItem {
     fn get_packet_id() -> i32 {
-        72
+        74
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CollectItem(CollectItem {
@@ -3596,7 +3660,7 @@ pub struct EntityTeleport {
 
 impl EntityTeleport {
     fn get_packet_id() -> i32 {
-        73
+        75
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityTeleport(EntityTeleport {
@@ -3659,6 +3723,39 @@ impl EntityTeleport {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct Advancements {
+    data: Vec<u8>,
+}
+
+impl Advancements {
+    fn get_packet_id() -> i32 {
+        76
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        Ok(ClientboundPacket::Advancements(Advancements {
+            data: read_bytearray_to_end(r)?,
+
+        }))
+    }
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Advancements::get_packet_id(), &mut ret)?;
+        write_bytearray_to_end(&self.data, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(data: Vec<u8>) -> ClientboundPacket {
+        ClientboundPacket::Advancements(Advancements {
+            data: data,
+        })
+    }
+    /// Get the raw data for the packet. Parsing it is out of the scope of this library
+    pub fn get_data(&self) -> &Vec<u8> {
+        &self.data
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct EntityProperties {
     entity_id: i32,
     data: Vec<u8>,
@@ -3666,7 +3763,7 @@ pub struct EntityProperties {
 
 impl EntityProperties {
     fn get_packet_id() -> i32 {
-        74
+        77
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityProperties(EntityProperties {
@@ -3709,7 +3806,7 @@ pub struct EntityEffect {
 
 impl EntityEffect {
     fn get_packet_id() -> i32 {
-        75
+        78
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEffect(EntityEffect {

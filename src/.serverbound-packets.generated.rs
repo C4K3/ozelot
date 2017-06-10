@@ -213,6 +213,53 @@ impl TeleportConfirm {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct PrepareCraftingGrid {
+    window_id: i8,
+    action: i16,
+    return_prepare_entries: Vec<u8>,
+}
+
+impl PrepareCraftingGrid {
+    fn get_packet_id() -> i32 {
+        1
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
+        Ok(ServerboundPacket::PrepareCraftingGrid(PrepareCraftingGrid {
+            window_id: read_i8(r)?,
+            action: read_i16(r)?,
+            return_prepare_entries: read_bytearray_to_end(r)?,
+
+        }))
+    }
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&PrepareCraftingGrid::get_packet_id(), &mut ret)?;
+        write_i8(&self.window_id, &mut ret)?;
+        write_i16(&self.action, &mut ret)?;
+        write_bytearray_to_end(&self.return_prepare_entries, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(window_id: i8, action: i16, return_prepare_entries: Vec<u8>) -> ServerboundPacket {
+        ServerboundPacket::PrepareCraftingGrid(PrepareCraftingGrid {
+            window_id: window_id,
+            action: action,
+            return_prepare_entries: return_prepare_entries,
+        })
+    }
+    /// Get the window id
+    pub fn get_window_id(&self) -> &i8 {
+        &self.window_id
+    }    /// Get the action number
+    pub fn get_action(&self) -> &i16 {
+        &self.action
+    }    /// Get the raw data for the Return Entry and Prepare Entry lists (including their respective array sizes). Finding out where to delimit each of the items requires parsing the NBT in the data slot data
+    pub fn get_return_prepare_entries(&self) -> &Vec<u8> {
+        &self.return_prepare_entries
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct TabComplete {
     text: String,
     assume_command: bool,
@@ -221,7 +268,7 @@ pub struct TabComplete {
 
 impl TabComplete {
     fn get_packet_id() -> i32 {
-        1
+        2
     }
 
 
@@ -251,7 +298,7 @@ pub struct ChatMessage {
 
 impl ChatMessage {
     fn get_packet_id() -> i32 {
-        2
+        3
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ChatMessage(ChatMessage {
@@ -284,7 +331,7 @@ pub struct ClientStatus {
 
 impl ClientStatus {
     fn get_packet_id() -> i32 {
-        3
+        4
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ClientStatus(ClientStatus {
@@ -322,7 +369,7 @@ pub struct ClientSettings {
 
 impl ClientSettings {
     fn get_packet_id() -> i32 {
-        4
+        5
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ClientSettings(ClientSettings {
@@ -387,7 +434,7 @@ pub struct ConfirmTransaction {
 
 impl ConfirmTransaction {
     fn get_packet_id() -> i32 {
-        5
+        6
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ConfirmTransaction(ConfirmTransaction {
@@ -433,7 +480,7 @@ pub struct EnchantItem {
 
 impl EnchantItem {
     fn get_packet_id() -> i32 {
-        6
+        7
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::EnchantItem(EnchantItem {
@@ -477,7 +524,7 @@ pub struct ClickWindow {
 
 impl ClickWindow {
     fn get_packet_id() -> i32 {
-        7
+        8
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ClickWindow(ClickWindow {
@@ -540,7 +587,7 @@ pub struct CloseWindow {
 
 impl CloseWindow {
     fn get_packet_id() -> i32 {
-        8
+        9
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::CloseWindow(CloseWindow {
@@ -574,7 +621,7 @@ pub struct PluginMessage {
 
 impl PluginMessage {
     fn get_packet_id() -> i32 {
-        9
+        10
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PluginMessage(PluginMessage {
@@ -616,7 +663,7 @@ pub struct UseEntity {
 
 impl UseEntity {
     fn get_packet_id() -> i32 {
-        10
+        11
     }
 
 
@@ -650,7 +697,7 @@ pub struct KeepAlive {
 
 impl KeepAlive {
     fn get_packet_id() -> i32 {
-        11
+        12
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::KeepAlive(KeepAlive {
@@ -677,6 +724,39 @@ impl KeepAlive {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct Player {
+    on_ground: bool,
+}
+
+impl Player {
+    fn get_packet_id() -> i32 {
+        13
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
+        Ok(ServerboundPacket::Player(Player {
+            on_ground: read_bool(r)?,
+
+        }))
+    }
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Player::get_packet_id(), &mut ret)?;
+        write_bool(&self.on_ground, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(on_ground: bool) -> ServerboundPacket {
+        ServerboundPacket::Player(Player {
+            on_ground: on_ground,
+        })
+    }
+    /// Get whether on the ground
+    pub fn get_on_ground(&self) -> &bool {
+        &self.on_ground
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct PlayerPosition {
     x: f64,
     y: f64,
@@ -686,7 +766,7 @@ pub struct PlayerPosition {
 
 impl PlayerPosition {
     fn get_packet_id() -> i32 {
-        12
+        14
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerPosition(PlayerPosition {
@@ -742,7 +822,7 @@ pub struct PlayerPositionAndLook {
 
 impl PlayerPositionAndLook {
     fn get_packet_id() -> i32 {
-        13
+        15
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerPositionAndLook(PlayerPositionAndLook {
@@ -807,7 +887,7 @@ pub struct PlayerLook {
 
 impl PlayerLook {
     fn get_packet_id() -> i32 {
-        14
+        16
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerLook(PlayerLook {
@@ -846,39 +926,6 @@ impl PlayerLook {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Player {
-    on_ground: bool,
-}
-
-impl Player {
-    fn get_packet_id() -> i32 {
-        15
-    }
-    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
-        Ok(ServerboundPacket::Player(Player {
-            on_ground: read_bool(r)?,
-
-        }))
-    }
-    fn to_u8(&self) -> Result<Vec<u8>> {
-        let mut ret = Vec::new();
-        write_varint(&Player::get_packet_id(), &mut ret)?;
-        write_bool(&self.on_ground, &mut ret)?;
-
-        Ok(ret)
-    }
-    pub fn new(on_ground: bool) -> ServerboundPacket {
-        ServerboundPacket::Player(Player {
-            on_ground: on_ground,
-        })
-    }
-    /// Get whether on the ground
-    pub fn get_on_ground(&self) -> &bool {
-        &self.on_ground
-    }
-}
-
-#[derive(Debug, PartialEq, Clone)]
 pub struct VehicleMove {
     x: f64,
     y: f64,
@@ -889,7 +936,7 @@ pub struct VehicleMove {
 
 impl VehicleMove {
     fn get_packet_id() -> i32 {
-        16
+        17
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::VehicleMove(VehicleMove {
@@ -947,7 +994,7 @@ pub struct SteerBoat {
 
 impl SteerBoat {
     fn get_packet_id() -> i32 {
-        17
+        18
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::SteerBoat(SteerBoat {
@@ -988,7 +1035,7 @@ pub struct PlayerAbilities {
 
 impl PlayerAbilities {
     fn get_packet_id() -> i32 {
-        18
+        19
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerAbilities(PlayerAbilities {
@@ -1035,7 +1082,7 @@ pub struct PlayerDigging {
 
 impl PlayerDigging {
     fn get_packet_id() -> i32 {
-        19
+        20
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerDigging(PlayerDigging {
@@ -1082,7 +1129,7 @@ pub struct EntityAction {
 
 impl EntityAction {
     fn get_packet_id() -> i32 {
-        20
+        21
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::EntityAction(EntityAction {
@@ -1129,7 +1176,7 @@ pub struct SteerVehicle {
 
 impl SteerVehicle {
     fn get_packet_id() -> i32 {
-        21
+        22
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::SteerVehicle(SteerVehicle {
@@ -1168,13 +1215,40 @@ impl SteerVehicle {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct CraftingBookData {
+    displayed_recipe: Option<i32>,
+    crafting_book_status: Option<(bool, bool)>,
+}
+
+impl CraftingBookData {
+    fn get_packet_id() -> i32 {
+        23
+    }
+
+
+    pub fn new_raw(displayed_recipe: Option<i32>, crafting_book_status: Option<(bool, bool)>) -> ServerboundPacket {
+        ServerboundPacket::CraftingBookData(CraftingBookData {
+            displayed_recipe: displayed_recipe,
+            crafting_book_status: crafting_book_status,
+        })
+    }
+    /// Get the displayed recipe, if the type of this packet is displayed recipe
+    pub fn get_displayed_recipe(&self) -> &Option<i32> {
+        &self.displayed_recipe
+    }    /// Get the values (Crafting book open, Crafting filter), if the tyep of this packet is crafting book status
+    pub fn get_crafting_book_status(&self) -> &Option<(bool, bool)> {
+        &self.crafting_book_status
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct ResourcePackStatus {
     result: i32,
 }
 
 impl ResourcePackStatus {
     fn get_packet_id() -> i32 {
-        22
+        24
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ResourcePackStatus(ResourcePackStatus {
@@ -1201,13 +1275,35 @@ impl ResourcePackStatus {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct AdvancementTab {
+    tab_id: Option<String>,
+}
+
+impl AdvancementTab {
+    fn get_packet_id() -> i32 {
+        25
+    }
+
+
+    pub fn new_raw(tab_id: Option<String>) -> ServerboundPacket {
+        ServerboundPacket::AdvancementTab(AdvancementTab {
+            tab_id: tab_id,
+        })
+    }
+    /// Get Some(Tab ID) if the action was to open a tab, and None else
+    pub fn get_tab_id(&self) -> &Option<String> {
+        &self.tab_id
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct HeldItemChange {
     slot: i16,
 }
 
 impl HeldItemChange {
     fn get_packet_id() -> i32 {
-        23
+        26
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::HeldItemChange(HeldItemChange {
@@ -1241,7 +1337,7 @@ pub struct CreativeInventoryAction {
 
 impl CreativeInventoryAction {
     fn get_packet_id() -> i32 {
-        24
+        27
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::CreativeInventoryAction(CreativeInventoryAction {
@@ -1284,7 +1380,7 @@ pub struct UpdateSign {
 
 impl UpdateSign {
     fn get_packet_id() -> i32 {
-        25
+        28
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::UpdateSign(UpdateSign {
@@ -1341,7 +1437,7 @@ pub struct Animation {
 
 impl Animation {
     fn get_packet_id() -> i32 {
-        26
+        29
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::Animation(Animation {
@@ -1374,7 +1470,7 @@ pub struct Spectate {
 
 impl Spectate {
     fn get_packet_id() -> i32 {
-        27
+        30
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::Spectate(Spectate {
@@ -1412,7 +1508,7 @@ pub struct PlayerBlockPlacement {
 
 impl PlayerBlockPlacement {
     fn get_packet_id() -> i32 {
-        28
+        31
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerBlockPlacement(PlayerBlockPlacement {
@@ -1475,7 +1571,7 @@ pub struct UseItem {
 
 impl UseItem {
     fn get_packet_id() -> i32 {
-        29
+        32
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::UseItem(UseItem {

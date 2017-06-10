@@ -389,3 +389,70 @@ impl PlayerAbilities {
         (self.flags & 0x08) != 0
     }
 }
+
+impl UnlockRecipes {
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::get_packet_id(), &mut ret)?;
+        write_varint(&self.action, &mut ret)?;
+        write_bool(&self.crafting_book_open, &mut ret)?;
+        write_bool(&self.filter_craftable, &mut ret)?;
+        write_prefixed_varintarray(&self.recipes, &mut ret)?;
+        if self.action == 0 {
+            write_prefixed_varintarray(&self.recipes2, &mut ret)?;
+        }
+        Ok(ret)
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        let action = read_varint(r)?;
+        let crafting_book_open = read_bool(r)?;
+        let filter_craftable = read_bool(r)?;
+        let recipes = read_prefixed_varintarray(r)?;
+        let recipes2 = if let 0 = action {
+            read_prefixed_varintarray(r)?
+        } else {
+            Vec::new()
+        };
+
+        Ok(ClientboundPacket::UnlockRecipes(UnlockRecipes {
+            action,
+            crafting_book_open,
+            filter_craftable,
+            recipes,
+            recipes2
+        }))
+    }
+}
+
+impl SelectAdvancementTab {
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::get_packet_id(), &mut ret)?;
+        if let Some(ref identifier) = self.identifier {
+            if identifier.len() > 32767 {
+                bail!("SelectAdvancementTab identifier is too long, is {} bytes long", identifier.len());
+            }
+            write_bool(&true, &mut ret)?;
+            write_String(identifier, &mut ret)?;
+        } else {
+            write_bool(&false, &mut ret)?;
+        }
+        Ok(ret)
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        let has_id = read_bool(r)?;
+        let identifier = if has_id {
+            let tmp = read_String(r)?;
+            if tmp.len() > 32767 {
+                bail!("SelectAdvancementTab identifier is too long, is {} bytes long", tmp.len());
+            }
+            Some(tmp)
+        } else {
+            None
+        };
+
+        Ok(ClientboundPacket::SelectAdvancementTab(SelectAdvancementTab {
+            identifier,
+        }))
+    }
+}

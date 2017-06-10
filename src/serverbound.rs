@@ -150,6 +150,61 @@ impl UseEntity {
     }
 }
 
+impl CraftingBookData {
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::get_packet_id(), &mut ret)?;
+
+        if let Some(x) = self.displayed_recipe {
+            write_varint(&0, &mut ret)?;
+            write_i32(&x, &mut ret)?;
+        } else if let Some((book_open, filter)) = self.crafting_book_status {
+            write_varint(&1, &mut ret)?;
+            write_bool(&book_open, &mut ret)?;
+            write_bool(&filter, &mut ret)?;
+        }
+        Ok(ret)
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
+        let typee = read_varint(r)?;
+        let (recipe, status) = match typee {
+            0 => (Some(read_i32(r)?), None),
+            1 => (None, Some((read_bool(r)?, read_bool(r)?))),
+            _ => bail!("CraftingBookData got invalid type {}", typee),
+        };
+        Ok(ServerboundPacket::CraftingBookData(CraftingBookData {
+            displayed_recipe: recipe,
+            crafting_book_status: status,
+        }))
+    }
+}
+
+impl AdvancementTab {
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::get_packet_id(), &mut ret)?;
+
+        if let Some(ref tab_id) = self.tab_id {
+            write_varint(&0, &mut ret)?;
+            write_String(tab_id, &mut ret)?;
+        } else {
+            write_varint(&1, &mut ret)?;
+        }
+        Ok(ret)
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
+        let action = read_varint(r)?;
+        let tab_id = match action {
+            0 => Some(read_String(r)?),
+            1 => None,
+            _ => bail!("Advancement Tab got invalid action {}", action),
+        };
+        Ok(ServerboundPacket::AdvancementTab(AdvancementTab {
+            tab_id: tab_id
+        }))
+    }
+}
+
 impl EncryptionResponse {
     /// Create the EncryptionResponse packet from the unencrypted shared secret
     /// and verify token, and the server's public key in DER format.
