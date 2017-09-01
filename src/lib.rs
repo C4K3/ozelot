@@ -120,7 +120,7 @@ use flate2::Compression;
 
 const COMPRESSION_LEVEL: Compression = Compression::Default;
 /// The protocol version supported by this version of ozelot
-pub const PROTOCOL_VERSION: i32 = 336;
+pub const PROTOCOL_VERSION: i32 = 338;
 
 /// FIXME temporary struct until u128 lands in stable rust, used for uuids
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
