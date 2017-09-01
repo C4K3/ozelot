@@ -2332,6 +2332,46 @@ impl OpenSignEditor {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct CraftRecipeResponse {
+    window_id: u8,
+    recipe: i32,
+}
+
+impl CraftRecipeResponse {
+    fn get_packet_id() -> i32 {
+        43
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        Ok(ClientboundPacket::CraftRecipeResponse(CraftRecipeResponse {
+            window_id: read_u8(r)?,
+            recipe: read_varint(r)?,
+
+        }))
+    }
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&CraftRecipeResponse::get_packet_id(), &mut ret)?;
+        write_u8(&self.window_id, &mut ret)?;
+        write_varint(&self.recipe, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(window_id: u8, recipe: i32) -> ClientboundPacket {
+        ClientboundPacket::CraftRecipeResponse(CraftRecipeResponse {
+            window_id: window_id,
+            recipe: recipe,
+        })
+    }
+    /// Get the window ID
+    pub fn get_window_id(&self) -> &u8 {
+        &self.window_id
+    }    /// Get the recipe ID
+    pub fn get_recipe(&self) -> &i32 {
+        &self.recipe
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct PlayerAbilities {
     flags: u8,
     flying_speed: f32,
@@ -2340,7 +2380,7 @@ pub struct PlayerAbilities {
 
 impl PlayerAbilities {
     fn get_packet_id() -> i32 {
-        43
+        44
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerAbilities(PlayerAbilities {
@@ -2385,7 +2425,7 @@ pub struct CombatEvent {
 
 impl CombatEvent {
     fn get_packet_id() -> i32 {
-        44
+        45
     }
 
 
@@ -2410,7 +2450,7 @@ pub struct PlayerListItem {
 
 impl PlayerListItem {
     fn get_packet_id() -> i32 {
-        45
+        46
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListItem(PlayerListItem {
@@ -2449,7 +2489,7 @@ pub struct PlayerPositionAndLook {
 
 impl PlayerPositionAndLook {
     fn get_packet_id() -> i32 {
-        46
+        47
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerPositionAndLook(PlayerPositionAndLook {
@@ -2519,7 +2559,7 @@ pub struct UseBed {
 
 impl UseBed {
     fn get_packet_id() -> i32 {
-        47
+        48
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UseBed(UseBed {
@@ -2562,7 +2602,7 @@ pub struct UnlockRecipes {
 
 impl UnlockRecipes {
     fn get_packet_id() -> i32 {
-        48
+        49
     }
 
 
@@ -2600,7 +2640,7 @@ pub struct DestroyEntities {
 
 impl DestroyEntities {
     fn get_packet_id() -> i32 {
-        49
+        50
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DestroyEntities(DestroyEntities {
@@ -2634,7 +2674,7 @@ pub struct RemoveEntityEffect {
 
 impl RemoveEntityEffect {
     fn get_packet_id() -> i32 {
-        50
+        51
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::RemoveEntityEffect(RemoveEntityEffect {
@@ -2671,7 +2711,7 @@ pub struct ResourcePackSend {
 
 impl ResourcePackSend {
     fn get_packet_id() -> i32 {
-        51
+        52
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ResourcePackSend(ResourcePackSend {
@@ -2713,7 +2753,7 @@ pub struct Respawn {
 
 impl Respawn {
     fn get_packet_id() -> i32 {
-        52
+        53
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Respawn(Respawn {
@@ -2765,7 +2805,7 @@ pub struct EntityHeadLook {
 
 impl EntityHeadLook {
     fn get_packet_id() -> i32 {
-        53
+        54
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityHeadLook(EntityHeadLook {
@@ -2804,7 +2844,7 @@ pub struct SelectAdvancementTab {
 
 impl SelectAdvancementTab {
     fn get_packet_id() -> i32 {
-        54
+        55
     }
 
 
@@ -2826,7 +2866,7 @@ pub struct WorldBorder {
 
 impl WorldBorder {
     fn get_packet_id() -> i32 {
-        55
+        56
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WorldBorder(WorldBorder {
@@ -2859,7 +2899,7 @@ pub struct Camera {
 
 impl Camera {
     fn get_packet_id() -> i32 {
-        56
+        57
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Camera(Camera {
@@ -2892,7 +2932,7 @@ pub struct ClientboundHeldItemChange {
 
 impl ClientboundHeldItemChange {
     fn get_packet_id() -> i32 {
-        57
+        58
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundHeldItemChange(ClientboundHeldItemChange {
@@ -2926,7 +2966,7 @@ pub struct DisplayScoreboard {
 
 impl DisplayScoreboard {
     fn get_packet_id() -> i32 {
-        58
+        59
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DisplayScoreboard(DisplayScoreboard {
@@ -2966,7 +3006,7 @@ pub struct EntityMetadata {
 
 impl EntityMetadata {
     fn get_packet_id() -> i32 {
-        59
+        60
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityMetadata(EntityMetadata {
@@ -3006,7 +3046,7 @@ pub struct AttachEntity {
 
 impl AttachEntity {
     fn get_packet_id() -> i32 {
-        60
+        61
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::AttachEntity(AttachEntity {
@@ -3048,7 +3088,7 @@ pub struct EntityVelocity {
 
 impl EntityVelocity {
     fn get_packet_id() -> i32 {
-        61
+        62
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityVelocity(EntityVelocity {
@@ -3101,7 +3141,7 @@ pub struct EntityEquipment {
 
 impl EntityEquipment {
     fn get_packet_id() -> i32 {
-        62
+        63
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEquipment(EntityEquipment {
@@ -3148,7 +3188,7 @@ pub struct SetExperience {
 
 impl SetExperience {
     fn get_packet_id() -> i32 {
-        63
+        64
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetExperience(SetExperience {
@@ -3195,7 +3235,7 @@ pub struct UpdateHealth {
 
 impl UpdateHealth {
     fn get_packet_id() -> i32 {
-        64
+        65
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateHealth(UpdateHealth {
@@ -3243,7 +3283,7 @@ pub struct ScoreboardObjective {
 
 impl ScoreboardObjective {
     fn get_packet_id() -> i32 {
-        65
+        66
     }
 
 
@@ -3278,7 +3318,7 @@ pub struct SetPassengers {
 
 impl SetPassengers {
     fn get_packet_id() -> i32 {
-        66
+        67
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetPassengers(SetPassengers {
@@ -3317,7 +3357,7 @@ pub struct Teams {
 
 impl Teams {
     fn get_packet_id() -> i32 {
-        67
+        68
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Teams(Teams {
@@ -3353,7 +3393,7 @@ pub struct UpdateScore {
 
 impl UpdateScore {
     fn get_packet_id() -> i32 {
-        68
+        69
     }
 
 
@@ -3387,7 +3427,7 @@ pub struct SpawnPosition {
 
 impl SpawnPosition {
     fn get_packet_id() -> i32 {
-        69
+        70
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPosition(SpawnPosition {
@@ -3421,7 +3461,7 @@ pub struct TimeUpdate {
 
 impl TimeUpdate {
     fn get_packet_id() -> i32 {
-        70
+        71
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::TimeUpdate(TimeUpdate {
@@ -3462,7 +3502,7 @@ pub struct Title {
 
 impl Title {
     fn get_packet_id() -> i32 {
-        71
+        72
     }
 
 
@@ -3498,7 +3538,7 @@ pub struct SoundEffect {
 
 impl SoundEffect {
     fn get_packet_id() -> i32 {
-        72
+        73
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SoundEffect(SoundEffect {
@@ -3568,7 +3608,7 @@ pub struct PlayerListHeaderFooter {
 
 impl PlayerListHeaderFooter {
     fn get_packet_id() -> i32 {
-        73
+        74
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListHeaderFooter(PlayerListHeaderFooter {
@@ -3609,7 +3649,7 @@ pub struct CollectItem {
 
 impl CollectItem {
     fn get_packet_id() -> i32 {
-        74
+        75
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CollectItem(CollectItem {
@@ -3660,7 +3700,7 @@ pub struct EntityTeleport {
 
 impl EntityTeleport {
     fn get_packet_id() -> i32 {
-        75
+        76
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityTeleport(EntityTeleport {
@@ -3729,7 +3769,7 @@ pub struct Advancements {
 
 impl Advancements {
     fn get_packet_id() -> i32 {
-        76
+        77
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Advancements(Advancements {
@@ -3763,7 +3803,7 @@ pub struct EntityProperties {
 
 impl EntityProperties {
     fn get_packet_id() -> i32 {
-        77
+        78
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityProperties(EntityProperties {
@@ -3806,7 +3846,7 @@ pub struct EntityEffect {
 
 impl EntityEffect {
     fn get_packet_id() -> i32 {
-        78
+        79
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEffect(EntityEffect {
