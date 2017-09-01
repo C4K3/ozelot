@@ -26,7 +26,7 @@ include!("./.clientbound-packets.generated.rs");
 impl Statistics {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Statistics::get_packet_id(), &mut ret)?;
+        write_varint(&Statistics::PACKET_ID, &mut ret)?;
         write_varint(&(self.values.len() as i32), &mut ret)?;
         for (key, value) in self.values.iter() {
             write_String(key, &mut ret)?;
@@ -49,7 +49,7 @@ impl Statistics {
 impl ClientboundTabComplete {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ClientboundTabComplete::get_packet_id(), &mut ret)?;
+        write_varint(&ClientboundTabComplete::PACKET_ID, &mut ret)?;
         write_varint(&(self.matches.len() as i32), &mut ret)?;
         for value in &self.matches {
             write_String(value, &mut ret)?;
@@ -71,7 +71,7 @@ impl ClientboundTabComplete {
 impl MultiBlockChange {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&MultiBlockChange::get_packet_id(), &mut ret)?;
+        write_varint(&MultiBlockChange::PACKET_ID, &mut ret)?;
         write_i32(&self.chunk_x, &mut ret)?;
         write_i32(&self.chunk_z, &mut ret)?;
         write_varint(&(self.changes.len() as i32), &mut ret)?;
@@ -108,7 +108,7 @@ impl MultiBlockChange {
 impl OpenWindow {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&OpenWindow::get_packet_id(), &mut ret)?;
+        write_varint(&OpenWindow::PACKET_ID, &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
         write_String(&self.window_type, &mut ret)?;
         write_String(&self.window_title, &mut ret)?;
@@ -141,7 +141,7 @@ impl OpenWindow {
 impl Explosion {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Explosion::get_packet_id(), &mut ret)?;
+        write_varint(&Explosion::PACKET_ID, &mut ret)?;
         write_f32(&self.x, &mut ret)?;
         write_f32(&self.y, &mut ret)?;
         write_f32(&self.z, &mut ret)?;
@@ -186,7 +186,7 @@ impl Explosion {
 impl Particle {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Particle::get_packet_id(), &mut ret)?;
+        write_varint(&Particle::PACKET_ID, &mut ret)?;
         write_i32(&self.particle_id, &mut ret)?;
         write_bool(&self.use_long_distance, &mut ret)?;
         write_f32(&self.x, &mut ret)?;
@@ -244,7 +244,7 @@ impl Particle {
 impl CombatEvent {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&CombatEvent::get_packet_id(), &mut ret)?;
+        write_varint(&CombatEvent::PACKET_ID, &mut ret)?;
         write_varint(&self.event, &mut ret)?;
         if let Some(x) = self.duration_playerid {
             write_varint(&x, &mut ret)?;
@@ -282,7 +282,7 @@ impl CombatEvent {
 impl ScoreboardObjective {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ScoreboardObjective::get_packet_id(), &mut ret)?;
+        write_varint(&ScoreboardObjective::PACKET_ID, &mut ret)?;
         write_String(&self.name, &mut ret)?;
         write_u8(&self.mode, &mut ret)?;
         if let &Some(ref x) = &self.value {
@@ -313,7 +313,7 @@ impl ScoreboardObjective {
 impl UpdateScore {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&UpdateScore::get_packet_id(), &mut ret)?;
+        write_varint(&UpdateScore::PACKET_ID, &mut ret)?;
         write_String(&self.name, &mut ret)?;
         write_u8(&self.action, &mut ret)?;
         write_String(&self.objective_name, &mut ret)?;
@@ -342,7 +342,7 @@ impl UpdateScore {
 impl Title {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Title::get_packet_id(), &mut ret)?;
+        write_varint(&Title::PACKET_ID, &mut ret)?;
         write_varint(&self.action, &mut ret)?;
         if let &Some(ref x) = &self.text {
             write_String(x, &mut ret)?;
@@ -393,7 +393,7 @@ impl PlayerAbilities {
 impl UnlockRecipes {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Self::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.action, &mut ret)?;
         write_bool(&self.crafting_book_open, &mut ret)?;
         write_bool(&self.filter_craftable, &mut ret)?;
@@ -427,7 +427,7 @@ impl UnlockRecipes {
 impl SelectAdvancementTab {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Self::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         if let Some(ref identifier) = self.identifier {
             if identifier.len() > 32767 {
                 bail!("SelectAdvancementTab identifier is too long, is {} bytes long",

@@ -210,13 +210,9 @@
                      name))
            fields)))
 
-;; Get the packet id for this packet
-(defn fn-get-packet-id [{name :name id :id}]
-  (format
-    (long-str "    fn get_packet_id() -> i32 {"
-              "        %s"
-              "    }")
-    id))
+;; Create the const PACKET_ID fields
+(defn const-packet-id [{name :name id :id}]
+  (format "    const PACKET_ID: i32 = %s;" id))
 
 ;; Given the fields of a packet, return a string containing functions that
 ;; read all those fields, i.e. for use inside a 'new' function for the packet
@@ -249,7 +245,7 @@
   (if (nil? automatic-serialize)
     (long-str "    fn to_u8(&self) -> Result<Vec<u8>> {"
               "        let mut ret = Vec::new();"
-              (format "        write_varint(&%s::get_packet_id(), &mut ret)?;" name)
+              "        write_varint(&Self::PACKET_ID, &mut ret)?;"
               (write-fields-str fields)
               "        Ok(ret)"
               "    }")
@@ -288,7 +284,7 @@
 (defn packet-impl [packet packet-type]
   (let [{name :name automatic-serialize :automatic-serialize} packet]
     (long-str (format "impl %s {" name)
-              (fn-get-packet-id packet)
+              (const-packet-id packet)
               (when (nil? automatic-serialize) (fn-deserialize packet packet-type))
               (fn-to-u8 packet)
               (fn-new packet packet-type)

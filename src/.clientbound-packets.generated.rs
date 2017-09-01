@@ -8,9 +8,7 @@ pub struct StatusResponse {
 }
 
 impl StatusResponse {
-    fn get_packet_id() -> i32 {
-        0
-    }
+    const PACKET_ID: i32 = 0;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::StatusResponse(StatusResponse {
             json: read_String(r)?,
@@ -19,7 +17,7 @@ impl StatusResponse {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&StatusResponse::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.json, &mut ret)?;
 
         Ok(ret)
@@ -41,9 +39,7 @@ pub struct StatusPong {
 }
 
 impl StatusPong {
-    fn get_packet_id() -> i32 {
-        1
-    }
+    const PACKET_ID: i32 = 1;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::StatusPong(StatusPong {
             id: read_u64(r)?,
@@ -52,7 +48,7 @@ impl StatusPong {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&StatusPong::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u64(&self.id, &mut ret)?;
 
         Ok(ret)
@@ -74,9 +70,7 @@ pub struct LoginDisconnect {
 }
 
 impl LoginDisconnect {
-    fn get_packet_id() -> i32 {
-        0
-    }
+    const PACKET_ID: i32 = 0;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::LoginDisconnect(LoginDisconnect {
             raw_chat: read_String(r)?,
@@ -85,7 +79,7 @@ impl LoginDisconnect {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&LoginDisconnect::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.raw_chat, &mut ret)?;
 
         Ok(ret)
@@ -109,9 +103,7 @@ pub struct EncryptionRequest {
 }
 
 impl EncryptionRequest {
-    fn get_packet_id() -> i32 {
-        1
-    }
+    const PACKET_ID: i32 = 1;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EncryptionRequest(EncryptionRequest {
             server_id: read_String(r)?,
@@ -122,7 +114,7 @@ impl EncryptionRequest {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EncryptionRequest::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.server_id, &mut ret)?;
         write_prefixed_bytearray(&self.public_key, &mut ret)?;
         write_prefixed_bytearray(&self.verify_token, &mut ret)?;
@@ -155,9 +147,7 @@ pub struct LoginSuccess {
 }
 
 impl LoginSuccess {
-    fn get_packet_id() -> i32 {
-        2
-    }
+    const PACKET_ID: i32 = 2;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::LoginSuccess(LoginSuccess {
             uuid: read_uuid_str(r)?,
@@ -167,7 +157,7 @@ impl LoginSuccess {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&LoginSuccess::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_uuid_str(&self.uuid, &mut ret)?;
         write_String(&self.username, &mut ret)?;
 
@@ -194,9 +184,7 @@ pub struct SetCompression {
 }
 
 impl SetCompression {
-    fn get_packet_id() -> i32 {
-        3
-    }
+    const PACKET_ID: i32 = 3;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetCompression(SetCompression {
             threshold: read_varint(r)?,
@@ -205,7 +193,7 @@ impl SetCompression {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SetCompression::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.threshold, &mut ret)?;
 
         Ok(ret)
@@ -238,9 +226,7 @@ pub struct SpawnObject {
 }
 
 impl SpawnObject {
-    fn get_packet_id() -> i32 {
-        0
-    }
+    const PACKET_ID: i32 = 0;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnObject(SpawnObject {
             entity_id: read_varint(r)?,
@@ -260,7 +246,7 @@ impl SpawnObject {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SpawnObject::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_uuid(&self.object_uuid, &mut ret)?;
         write_u8(&self.object_type, &mut ret)?;
@@ -335,9 +321,7 @@ pub struct SpawnExperienceOrb {
 }
 
 impl SpawnExperienceOrb {
-    fn get_packet_id() -> i32 {
-        1
-    }
+    const PACKET_ID: i32 = 1;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnExperienceOrb(SpawnExperienceOrb {
             entity_id: read_varint(r)?,
@@ -350,7 +334,7 @@ impl SpawnExperienceOrb {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SpawnExperienceOrb::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
         write_f64(&self.y, &mut ret)?;
@@ -396,9 +380,7 @@ pub struct SpawnGlobalEntity {
 }
 
 impl SpawnGlobalEntity {
-    fn get_packet_id() -> i32 {
-        2
-    }
+    const PACKET_ID: i32 = 2;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnGlobalEntity(SpawnGlobalEntity {
             entity_id: read_varint(r)?,
@@ -411,7 +393,7 @@ impl SpawnGlobalEntity {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SpawnGlobalEntity::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_u8(&self.entity_type, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
@@ -462,9 +444,7 @@ pub struct SpawnMob {
 }
 
 impl SpawnMob {
-    fn get_packet_id() -> i32 {
-        3
-    }
+    const PACKET_ID: i32 = 3;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnMob(SpawnMob {
             entity_id: read_varint(r)?,
@@ -485,7 +465,7 @@ impl SpawnMob {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SpawnMob::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_uuid(&self.uuid, &mut ret)?;
         write_varint(&self.mob_type, &mut ret)?;
@@ -571,9 +551,7 @@ pub struct SpawnPainting {
 }
 
 impl SpawnPainting {
-    fn get_packet_id() -> i32 {
-        4
-    }
+    const PACKET_ID: i32 = 4;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPainting(SpawnPainting {
             entity_id: read_varint(r)?,
@@ -586,7 +564,7 @@ impl SpawnPainting {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SpawnPainting::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_uuid(&self.uuid, &mut ret)?;
         write_String(&self.title, &mut ret)?;
@@ -632,9 +610,7 @@ pub struct SpawnPlayer {
 }
 
 impl SpawnPlayer {
-    fn get_packet_id() -> i32 {
-        5
-    }
+    const PACKET_ID: i32 = 5;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPlayer(SpawnPlayer {
             entity_id: read_varint(r)?,
@@ -650,7 +626,7 @@ impl SpawnPlayer {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SpawnPlayer::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_uuid(&self.uuid, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
@@ -708,9 +684,7 @@ pub struct ClientboundAnimation {
 }
 
 impl ClientboundAnimation {
-    fn get_packet_id() -> i32 {
-        6
-    }
+    const PACKET_ID: i32 = 6;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundAnimation(ClientboundAnimation {
             entity_id: read_varint(r)?,
@@ -720,7 +694,7 @@ impl ClientboundAnimation {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ClientboundAnimation::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_u8(&self.animation, &mut ret)?;
 
@@ -747,9 +721,7 @@ pub struct Statistics {
 }
 
 impl Statistics {
-    fn get_packet_id() -> i32 {
-        7
-    }
+    const PACKET_ID: i32 = 7;
 
 
     pub fn new_raw(values: BTreeMap<String, i32>) -> ClientboundPacket {
@@ -769,9 +741,7 @@ pub struct BlockBreakAnimation {
 }
 
 impl BlockBreakAnimation {
-    fn get_packet_id() -> i32 {
-        8
-    }
+    const PACKET_ID: i32 = 8;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockBreakAnimation(BlockBreakAnimation {
             entity_id: read_varint(r)?,
@@ -780,7 +750,7 @@ impl BlockBreakAnimation {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&BlockBreakAnimation::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
 
         Ok(ret)
@@ -804,9 +774,7 @@ pub struct UpdateBlockEntity {
 }
 
 impl UpdateBlockEntity {
-    fn get_packet_id() -> i32 {
-        9
-    }
+    const PACKET_ID: i32 = 9;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateBlockEntity(UpdateBlockEntity {
             position: read_position(r)?,
@@ -817,7 +785,7 @@ impl UpdateBlockEntity {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&UpdateBlockEntity::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_position(&self.position, &mut ret)?;
         write_u8(&self.action, &mut ret)?;
         write_bytearray_to_end(&self.nbt, &mut ret)?;
@@ -852,9 +820,7 @@ pub struct BlockAction {
 }
 
 impl BlockAction {
-    fn get_packet_id() -> i32 {
-        10
-    }
+    const PACKET_ID: i32 = 10;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockAction(BlockAction {
             position: read_position(r)?,
@@ -866,7 +832,7 @@ impl BlockAction {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&BlockAction::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_position(&self.position, &mut ret)?;
         write_u8(&self.action_id, &mut ret)?;
         write_u8(&self.action_param, &mut ret)?;
@@ -904,9 +870,7 @@ pub struct BlockChange {
 }
 
 impl BlockChange {
-    fn get_packet_id() -> i32 {
-        11
-    }
+    const PACKET_ID: i32 = 11;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockChange(BlockChange {
             position: read_position(r)?,
@@ -916,7 +880,7 @@ impl BlockChange {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&BlockChange::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_position(&self.position, &mut ret)?;
         write_varint(&self.new_block, &mut ret)?;
 
@@ -943,9 +907,7 @@ pub struct BossBar {
 }
 
 impl BossBar {
-    fn get_packet_id() -> i32 {
-        12
-    }
+    const PACKET_ID: i32 = 12;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BossBar(BossBar {
             data: read_bytearray_to_end(r)?,
@@ -954,7 +916,7 @@ impl BossBar {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&BossBar::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
         Ok(ret)
@@ -976,9 +938,7 @@ pub struct ServerDifficulty {
 }
 
 impl ServerDifficulty {
-    fn get_packet_id() -> i32 {
-        13
-    }
+    const PACKET_ID: i32 = 13;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ServerDifficulty(ServerDifficulty {
             difficulty: read_u8(r)?,
@@ -987,7 +947,7 @@ impl ServerDifficulty {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ServerDifficulty::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.difficulty, &mut ret)?;
 
         Ok(ret)
@@ -1009,9 +969,7 @@ pub struct ClientboundTabComplete {
 }
 
 impl ClientboundTabComplete {
-    fn get_packet_id() -> i32 {
-        14
-    }
+    const PACKET_ID: i32 = 14;
 
 
     pub fn new_raw(matches: Vec<String>) -> ClientboundPacket {
@@ -1032,9 +990,7 @@ pub struct ChatMessage {
 }
 
 impl ChatMessage {
-    fn get_packet_id() -> i32 {
-        15
-    }
+    const PACKET_ID: i32 = 15;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChatMessage(ChatMessage {
             chat: read_String(r)?,
@@ -1044,7 +1000,7 @@ impl ChatMessage {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ChatMessage::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.chat, &mut ret)?;
         write_u8(&self.position, &mut ret)?;
 
@@ -1073,9 +1029,7 @@ pub struct MultiBlockChange {
 }
 
 impl MultiBlockChange {
-    fn get_packet_id() -> i32 {
-        16
-    }
+    const PACKET_ID: i32 = 16;
 
 
     pub fn new_raw(chunk_x: i32, chunk_z: i32, changes: Vec<(u8, u8, u8, i32)>) -> ClientboundPacket {
@@ -1105,9 +1059,7 @@ pub struct ClientboundConfirmTransaction {
 }
 
 impl ClientboundConfirmTransaction {
-    fn get_packet_id() -> i32 {
-        17
-    }
+    const PACKET_ID: i32 = 17;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundConfirmTransaction(ClientboundConfirmTransaction {
             window_id: read_u8(r)?,
@@ -1118,7 +1070,7 @@ impl ClientboundConfirmTransaction {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ClientboundConfirmTransaction::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
         write_i16(&self.action_id, &mut ret)?;
         write_bool(&self.accepted, &mut ret)?;
@@ -1147,9 +1099,7 @@ pub struct ClientboundCloseWindow {
 }
 
 impl ClientboundCloseWindow {
-    fn get_packet_id() -> i32 {
-        18
-    }
+    const PACKET_ID: i32 = 18;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundCloseWindow(ClientboundCloseWindow {
             window_id: read_u8(r)?,
@@ -1158,7 +1108,7 @@ impl ClientboundCloseWindow {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ClientboundCloseWindow::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
 
         Ok(ret)
@@ -1184,9 +1134,7 @@ pub struct OpenWindow {
 }
 
 impl OpenWindow {
-    fn get_packet_id() -> i32 {
-        19
-    }
+    const PACKET_ID: i32 = 19;
 
 
     pub fn new_raw(window_id: u8, window_type: String, window_title: String, number_of_slots: u8, entity_id: Option<i32>) -> ClientboundPacket {
@@ -1223,9 +1171,7 @@ pub struct WindowItems {
 }
 
 impl WindowItems {
-    fn get_packet_id() -> i32 {
-        20
-    }
+    const PACKET_ID: i32 = 20;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WindowItems(WindowItems {
             window_id: read_u8(r)?,
@@ -1235,7 +1181,7 @@ impl WindowItems {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&WindowItems::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
         write_bytearray_to_end(&self.slots, &mut ret)?;
 
@@ -1264,9 +1210,7 @@ pub struct WindowProperty {
 }
 
 impl WindowProperty {
-    fn get_packet_id() -> i32 {
-        21
-    }
+    const PACKET_ID: i32 = 21;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WindowProperty(WindowProperty {
             window_id: read_u8(r)?,
@@ -1277,7 +1221,7 @@ impl WindowProperty {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&WindowProperty::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
         write_i16(&self.property, &mut ret)?;
         write_i16(&self.new_value, &mut ret)?;
@@ -1311,9 +1255,7 @@ pub struct SetSlot {
 }
 
 impl SetSlot {
-    fn get_packet_id() -> i32 {
-        22
-    }
+    const PACKET_ID: i32 = 22;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetSlot(SetSlot {
             window_id: read_u8(r)?,
@@ -1324,7 +1266,7 @@ impl SetSlot {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SetSlot::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
         write_i16(&self.slot_id, &mut ret)?;
         write_bytearray_to_end(&self.slot_data, &mut ret)?;
@@ -1357,9 +1299,7 @@ pub struct SetCooldown {
 }
 
 impl SetCooldown {
-    fn get_packet_id() -> i32 {
-        23
-    }
+    const PACKET_ID: i32 = 23;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetCooldown(SetCooldown {
             item_id: read_varint(r)?,
@@ -1369,7 +1309,7 @@ impl SetCooldown {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SetCooldown::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.item_id, &mut ret)?;
         write_varint(&self.cooldown, &mut ret)?;
 
@@ -1397,9 +1337,7 @@ pub struct ClientboundPluginMessage {
 }
 
 impl ClientboundPluginMessage {
-    fn get_packet_id() -> i32 {
-        24
-    }
+    const PACKET_ID: i32 = 24;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundPluginMessage(ClientboundPluginMessage {
             channel: read_String(r)?,
@@ -1409,7 +1347,7 @@ impl ClientboundPluginMessage {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ClientboundPluginMessage::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.channel, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
@@ -1442,9 +1380,7 @@ pub struct NamedSoundEffect {
 }
 
 impl NamedSoundEffect {
-    fn get_packet_id() -> i32 {
-        25
-    }
+    const PACKET_ID: i32 = 25;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::NamedSoundEffect(NamedSoundEffect {
             sound_name: read_String(r)?,
@@ -1459,7 +1395,7 @@ impl NamedSoundEffect {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&NamedSoundEffect::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.sound_name, &mut ret)?;
         write_varint(&self.sound_category, &mut ret)?;
         write_i32(&self.x, &mut ret)?;
@@ -1511,9 +1447,7 @@ pub struct PlayDisconnect {
 }
 
 impl PlayDisconnect {
-    fn get_packet_id() -> i32 {
-        26
-    }
+    const PACKET_ID: i32 = 26;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayDisconnect(PlayDisconnect {
             reason: read_String(r)?,
@@ -1522,7 +1456,7 @@ impl PlayDisconnect {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&PlayDisconnect::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.reason, &mut ret)?;
 
         Ok(ret)
@@ -1545,9 +1479,7 @@ pub struct EntityStatus {
 }
 
 impl EntityStatus {
-    fn get_packet_id() -> i32 {
-        27
-    }
+    const PACKET_ID: i32 = 27;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityStatus(EntityStatus {
             entity_id: read_i32(r)?,
@@ -1557,7 +1489,7 @@ impl EntityStatus {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityStatus::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_i32(&self.entity_id, &mut ret)?;
         write_u8(&self.status, &mut ret)?;
 
@@ -1591,9 +1523,7 @@ pub struct Explosion {
 }
 
 impl Explosion {
-    fn get_packet_id() -> i32 {
-        28
-    }
+    const PACKET_ID: i32 = 28;
 
 
     pub fn new_raw(x: f32, y: f32, z: f32, radius: f32, affected_blocks: Vec<(i8, i8, i8)>, motion_x: f32, motion_y: f32, motion_z: f32) -> ClientboundPacket {
@@ -1642,9 +1572,7 @@ pub struct UnloadChunk {
 }
 
 impl UnloadChunk {
-    fn get_packet_id() -> i32 {
-        29
-    }
+    const PACKET_ID: i32 = 29;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UnloadChunk(UnloadChunk {
             chunk_x: read_i32(r)?,
@@ -1654,7 +1582,7 @@ impl UnloadChunk {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&UnloadChunk::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_i32(&self.chunk_x, &mut ret)?;
         write_i32(&self.chunk_z, &mut ret)?;
 
@@ -1682,9 +1610,7 @@ pub struct ChangeGameState {
 }
 
 impl ChangeGameState {
-    fn get_packet_id() -> i32 {
-        30
-    }
+    const PACKET_ID: i32 = 30;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChangeGameState(ChangeGameState {
             action: read_u8(r)?,
@@ -1694,7 +1620,7 @@ impl ChangeGameState {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ChangeGameState::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.action, &mut ret)?;
         write_f32(&self.value, &mut ret)?;
 
@@ -1721,9 +1647,7 @@ pub struct KeepAlive {
 }
 
 impl KeepAlive {
-    fn get_packet_id() -> i32 {
-        31
-    }
+    const PACKET_ID: i32 = 31;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::KeepAlive(KeepAlive {
             id: read_varint(r)?,
@@ -1732,7 +1656,7 @@ impl KeepAlive {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&KeepAlive::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.id, &mut ret)?;
 
         Ok(ret)
@@ -1754,9 +1678,7 @@ pub struct ChunkData {
 }
 
 impl ChunkData {
-    fn get_packet_id() -> i32 {
-        32
-    }
+    const PACKET_ID: i32 = 32;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChunkData(ChunkData {
             data: read_bytearray_to_end(r)?,
@@ -1765,7 +1687,7 @@ impl ChunkData {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ChunkData::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
         Ok(ret)
@@ -1790,9 +1712,7 @@ pub struct Effect {
 }
 
 impl Effect {
-    fn get_packet_id() -> i32 {
-        33
-    }
+    const PACKET_ID: i32 = 33;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Effect(Effect {
             effect_id: read_i32(r)?,
@@ -1804,7 +1724,7 @@ impl Effect {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Effect::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_i32(&self.effect_id, &mut ret)?;
         write_position(&self.location, &mut ret)?;
         write_i32(&self.data, &mut ret)?;
@@ -1849,9 +1769,7 @@ pub struct Particle {
 }
 
 impl Particle {
-    fn get_packet_id() -> i32 {
-        34
-    }
+    const PACKET_ID: i32 = 34;
 
 
     pub fn new_raw(particle_id: i32, use_long_distance: bool, x: f32, y: f32, z: f32, offset_x: f32, offset_y: f32, offset_z: f32, particle_data: f32, count: i32, id: Option<i32>, crack_data: Option<i32>) -> ClientboundPacket {
@@ -1921,9 +1839,7 @@ pub struct JoinGame {
 }
 
 impl JoinGame {
-    fn get_packet_id() -> i32 {
-        35
-    }
+    const PACKET_ID: i32 = 35;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::JoinGame(JoinGame {
             entity_id: read_i32(r)?,
@@ -1938,7 +1854,7 @@ impl JoinGame {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&JoinGame::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_i32(&self.entity_id, &mut ret)?;
         write_u8(&self.gamemode, &mut ret)?;
         write_i32(&self.dimension, &mut ret)?;
@@ -1987,9 +1903,7 @@ pub struct Map {
 }
 
 impl Map {
-    fn get_packet_id() -> i32 {
-        36
-    }
+    const PACKET_ID: i32 = 36;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Map(Map {
             data: read_bytearray_to_end(r)?,
@@ -1998,7 +1912,7 @@ impl Map {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Map::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
         Ok(ret)
@@ -2020,9 +1934,7 @@ pub struct Entity {
 }
 
 impl Entity {
-    fn get_packet_id() -> i32 {
-        37
-    }
+    const PACKET_ID: i32 = 37;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Entity(Entity {
             entity_id: read_varint(r)?,
@@ -2031,7 +1943,7 @@ impl Entity {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Entity::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
 
         Ok(ret)
@@ -2057,9 +1969,7 @@ pub struct EntityRelativeMove {
 }
 
 impl EntityRelativeMove {
-    fn get_packet_id() -> i32 {
-        38
-    }
+    const PACKET_ID: i32 = 38;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityRelativeMove(EntityRelativeMove {
             entity_id: read_varint(r)?,
@@ -2072,7 +1982,7 @@ impl EntityRelativeMove {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityRelativeMove::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_i16(&self.x, &mut ret)?;
         write_i16(&self.y, &mut ret)?;
@@ -2120,9 +2030,7 @@ pub struct EntityLookRelativeMove {
 }
 
 impl EntityLookRelativeMove {
-    fn get_packet_id() -> i32 {
-        39
-    }
+    const PACKET_ID: i32 = 39;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLookRelativeMove(EntityLookRelativeMove {
             entity_id: read_varint(r)?,
@@ -2137,7 +2045,7 @@ impl EntityLookRelativeMove {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityLookRelativeMove::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_i16(&self.x, &mut ret)?;
         write_i16(&self.y, &mut ret)?;
@@ -2192,9 +2100,7 @@ pub struct EntityLook {
 }
 
 impl EntityLook {
-    fn get_packet_id() -> i32 {
-        40
-    }
+    const PACKET_ID: i32 = 40;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLook(EntityLook {
             entity_id: read_varint(r)?,
@@ -2206,7 +2112,7 @@ impl EntityLook {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityLook::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_i8(&self.yaw, &mut ret)?;
         write_i8(&self.pitch, &mut ret)?;
@@ -2247,9 +2153,7 @@ pub struct ClientboundVehicleMove {
 }
 
 impl ClientboundVehicleMove {
-    fn get_packet_id() -> i32 {
-        41
-    }
+    const PACKET_ID: i32 = 41;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundVehicleMove(ClientboundVehicleMove {
             x: read_f64(r)?,
@@ -2262,7 +2166,7 @@ impl ClientboundVehicleMove {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ClientboundVehicleMove::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
         write_f64(&self.y, &mut ret)?;
         write_f64(&self.z, &mut ret)?;
@@ -2304,9 +2208,7 @@ pub struct OpenSignEditor {
 }
 
 impl OpenSignEditor {
-    fn get_packet_id() -> i32 {
-        42
-    }
+    const PACKET_ID: i32 = 42;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::OpenSignEditor(OpenSignEditor {
             position: read_position(r)?,
@@ -2315,7 +2217,7 @@ impl OpenSignEditor {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&OpenSignEditor::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_position(&self.position, &mut ret)?;
 
         Ok(ret)
@@ -2338,9 +2240,7 @@ pub struct CraftRecipeResponse {
 }
 
 impl CraftRecipeResponse {
-    fn get_packet_id() -> i32 {
-        43
-    }
+    const PACKET_ID: i32 = 43;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CraftRecipeResponse(CraftRecipeResponse {
             window_id: read_u8(r)?,
@@ -2350,7 +2250,7 @@ impl CraftRecipeResponse {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&CraftRecipeResponse::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.window_id, &mut ret)?;
         write_varint(&self.recipe, &mut ret)?;
 
@@ -2379,9 +2279,7 @@ pub struct PlayerAbilities {
 }
 
 impl PlayerAbilities {
-    fn get_packet_id() -> i32 {
-        44
-    }
+    const PACKET_ID: i32 = 44;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerAbilities(PlayerAbilities {
             flags: read_u8(r)?,
@@ -2392,7 +2290,7 @@ impl PlayerAbilities {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&PlayerAbilities::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.flags, &mut ret)?;
         write_f32(&self.flying_speed, &mut ret)?;
         write_f32(&self.fov, &mut ret)?;
@@ -2424,9 +2322,7 @@ pub struct CombatEvent {
 }
 
 impl CombatEvent {
-    fn get_packet_id() -> i32 {
-        45
-    }
+    const PACKET_ID: i32 = 45;
 
 
     pub fn new_raw(event: i32, duration_playerid: Option<i32>, entity_id: Option<i32>, message: Option<String>) -> ClientboundPacket {
@@ -2449,9 +2345,7 @@ pub struct PlayerListItem {
 }
 
 impl PlayerListItem {
-    fn get_packet_id() -> i32 {
-        46
-    }
+    const PACKET_ID: i32 = 46;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListItem(PlayerListItem {
             data: read_bytearray_to_end(r)?,
@@ -2460,7 +2354,7 @@ impl PlayerListItem {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&PlayerListItem::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
         Ok(ret)
@@ -2488,9 +2382,7 @@ pub struct PlayerPositionAndLook {
 }
 
 impl PlayerPositionAndLook {
-    fn get_packet_id() -> i32 {
-        47
-    }
+    const PACKET_ID: i32 = 47;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerPositionAndLook(PlayerPositionAndLook {
             x: read_f64(r)?,
@@ -2505,7 +2397,7 @@ impl PlayerPositionAndLook {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&PlayerPositionAndLook::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
         write_f64(&self.y, &mut ret)?;
         write_f64(&self.z, &mut ret)?;
@@ -2558,9 +2450,7 @@ pub struct UseBed {
 }
 
 impl UseBed {
-    fn get_packet_id() -> i32 {
-        48
-    }
+    const PACKET_ID: i32 = 48;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UseBed(UseBed {
             entity_id: read_varint(r)?,
@@ -2570,7 +2460,7 @@ impl UseBed {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&UseBed::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_position(&self.position, &mut ret)?;
 
@@ -2601,9 +2491,7 @@ pub struct UnlockRecipes {
 }
 
 impl UnlockRecipes {
-    fn get_packet_id() -> i32 {
-        49
-    }
+    const PACKET_ID: i32 = 49;
 
 
     pub fn new_raw(action: i32, crafting_book_open: bool, filter_craftable: bool, recipes: Vec<i32>, recipes2: Vec<i32>) -> ClientboundPacket {
@@ -2639,9 +2527,7 @@ pub struct DestroyEntities {
 }
 
 impl DestroyEntities {
-    fn get_packet_id() -> i32 {
-        50
-    }
+    const PACKET_ID: i32 = 50;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DestroyEntities(DestroyEntities {
             entity_ids: read_prefixed_varintarray(r)?,
@@ -2650,7 +2536,7 @@ impl DestroyEntities {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&DestroyEntities::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_prefixed_varintarray(&self.entity_ids, &mut ret)?;
 
         Ok(ret)
@@ -2673,9 +2559,7 @@ pub struct RemoveEntityEffect {
 }
 
 impl RemoveEntityEffect {
-    fn get_packet_id() -> i32 {
-        51
-    }
+    const PACKET_ID: i32 = 51;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::RemoveEntityEffect(RemoveEntityEffect {
             entity_id: read_varint(r)?,
@@ -2685,7 +2569,7 @@ impl RemoveEntityEffect {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&RemoveEntityEffect::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_u8(&self.effect_id, &mut ret)?;
 
@@ -2710,9 +2594,7 @@ pub struct ResourcePackSend {
 }
 
 impl ResourcePackSend {
-    fn get_packet_id() -> i32 {
-        52
-    }
+    const PACKET_ID: i32 = 52;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ResourcePackSend(ResourcePackSend {
             url: read_String(r)?,
@@ -2722,7 +2604,7 @@ impl ResourcePackSend {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ResourcePackSend::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.url, &mut ret)?;
         write_String(&self.hash, &mut ret)?;
 
@@ -2752,9 +2634,7 @@ pub struct Respawn {
 }
 
 impl Respawn {
-    fn get_packet_id() -> i32 {
-        53
-    }
+    const PACKET_ID: i32 = 53;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Respawn(Respawn {
             dimension: read_i32(r)?,
@@ -2766,7 +2646,7 @@ impl Respawn {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Respawn::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_i32(&self.dimension, &mut ret)?;
         write_u8(&self.difficulty, &mut ret)?;
         write_u8(&self.gamemode, &mut ret)?;
@@ -2804,9 +2684,7 @@ pub struct EntityHeadLook {
 }
 
 impl EntityHeadLook {
-    fn get_packet_id() -> i32 {
-        54
-    }
+    const PACKET_ID: i32 = 54;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityHeadLook(EntityHeadLook {
             entity_id: read_varint(r)?,
@@ -2816,7 +2694,7 @@ impl EntityHeadLook {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityHeadLook::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_i8(&self.head_yaw, &mut ret)?;
 
@@ -2843,9 +2721,7 @@ pub struct SelectAdvancementTab {
 }
 
 impl SelectAdvancementTab {
-    fn get_packet_id() -> i32 {
-        55
-    }
+    const PACKET_ID: i32 = 55;
 
 
     pub fn new_raw(identifier: Option<String>) -> ClientboundPacket {
@@ -2865,9 +2741,7 @@ pub struct WorldBorder {
 }
 
 impl WorldBorder {
-    fn get_packet_id() -> i32 {
-        56
-    }
+    const PACKET_ID: i32 = 56;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WorldBorder(WorldBorder {
             data: read_bytearray_to_end(r)?,
@@ -2876,7 +2750,7 @@ impl WorldBorder {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&WorldBorder::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
         Ok(ret)
@@ -2898,9 +2772,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    fn get_packet_id() -> i32 {
-        57
-    }
+    const PACKET_ID: i32 = 57;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Camera(Camera {
             entity_id: read_varint(r)?,
@@ -2909,7 +2781,7 @@ impl Camera {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Camera::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
 
         Ok(ret)
@@ -2931,9 +2803,7 @@ pub struct ClientboundHeldItemChange {
 }
 
 impl ClientboundHeldItemChange {
-    fn get_packet_id() -> i32 {
-        58
-    }
+    const PACKET_ID: i32 = 58;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundHeldItemChange(ClientboundHeldItemChange {
             slot: read_u8(r)?,
@@ -2942,7 +2812,7 @@ impl ClientboundHeldItemChange {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&ClientboundHeldItemChange::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.slot, &mut ret)?;
 
         Ok(ret)
@@ -2965,9 +2835,7 @@ pub struct DisplayScoreboard {
 }
 
 impl DisplayScoreboard {
-    fn get_packet_id() -> i32 {
-        59
-    }
+    const PACKET_ID: i32 = 59;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DisplayScoreboard(DisplayScoreboard {
             position: read_u8(r)?,
@@ -2977,7 +2845,7 @@ impl DisplayScoreboard {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&DisplayScoreboard::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_u8(&self.position, &mut ret)?;
         write_String(&self.name, &mut ret)?;
 
@@ -3005,9 +2873,7 @@ pub struct EntityMetadata {
 }
 
 impl EntityMetadata {
-    fn get_packet_id() -> i32 {
-        60
-    }
+    const PACKET_ID: i32 = 60;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityMetadata(EntityMetadata {
             entity_id: read_varint(r)?,
@@ -3017,7 +2883,7 @@ impl EntityMetadata {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityMetadata::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_bytearray_to_end(&self.metadata, &mut ret)?;
 
@@ -3045,9 +2911,7 @@ pub struct AttachEntity {
 }
 
 impl AttachEntity {
-    fn get_packet_id() -> i32 {
-        61
-    }
+    const PACKET_ID: i32 = 61;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::AttachEntity(AttachEntity {
             attached_entity_id: read_i32(r)?,
@@ -3057,7 +2921,7 @@ impl AttachEntity {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&AttachEntity::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_i32(&self.attached_entity_id, &mut ret)?;
         write_i32(&self.holding_entity_id, &mut ret)?;
 
@@ -3087,9 +2951,7 @@ pub struct EntityVelocity {
 }
 
 impl EntityVelocity {
-    fn get_packet_id() -> i32 {
-        62
-    }
+    const PACKET_ID: i32 = 62;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityVelocity(EntityVelocity {
             entity_id: read_varint(r)?,
@@ -3101,7 +2963,7 @@ impl EntityVelocity {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityVelocity::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_i16(&self.x_velocity, &mut ret)?;
         write_i16(&self.y_velocity, &mut ret)?;
@@ -3140,9 +3002,7 @@ pub struct EntityEquipment {
 }
 
 impl EntityEquipment {
-    fn get_packet_id() -> i32 {
-        63
-    }
+    const PACKET_ID: i32 = 63;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEquipment(EntityEquipment {
             entity_id: read_varint(r)?,
@@ -3153,7 +3013,7 @@ impl EntityEquipment {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityEquipment::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_varint(&self.slot_enum, &mut ret)?;
         write_bytearray_to_end(&self.slot_data, &mut ret)?;
@@ -3187,9 +3047,7 @@ pub struct SetExperience {
 }
 
 impl SetExperience {
-    fn get_packet_id() -> i32 {
-        64
-    }
+    const PACKET_ID: i32 = 64;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetExperience(SetExperience {
             experience: read_f32(r)?,
@@ -3200,7 +3058,7 @@ impl SetExperience {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SetExperience::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_f32(&self.experience, &mut ret)?;
         write_varint(&self.level, &mut ret)?;
         write_varint(&self.total_experience, &mut ret)?;
@@ -3234,9 +3092,7 @@ pub struct UpdateHealth {
 }
 
 impl UpdateHealth {
-    fn get_packet_id() -> i32 {
-        65
-    }
+    const PACKET_ID: i32 = 65;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateHealth(UpdateHealth {
             health: read_f32(r)?,
@@ -3247,7 +3103,7 @@ impl UpdateHealth {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&UpdateHealth::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_f32(&self.health, &mut ret)?;
         write_varint(&self.food, &mut ret)?;
         write_f32(&self.saturation, &mut ret)?;
@@ -3282,9 +3138,7 @@ pub struct ScoreboardObjective {
 }
 
 impl ScoreboardObjective {
-    fn get_packet_id() -> i32 {
-        66
-    }
+    const PACKET_ID: i32 = 66;
 
 
     pub fn new_raw(name: String, mode: u8, value: Option<String>, objective_type: Option<String>) -> ClientboundPacket {
@@ -3317,9 +3171,7 @@ pub struct SetPassengers {
 }
 
 impl SetPassengers {
-    fn get_packet_id() -> i32 {
-        67
-    }
+    const PACKET_ID: i32 = 67;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetPassengers(SetPassengers {
             entity_id: read_varint(r)?,
@@ -3329,7 +3181,7 @@ impl SetPassengers {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SetPassengers::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_prefixed_varintarray(&self.passengers, &mut ret)?;
 
@@ -3356,9 +3208,7 @@ pub struct Teams {
 }
 
 impl Teams {
-    fn get_packet_id() -> i32 {
-        68
-    }
+    const PACKET_ID: i32 = 68;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Teams(Teams {
             data: read_bytearray_to_end(r)?,
@@ -3367,7 +3217,7 @@ impl Teams {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Teams::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
         Ok(ret)
@@ -3392,9 +3242,7 @@ pub struct UpdateScore {
 }
 
 impl UpdateScore {
-    fn get_packet_id() -> i32 {
-        69
-    }
+    const PACKET_ID: i32 = 69;
 
 
     pub fn new_raw(name: String, action: u8, objective_name: String, value: Option<i32>) -> ClientboundPacket {
@@ -3426,9 +3274,7 @@ pub struct SpawnPosition {
 }
 
 impl SpawnPosition {
-    fn get_packet_id() -> i32 {
-        70
-    }
+    const PACKET_ID: i32 = 70;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPosition(SpawnPosition {
             position: read_position(r)?,
@@ -3437,7 +3283,7 @@ impl SpawnPosition {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SpawnPosition::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_position(&self.position, &mut ret)?;
 
         Ok(ret)
@@ -3460,9 +3306,7 @@ pub struct TimeUpdate {
 }
 
 impl TimeUpdate {
-    fn get_packet_id() -> i32 {
-        71
-    }
+    const PACKET_ID: i32 = 71;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::TimeUpdate(TimeUpdate {
             world_age: read_i64(r)?,
@@ -3472,7 +3316,7 @@ impl TimeUpdate {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&TimeUpdate::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_i64(&self.world_age, &mut ret)?;
         write_i64(&self.time_of_day, &mut ret)?;
 
@@ -3501,9 +3345,7 @@ pub struct Title {
 }
 
 impl Title {
-    fn get_packet_id() -> i32 {
-        72
-    }
+    const PACKET_ID: i32 = 72;
 
 
     pub fn new_raw(action: i32, text: Option<String>, times: Option<(i32, i32, i32)>) -> ClientboundPacket {
@@ -3537,9 +3379,7 @@ pub struct SoundEffect {
 }
 
 impl SoundEffect {
-    fn get_packet_id() -> i32 {
-        73
-    }
+    const PACKET_ID: i32 = 73;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SoundEffect(SoundEffect {
             sound_id: read_varint(r)?,
@@ -3554,7 +3394,7 @@ impl SoundEffect {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&SoundEffect::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.sound_id, &mut ret)?;
         write_varint(&self.sound_category, &mut ret)?;
         write_i32(&self.x, &mut ret)?;
@@ -3607,9 +3447,7 @@ pub struct PlayerListHeaderFooter {
 }
 
 impl PlayerListHeaderFooter {
-    fn get_packet_id() -> i32 {
-        74
-    }
+    const PACKET_ID: i32 = 74;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListHeaderFooter(PlayerListHeaderFooter {
             header: read_String(r)?,
@@ -3619,7 +3457,7 @@ impl PlayerListHeaderFooter {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&PlayerListHeaderFooter::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_String(&self.header, &mut ret)?;
         write_String(&self.footer, &mut ret)?;
 
@@ -3648,9 +3486,7 @@ pub struct CollectItem {
 }
 
 impl CollectItem {
-    fn get_packet_id() -> i32 {
-        75
-    }
+    const PACKET_ID: i32 = 75;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CollectItem(CollectItem {
             collected_entity_id: read_varint(r)?,
@@ -3661,7 +3497,7 @@ impl CollectItem {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&CollectItem::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.collected_entity_id, &mut ret)?;
         write_varint(&self.collector_entity_id, &mut ret)?;
         write_varint(&self.item_count, &mut ret)?;
@@ -3699,9 +3535,7 @@ pub struct EntityTeleport {
 }
 
 impl EntityTeleport {
-    fn get_packet_id() -> i32 {
-        76
-    }
+    const PACKET_ID: i32 = 76;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityTeleport(EntityTeleport {
             entity_id: read_varint(r)?,
@@ -3716,7 +3550,7 @@ impl EntityTeleport {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityTeleport::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
         write_f64(&self.y, &mut ret)?;
@@ -3768,9 +3602,7 @@ pub struct Advancements {
 }
 
 impl Advancements {
-    fn get_packet_id() -> i32 {
-        77
-    }
+    const PACKET_ID: i32 = 77;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Advancements(Advancements {
             data: read_bytearray_to_end(r)?,
@@ -3779,7 +3611,7 @@ impl Advancements {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Advancements::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
         Ok(ret)
@@ -3802,9 +3634,7 @@ pub struct EntityProperties {
 }
 
 impl EntityProperties {
-    fn get_packet_id() -> i32 {
-        78
-    }
+    const PACKET_ID: i32 = 78;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityProperties(EntityProperties {
             entity_id: read_varint(r)?,
@@ -3814,7 +3644,7 @@ impl EntityProperties {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityProperties::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_bytearray_to_end(&self.data, &mut ret)?;
 
@@ -3845,9 +3675,7 @@ pub struct EntityEffect {
 }
 
 impl EntityEffect {
-    fn get_packet_id() -> i32 {
-        79
-    }
+    const PACKET_ID: i32 = 79;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEffect(EntityEffect {
             entity_id: read_varint(r)?,
@@ -3860,7 +3688,7 @@ impl EntityEffect {
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&EntityEffect::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_u8(&self.effect_id, &mut ret)?;
         write_i8(&self.amplifier, &mut ret)?;

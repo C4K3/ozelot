@@ -52,7 +52,7 @@ impl EncryptionResponse {
 impl StatusRequest {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&StatusRequest::get_packet_id(), &mut ret)?;
+        write_varint(&StatusRequest::PACKET_ID, &mut ret)?;
         Ok(ret)
     }
     fn deserialize<R: Read>(_: &mut R) -> Result<ServerboundPacket> {
@@ -63,7 +63,7 @@ impl StatusRequest {
 impl TabComplete {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&TabComplete::get_packet_id(), &mut ret)?;
+        write_varint(&TabComplete::PACKET_ID, &mut ret)?;
         write_String(&self.text, &mut ret)?;
         write_bool(&self.assume_command, &mut ret)?;
         match self.looked_at_block {
@@ -98,7 +98,7 @@ impl TabComplete {
 impl UseEntity {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&UseEntity::get_packet_id(), &mut ret)?;
+        write_varint(&UseEntity::PACKET_ID, &mut ret)?;
         write_varint(&self.target, &mut ret)?;
         write_varint(&self.action, &mut ret)?;
         match self.action {
@@ -153,7 +153,7 @@ impl UseEntity {
 impl CraftingBookData {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Self::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
 
         if let Some(x) = self.displayed_recipe {
             write_varint(&0, &mut ret)?;
@@ -182,7 +182,7 @@ impl CraftingBookData {
 impl AdvancementTab {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
-        write_varint(&Self::get_packet_id(), &mut ret)?;
+        write_varint(&Self::PACKET_ID, &mut ret)?;
 
         if let Some(ref tab_id) = self.tab_id {
             write_varint(&0, &mut ret)?;
