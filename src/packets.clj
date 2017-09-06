@@ -211,7 +211,7 @@
            fields)))
 
 ;; Create the const PACKET_ID fields
-(defn const-packet-id [{name :name id :id}]
+(defn const-packet-id [{id :id}]
   (format "    const PACKET_ID: i32 = %s;" id))
 
 ;; Given the fields of a packet, return a string containing functions that
