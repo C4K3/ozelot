@@ -83,7 +83,7 @@
                {:name "hand" :type "Option<i32>" :getter "Get the hand used as a varint enum (if any)"}]}
      {:name "KeepAlive"
       :id 11
-      :fields [{:name "id" :type "i32" :read "varint" :getter "Get the keep alive ID"}]}
+      :fields [{:name "id" :type "i64" :getter "Get the keep alive ID"}]}
       {:name "Player"
       :id 12
       :fields [{:name "on_ground" :type "bool" :getter "Get whether on the ground"}]}
@@ -392,7 +392,7 @@
           {:name "value" :type "f32" :getter "Get the value, its meaning depends on the action"}]}
 {:name "KeepAlive"
  :id 31
- :fields [{:name "id" :type "i32" :getter "Get the ID of the keep alive packet" :read "varint"}]}
+ :fields [{:name "id" :type "i64" :getter "Get the ID of the keep alive packet"}]}
 {:name "ChunkData"
  :id 32
  :fields [{:name "data" :type "Vec<u8>" :getter "Get all the data contained in this packet. Currently it's decided that this library shouldn't try to interpret complex data structures that are likely dependent on the specific implementation, so the parsing of this packet is left up to the client." :read "bytearray_to_end"}]}

@@ -1643,31 +1643,31 @@ impl ChangeGameState {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct KeepAlive {
-    id: i32,
+    id: i64,
 }
 
 impl KeepAlive {
     const PACKET_ID: i32 = 31;
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::KeepAlive(KeepAlive {
-            id: read_varint(r)?,
+            id: read_i64(r)?,
 
         }))
     }
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
-        write_varint(&self.id, &mut ret)?;
+        write_i64(&self.id, &mut ret)?;
 
         Ok(ret)
     }
-    pub fn new(id: i32) -> ClientboundPacket {
+    pub fn new(id: i64) -> ClientboundPacket {
         ClientboundPacket::KeepAlive(KeepAlive {
             id: id,
         })
     }
     /// Get the ID of the keep alive packet
-    pub fn get_id(&self) -> &i32 {
+    pub fn get_id(&self) -> &i64 {
         &self.id
     }
 }
