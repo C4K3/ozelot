@@ -35,11 +35,20 @@ impl Server {
         Ok(ret)
     }
 
-    /// Send the given packet to the client
+    /// Send the given packet
     ///
-    /// This function may block.
-    pub fn send(&mut self, packet: ClientboundPacket) -> Result<()> {
+    /// This adds the packet to the outgoing buffer, and sends as much as is
+    /// possible. Returns the length of the outgoing buffer. If this is greater
+    /// than 0, you will need to call write() to send the remaining data.
+    pub fn send(&mut self, packet: ClientboundPacket) -> Result<usize> {
         self.conn.send(packet)
+    }
+
+    /// Write from the outgoing buffer to the TcpStream
+    ///
+    /// Returns the amount of bytes written.
+    pub fn write(&mut self) -> Result<usize> {
+        self.conn.write()
     }
 
     /// Attempt to close this connection, disconnecting the client

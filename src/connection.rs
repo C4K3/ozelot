@@ -42,6 +42,8 @@ pub struct Connection<I: Packet, O: Packet> {
      * packet id header) */
     packet_len: Option<usize>,
     compression: Option<usize>,
+    /// Buffer for outgoing data
+    out_buf: Buf,
     /* Incoming encryption cipher */
     in_encryption: Option<symm::Crypter>,
     /* Outgoing encryption cipher */
@@ -60,6 +62,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             buf: Buf::new(),
             packet_len: None,
             compression: None,
+            out_buf: Buf::new(),
             in_encryption: None,
             out_encryption: None,
             last_read: time::Instant::now(),
@@ -81,8 +84,10 @@ impl<I: Packet, O: Packet> Connection<I, O> {
 
     /// Send the given packet
     ///
-    /// Will block until the packet has been sent
-    pub fn send(&mut self, packet: O) -> Result<()> {
+    /// This adds the packet to the outgoing buffer, and sends as much as is
+    /// possible. Returns the length of the outgoing buffer. If this is greater
+    /// than 0, you will need to call write() to send the remaining data.
+    pub fn send(&mut self, packet: O) -> Result<usize> {
         let tmp = packet.to_u8()?;
         let uncompressed_length = tmp.len();
         let mut out = Vec::with_capacity(uncompressed_length);
@@ -132,18 +137,25 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             let n = enc.update(&out, &mut tmp).chain_err(|| "connection::send error writing encrypted data")?;
             let mut i = 0;
             while i < n {
-                i += self.stream.write(&tmp[i..n])?;
+                i += self.out_buf.write(&tmp[i..n])?;
             }
         } else {
             let mut i = 0;
             while i < out.len() {
-                i += self.stream.write(&out[i..])?;
+                i += self.out_buf.write(&out[i..])?;
             }
         }
 
-        Ok(())
+        let _: usize = self.out_buf.write_to(&mut self.stream)?;
+        Ok(self.out_buf.len())
     }
 
+    /// Write from the outgoing buffer to the TcpStream
+    ///
+    /// Returns the amount of bytes written.
+    pub fn write(&mut self) -> Result<usize> {
+        return Ok(self.out_buf.write_to(&mut self.stream)?);
+    }
 
     /// Attempt to close this connection.
     ///

@@ -73,7 +73,7 @@
 //!                  * Note that this echoes back the raw chat message, that is
 //!                  * playername and everything, and also non-chat messages. */
 //!                 let response = serverbound::ChatMessage::new(msg);
-//!                 client.send(response).unwrap();
+//!                 let _: usize = client.send(response).unwrap();
 //!             }
 //!         },
 //!         /* We throw away all other packets */
