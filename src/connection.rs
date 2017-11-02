@@ -30,7 +30,7 @@ pub trait Packet: Sized {
 pub struct Connection<I: Packet, O: Packet> {
     stream: TcpStream,
     clientstate: ClientState,
-    /* The buffer for clientbound packets */
+    /* The buffer for incoming packets */
     buf: Buf,
     /* This tracks the length the next packet in the buffer.
      * If None, then we haven't received enough bytes to completely figure out
