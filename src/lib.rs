@@ -37,6 +37,8 @@
 //! messages, and then echoing back messages that appear not to be written by us
 //! (else we'd get into an infinite loop echoing our own messages.)
 //!
+//! (See the *textclient* example for a comprehensive version.)
+//!
 //! ```rust,no_run
 //! use ozelot::{mojang, Client, serverbound, utils};
 //! use ozelot::clientbound::ClientboundPacket;
