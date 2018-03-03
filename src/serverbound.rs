@@ -115,7 +115,7 @@ impl UseEntity {
         }
 
         match self.action {
-            0 | 1 => {
+            0 | 2 => {
                 if let Some(x) = self.hand {
                     write_varint(&x, &mut ret)?;
                 } else {
@@ -136,7 +136,7 @@ impl UseEntity {
             None
         };
 
-        let hand = if action == 0 || action == 1 {
+        let hand = if action == 0 || action == 2 {
             Some(read_varint(r)?)
         } else {
             None
