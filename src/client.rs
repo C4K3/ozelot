@@ -6,6 +6,7 @@ use serverbound::ServerboundPacket;
 use {ClientState, PROTOCOL_VERSION, mojang, serverbound, utils};
 
 use std::{thread, time};
+use std::net::TcpStream;
 
 /// Represents a single client connection to a Server.
 pub struct Client {
@@ -23,6 +24,15 @@ impl Client {
                auto_handle: false,
                hide_handled: false,
            })
+    }
+
+    /// Create a new connection from an existing TcpStream
+    pub fn from_tcpstream(stream: TcpStream) -> Result<Self> {
+        Ok(Client {
+            conn: Connection::from_tcpstream(stream)?,
+            auto_handle: false,
+            hide_handled: false,
+        })
     }
 
     /// Attempt to connect to the server at the given host and port,
