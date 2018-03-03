@@ -7,6 +7,7 @@ use {ClientState, PROTOCOL_VERSION, mojang, serverbound, utils};
 
 use std::{thread, time};
 use std::net::TcpStream;
+use std::borrow::Borrow;
 
 /// Represents a single client connection to a Server.
 pub struct Client {
@@ -235,8 +236,8 @@ impl Client {
     /// This adds the packet to the outgoing buffer, and sends as much as is
     /// possible. Returns the length of the outgoing buffer. If this is greater
     /// than 0, you will need to call write() to send the remaining data.
-    pub fn send(&mut self, packet: ServerboundPacket) -> Result<usize> {
-        self.conn.send(packet)
+    pub fn send<T: Borrow<ServerboundPacket>>(&mut self, packet: T) -> Result<usize> {
+        self.conn.send(packet.borrow())
     }
 
     /// Write from the outgoing buffer to the TcpStream

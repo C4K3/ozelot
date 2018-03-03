@@ -87,7 +87,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// This adds the packet to the outgoing buffer, and sends as much as is
     /// possible. Returns the length of the outgoing buffer. If this is greater
     /// than 0, you will need to call write() to send the remaining data.
-    pub fn send(&mut self, packet: O) -> Result<usize> {
+    pub fn send(&mut self, packet: &O) -> Result<usize> {
         let tmp = packet.to_u8()?;
         let uncompressed_length = tmp.len();
         let mut out = Vec::with_capacity(uncompressed_length);
