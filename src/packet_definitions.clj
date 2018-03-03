@@ -1,5 +1,4 @@
 ;;;;;; This file contains only the definitions for all the packets.
-(ns packet-definitions)
 
 (def packets
   {:serverbound

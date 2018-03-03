@@ -1,7 +1,7 @@
 #!/usr/bin/env clojure
-(ns ozelot.packets
-  (:use [packet-definitions :only [packets]]
-        [clojure.java.io]))
+(ns packets
+  (:use [clojure.java.io]))
+(load-file "packet_definitions.clj")
 
 ;;;; What this file does is given a bunch of packet definitions, create all
 ;;;; the .*.generated.rs files, which contain the definitions of packets
