@@ -118,9 +118,6 @@ pub use server::Server;
 
 use std::fmt;
 
-use flate2::Compression;
-
-const COMPRESSION_LEVEL: Compression = Compression::Default;
 /// The protocol version supported by this version of ozelot
 pub const PROTOCOL_VERSION: i32 = 340;
 

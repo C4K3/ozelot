@@ -11,9 +11,9 @@ use std::{io, time};
 
 use netbuf::Buf;
 
-use flate2::Compress;
+use flate2::write::ZlibEncoder;
 use flate2::read::ZlibDecoder;
-use flate2;
+use flate2::Compression;
 
 use openssl::symm;
 
@@ -98,23 +98,14 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             Some(threshold) if uncompressed_length >= threshold => {
                 /* We have to copy all the data again, because we need
                  * to prefix the packet with length of the compressed data */
-                let mut output = Vec::new();
-                let mut compressor = Compress::new(::COMPRESSION_LEVEL, false);
-                match compressor.compress(&tmp,
-                                          &mut output,
-                                          flate2::Flush::Sync) {
-                    flate2::Status::Ok => {
-                        bail!("Got a Status::Ok when trying to compress outgoing packet");
-                    },
-                    flate2::Status::BufError => {
-                        bail!("Got a Status::BufError when trying to compress outgoing packet");
-                    },
-                    flate2::Status::StreamEnd => (),
-                }
+                let mut compressed = Vec::new();
+                write_varint(&(uncompressed_length as i32), &mut compressed)?;
+                let mut compressor = ZlibEncoder::new(compressed, Compression::default());
+                compressor.write(&tmp)?;
+                let compressed = compressor.finish()?;
 
-                write_varint(&(output.len() as i32), &mut out)?;
-                write_varint(&(uncompressed_length as i32), &mut out)?;
-                out.write_all(&output)?;
+                write_varint(&(compressed.len() as i32), &mut out)?;
+                out.write_all(&compressed)?;
             },
             /* Compression is enabled, but the packet length is not over the
              * threshold, thus we don't compress the packet */
