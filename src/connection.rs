@@ -137,7 +137,11 @@ impl<I: Packet, O: Packet> Connection<I, O> {
             }
         }
 
-        let _: usize = self.out_buf.write_to(&mut self.stream)?;
+        match self.out_buf.write_to(&mut self.stream) {
+            Ok(_) => (),
+            Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => (),
+            Err(e) => bail!(e),
+        }
         Ok(self.out_buf.len())
     }
 
