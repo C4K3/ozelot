@@ -2,7 +2,7 @@
 //! the various Mojang APIs.
 
 /// Contains the status about each of the Mojang APIs
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct APIStatusResponse {
     #[serde(rename="minecraft.net")]
     pub minecraftnet: String,
@@ -29,7 +29,7 @@ pub struct APIStatusResponse {
 /// Represents a single username - UUID mapping.
 ///
 /// This struct is used in both PlayernamesToUUIDs and NameToUUID.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct NameUUID {
     /// The uuid in hex without dashes
     pub id: String,
@@ -42,7 +42,7 @@ pub struct NameUUID {
 }
 
 /// Represents a player Profile, as returned in a UUIDToProfile lookup
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Profile {
     pub id: String,
     pub name: String,
@@ -51,7 +51,7 @@ pub struct Profile {
 /// Represents the properties part of a Profile response
 ///
 /// Used in the UUIDToProfile and SessionHasJoined requests.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ProfileProperties {
     pub name: String,
     pub value: String,
@@ -59,7 +59,7 @@ pub struct ProfileProperties {
 }
 
 /// The requested statistics
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[allow(non_snake_case)]
 pub struct StatisticsResponse {
     pub total: u64,
@@ -69,7 +69,7 @@ pub struct StatisticsResponse {
 
 /// Represents a single historic name for a given account. Used in the
 /// UUIDToHistory request.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[allow(non_snake_case)]
 pub struct NameHistory {
     pub name: String,
@@ -77,7 +77,7 @@ pub struct NameHistory {
 }
 
 /// Represents a response to a successful authentication
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct AuthenticationResponse {
     pub accessToken: String,
     pub clientToken: Option<String>,
@@ -86,7 +86,7 @@ pub struct AuthenticationResponse {
 }
 
 /// Response about whether the client has posted a join to Mojang
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct SessionHasJoinedResponse {
     /// The uuid
     id: String,

@@ -22,7 +22,7 @@ use curl::easy::{Easy, List};
 use serde_json;
 
 /// Make a request to check the status of the Mojang APIs
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct APIStatus();
 impl APIStatus {
     pub fn perform(&self) -> Result<APIStatusResponse> {
@@ -55,7 +55,7 @@ impl APIStatus {
 ///
 /// If unable to find the player at the given point in time, will return an
 /// error.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NameToUUID {
     username: String,
     at: Option<i64>,
@@ -87,7 +87,7 @@ impl NameToUUID {
 /// A UUID -> Username history request
 ///
 /// The UUID must be given as a string without hyphens.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UUIDToHistory {
     uuid: String,
 }
@@ -108,7 +108,7 @@ impl UUIDToHistory {
 /// A Playernames -> UUIDs request.
 ///
 /// Can request up to 100 UUIDs at a time.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlayernamesToUUIDs {
     usernames: Vec<String>,
 }
@@ -139,7 +139,7 @@ impl PlayernamesToUUIDs {
 }
 
 /// Represents a UUID -> Profile + Skin and Cape request
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UUIDToProfile {
     uuid: String,
     /// Whether you want the response signed by the yggdrasil private key
@@ -167,7 +167,7 @@ impl UUIDToProfile {
 }
 
 /// Get the blocked server's hashes
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BlockedServers();
 impl BlockedServers {
     fn get_endpoint() -> String {
@@ -193,7 +193,7 @@ impl BlockedServers {
 /// The API will respond with the sum of sales for the selected types. E.g. by
 /// setting item_sold_minecraft and prepaid_card_redeemed_minecraft to true,
 /// you'll get the sum of sales for those two types.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Statistics {
     item_sold_minecraft: bool,
     prepaid_card_redeemed_minecraft: bool,
@@ -269,7 +269,7 @@ impl Statistics {
 /* Here begins the authentication requests */
 
 /// Authenticate with Mojang
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Authenticate {
     username: String,
     password: String,
@@ -305,7 +305,7 @@ impl Authenticate {
 }
 
 /// Refresh a valid accessToken
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AuthenticateRefresh {
     accessToken: String,
     clientToken: String,
@@ -333,7 +333,7 @@ impl AuthenticateRefresh {
 }
 
 /// Validate an existing access token
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AuthenticateValidate {
     accessToken: String,
     clientToken: Option<String>,
@@ -356,7 +356,7 @@ impl AuthenticateValidate {
 }
 
 /// Invalidate an accessToken, using the client username/password
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AuthenticateSignout {
     username: String,
     password: String,
@@ -379,7 +379,7 @@ impl AuthenticateSignout {
 }
 
 /// Invalidate an accessToken, using the accessToken and a clientToken
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AuthenticateInvalidate {
     accessToken: String,
     clientToken: String,
@@ -403,7 +403,7 @@ impl AuthenticateInvalidate {
 
 /// Send a session join message to Mojang, used by clients when connecting to
 /// online servers
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct SessionJoin {
     accessToken: String,
     /// The player's uuid
@@ -437,7 +437,7 @@ impl SessionJoin {
 
 /// Check whether a client has posted a SessionJoin to Mojang, used by servers
 /// for authenticating connecting clients.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SessionHasJoined {
     username: String,
     serverId: String,
