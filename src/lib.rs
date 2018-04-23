@@ -40,6 +40,8 @@
 //! (See the *textclient* example for a comprehensive version.)
 //!
 //! ```rust,no_run
+//! use std::thread;
+//! use std::time::Duration;
 //! use ozelot::{mojang, Client, serverbound, utils};
 //! use ozelot::clientbound::ClientboundPacket;
 //!
@@ -82,6 +84,8 @@
 //!         _ => (),
 //!         }
 //!     }
+//!     /* Make sure we don't consume the entire CPU trying to check if new packets have arrived */
+//!     thread::sleep(Duration::from_millis(50));
 //! }
 //! ```
 extern crate byteorder;
