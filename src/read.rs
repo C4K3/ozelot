@@ -175,14 +175,14 @@ pub fn read_position<R: Read>(reader: &mut R) -> Result<(i32, i32, i32)> {
     let val = read_u64(reader)?;
     let mut x = (val >> 38) as i32;
     let mut y = ((val >> 26) & 0xfff) as i32;
-    let mut z = (val & 0x3ffffff) as i32;
+    let mut z = (val << 38 >> 38) as i32;
     if x >= 1 << 25 {
         x -= 1 << 26;
     }
     if y >= 1 << 11 {
         y -= 1 << 12;
     }
-    if z >= 2 << 25 {
+    if z >= 1 << 25 {
         z -= 1 << 26;
     }
     Ok((x, y, z))

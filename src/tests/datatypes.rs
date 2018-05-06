@@ -79,4 +79,8 @@ fn position() {
                     &[0xff, 0xe0, 0x62, 0xbe, 0xe0, 0x00, 0x72, 0x63],
                     read_position,
                     write_position);
+    read_and_write!((-109, 64, -120),
+                    &[0xff, 0xff, 0xe4, 0xc1, 0x03, 0xff, 0xff, 0x88],
+                    read_position,
+                    write_position);
 }
