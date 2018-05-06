@@ -284,6 +284,9 @@ impl SpawnObject {
     }    /// Get the UUID of the created object
     pub fn get_object_uuid(&self) -> &u128 {
         &self.object_uuid
+    }    /// get the object_type field (UNDOCUMENTED)
+    pub fn get_object_type(&self) -> &u8 {
+        &self.object_type
     }    /// Get the X coordinate
     pub fn get_x(&self) -> &f64 {
         &self.x
@@ -299,6 +302,9 @@ impl SpawnObject {
     }    /// Get the yaw
     pub fn get_yaw(&self) -> &i8 {
         &self.yaw
+    }    /// get the data field (UNDOCUMENTED)
+    pub fn get_data(&self) -> &i32 {
+        &self.data
     }    /// Get the X velocity
     pub fn get_velocity_x(&self) -> &i16 {
         &self.velocity_x
@@ -414,6 +420,9 @@ impl SpawnGlobalEntity {
     /// Get the ID of the entity
     pub fn get_entity_id(&self) -> &i32 {
         &self.entity_id
+    }    /// get the entity_type field (UNDOCUMENTED)
+    pub fn get_entity_type(&self) -> &u8 {
+        &self.entity_type
     }    /// Get the X coordinate
     pub fn get_x(&self) -> &f64 {
         &self.x
@@ -591,6 +600,9 @@ impl SpawnPainting {
     }    /// Get the title of the painting
     pub fn get_title(&self) -> &String {
         &self.title
+    }    /// get the center_location field (UNDOCUMENTED)
+    pub fn get_center_location(&self) -> &(i32, i32, i32) {
+        &self.center_location
     }    /// The direction in which the painting faces
     pub fn get_direction(&self) -> &u8 {
         &self.direction
@@ -1090,6 +1102,9 @@ impl ClientboundConfirmTransaction {
     }    /// Get the action ID (nonce)
     pub fn get_action_id(&self) -> &i16 {
         &self.action_id
+    }    /// get the accepted field (UNDOCUMENTED)
+    pub fn get_accepted(&self) -> &bool {
+        &self.accepted
     }
 }
 
@@ -1743,6 +1758,9 @@ impl Effect {
     /// Get the ID of the effect
     pub fn get_effect_id(&self) -> &i32 {
         &self.effect_id
+    }    /// get the location field (UNDOCUMENTED)
+    pub fn get_location(&self) -> &(i32, i32, i32) {
+        &self.location
     }    /// Get the data for this effect
     pub fn get_data(&self) -> &i32 {
         &self.data
@@ -1888,6 +1906,9 @@ impl JoinGame {
     }    /// Get the difficulty
     pub fn get_difficulty(&self) -> &u8 {
         &self.difficulty
+    }    /// get the max_players field (UNDOCUMENTED)
+    pub fn get_max_players(&self) -> &u8 {
+        &self.max_players
     }    /// Get the level type of the world the player joined in
     pub fn get_level_type(&self) -> &String {
         &self.level_type
@@ -2304,7 +2325,10 @@ impl PlayerAbilities {
             fov: fov,
         })
     }
-    /// Get the player's allowed flying speed
+    /// get the flags field (UNDOCUMENTED)
+    pub fn get_flags(&self) -> &u8 {
+        &self.flags
+    }    /// Get the player's allowed flying speed
     pub fn get_flying_speed(&self) -> &f32 {
         &self.flying_speed
     }    /// Get the player's field of view modifier
@@ -2333,9 +2357,18 @@ impl CombatEvent {
             message: message,
         })
     }
-    /// Get the entity ID if packet action is 'end combat' or 'entity dead'
+    /// get the event field (UNDOCUMENTED)
+    pub fn get_event(&self) -> &i32 {
+        &self.event
+    }    /// get the duration_playerid field (UNDOCUMENTED)
+    pub fn get_duration_playerid(&self) -> &Option<i32> {
+        &self.duration_playerid
+    }    /// Get the entity ID if packet action is 'end combat' or 'entity dead'
     pub fn get_entity_id(&self) -> &Option<i32> {
         &self.entity_id
+    }    /// get the message field (UNDOCUMENTED)
+    pub fn get_message(&self) -> &Option<String> {
+        &self.message
     }
 }
 
@@ -2584,6 +2617,9 @@ impl RemoveEntityEffect {
     /// Get the entity ID to remove the effect from
     pub fn get_entity_id(&self) -> &i32 {
         &self.entity_id
+    }    /// get the effect_id field (UNDOCUMENTED)
+    pub fn get_effect_id(&self) -> &u8 {
+        &self.effect_id
     }
 }
 
