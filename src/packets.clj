@@ -271,14 +271,14 @@
 (defn packet-getter-fns [{fields :fields}]
   (apply str
          (for [{name :name type :type getter-docs :getter} fields]
-           (if (nil? getter-docs)
+           (if (or (nil? name) (nil? type))
              ""
              (format
                (long-str "    /// %s"
                          "    pub fn get_%s(&self) -> &%s {"
                          "        &self.%s"
                          "    }")
-               getter-docs name type name)))))
+               (or getter-docs (format "get the %s field (UNDOCUMENTED)" name)) name type name)))))
 
 ;; Create the impl for a given packet
 (defn packet-impl [packet packet-type]
