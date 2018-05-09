@@ -70,6 +70,8 @@ fn varint() {
 
     /* Test some random numbers */
     read_and_write!(16, &[16], read_varint, write_varint);
+    read_and_write!(128, &[0x80, 0x01], read_varint, write_varint);
+    read_and_write!(255, &[0xff, 0x01], read_varint, write_varint);
     read_and_write!(300, &[(1 << 7) | 44, 2], read_varint, write_varint);
     read_and_write!(2649887, &[0x9f, 0xde, 0xa1, 0x01], read_varint, write_varint);
 }

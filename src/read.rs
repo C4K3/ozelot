@@ -95,7 +95,7 @@ pub fn read_varint<R: Read>(reader: &mut R) -> Result<i32> {
     let mask: u8 = !msb;
 
     for i in 0..5 {
-        let mut read = reader.read_u8()?;
+        let read = reader.read_u8()?;
 
         result |= ((read & mask) as i32) << (7 * i);
 

@@ -60,10 +60,6 @@ pub fn write_i64<W: Write>(val: &i64, writer: &mut W) -> Result<()> {
 
 /// Write a single i32 to the Writer, as a varint
 pub fn write_varint<W: Write>(val: &i32, writer: &mut W) -> Result<()> {
-    if *val == 0 {
-        return Ok(writer.write_all(&[0])?);
-    }
-
     /* Define some helpful values for dealing with varints */
     let msb: u8 = 0b10000000;
     let mask: u32 = !(msb as u32);
@@ -73,10 +69,8 @@ pub fn write_varint<W: Write>(val: &i32, writer: &mut W) -> Result<()> {
 
     let mut vec: Vec<u8> = Vec::new();
     for _ in 0..5 {
-        /*
-            Get the last 7 bits and cast to an u8.
-            Also right-shift the value to advance further.
-        */
+        /* Get the last 7 bits and cast to an u8.
+         * Also right-shift the value to advance further. */
         let mut tmp = (val & mask) as u8;
         val >>= 7;
 
