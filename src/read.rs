@@ -89,36 +89,22 @@ pub fn read_String<R: Read>(reader: &mut R) -> Result<String> {
 
 /// Read a Minecraft-style varint, which currently fits into a i32
 pub fn read_varint<R: Read>(reader: &mut R) -> Result<i32> {
-    let mut radix: u64 = 128;
-    let msb: u8 = 0b10000000; /* Only the MSB set */
+    let mut result = 0;
 
+    let msb: u8 = 0b10000000;
+    let mask: u8 = !msb;
 
-    /* First we read the varint as an unsigned int */
-    let mut buf = reader.read_u8()?;
-    let mut res = (buf & (!msb)) as u64;
+    for i in 0..5 {
+        let mut read = reader.read_u8()?;
 
-    let mut i: usize = 0;
-    while (buf & msb) != 0 {
-        if i >= 5 {
-            bail!("VarInt is too long");
+        result |= ((read & mask) as i32) << (7 * i);
+
+        if (read & msb) == 0 {
+            return Ok(result);
         }
-
-        i += 1;
-        buf = reader.read_u8()?;
-        res += ((buf & (!msb)) as u64) * radix;
-        radix <<= 7;
     }
 
-    /* Now we convert it to signed */
-    if res >= 4294967296 {
-        bail!("Received too large varint");
-    }
-
-    if res > 2147483647 {
-        return Ok((4294967296 - res) as i32 * -1);
-    } else {
-        return Ok(res as i32);
-    }
+    bail!("Varint is too long");
 }
 
 /// Read length-prefixed bytearray where the length is given as a varint

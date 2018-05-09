@@ -4,6 +4,7 @@ use read::*;
 use write::*;
 
 use std::io::Cursor;
+use std::i32;
 
 /// Given a value, the same correctly encoded, and a reader and write function
 /// for that type of value, test that the reader and writer create values that
@@ -61,8 +62,16 @@ fn string() {
 
 #[test]
 fn varint() {
-    read_and_write!(300, &[(1 << 7) | 44, 2], read_varint, write_varint);
+    /* Test some special values */
+    read_and_write!(0, &[0], read_varint, write_varint);
     read_and_write!(-1, &[255, 255, 255, 255, 15], read_varint, write_varint);
+    read_and_write!(i32::MAX, &[255, 255, 255, 255, 7], read_varint, write_varint);
+    read_and_write!(i32::MIN, &[128, 128, 128, 128, 8], read_varint, write_varint);
+
+    /* Test some random numbers */
+    read_and_write!(16, &[16], read_varint, write_varint);
+    read_and_write!(300, &[(1 << 7) | 44, 2], read_varint, write_varint);
+    read_and_write!(2649887, &[0x9f, 0xde, 0xa1, 0x01], read_varint, write_varint);
 }
 
 #[test]

@@ -64,27 +64,31 @@ pub fn write_varint<W: Write>(val: &i32, writer: &mut W) -> Result<()> {
         return Ok(writer.write_all(&[0])?);
     }
 
+    /* Define some helpful values for dealing with varints */
+    let msb: u8 = 0b10000000;
+    let mask: u32 = !(msb as u32);
+
+    /* Make the value unsigned to avoid weird signed behavior when bit-shifting */
+    let mut val = *val as u32;
+
     let mut vec: Vec<u8> = Vec::new();
+    for _ in 0..5 {
+        /*
+            Get the last 7 bits and cast to an u8.
+            Also right-shift the value to advance further.
+        */
+        let mut tmp = (val & mask) as u8;
+        val >>= 7;
 
-    let mut tmp = {
-        if *val > 0 {
-            *val as u32
+        /* If there's still something to write, set the most significant bit and continue */
+        if val != 0 {
+            tmp |= msb;
+            vec.push(tmp);
         } else {
-            let mut tmp = (*val * -1) as u32;
-            tmp ^= 4294967295;
-            tmp + 1
+            vec.push(tmp);
+            break;
         }
-    };
-
-    while tmp > 0 {
-        /* By default we add the carrying bit to all bytes */
-        vec.push(((tmp % 128) as u8) | (1 << 7));
-        tmp = tmp >> 7;
     }
-
-    /* and then we remove the carrying bit from the last byte */
-    let i = vec.len() - 1;
-    vec[i] &= !(1 << 7);
 
     Ok(writer.write_all(&vec)?)
 }
