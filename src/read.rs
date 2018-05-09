@@ -99,12 +99,17 @@ pub fn read_varint<R: Read>(reader: &mut R) -> Result<i32> {
 
         result |= ((read & mask) as i32) << (7 * i);
 
+        /* The last (5th) byte is only allowed to have the 4 LSB set */
+        if i == 4 && (read & 0xf0 != 0) {
+            bail!("VarInt is too long, last byte: {}", read);
+        }
+
         if (read & msb) == 0 {
             return Ok(result);
         }
     }
 
-    bail!("Varint is too long");
+    panic!("read_varint reached end of loop, which should not be possible");
 }
 
 /// Read length-prefixed bytearray where the length is given as a varint

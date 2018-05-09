@@ -77,6 +77,14 @@ fn varint() {
 }
 
 #[test]
+fn varint_too_large() {
+    let mut cursor = Cursor::new([128, 128, 128, 128, 16]);
+    assert!(read_varint(&mut cursor).is_err());
+    let mut cursor = Cursor::new([128, 128, 128, 128, 128]);
+    assert!(read_varint(&mut cursor).is_err());
+}
+
+#[test]
 fn position() {
     read_and_write!((0, 63, 0),
                     &[0, 0, 0, 0, 0xfc, 0, 0, 0],
