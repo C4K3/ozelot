@@ -182,17 +182,17 @@ impl Client {
             }
         }
 
-        /* Now we wait for the PlayerAbilities packet from the server */
+        /* Now we wait for the LoginSuccess packet from the server */
         'wait2: loop {
             if timeout.elapsed() > time::Duration::new(30, 0) {
-                bail!("Timed out waiting for PlayerAbilities packet");
+                bail!("Timed out waiting for LoginSuccess packet");
             }
             client.update_inbuf()?;
             match client.read_packet()? {
                 Some(ClientboundPacket::LoginDisconnect(ref p)) => {
                     bail!("Got LoginDisconnect, reason: {}", p.get_raw_chat());
                 },
-                Some(ClientboundPacket::PlayerAbilities(..)) => break 'wait2,
+                Some(ClientboundPacket::LoginSuccess(..)) => break 'wait2,
                 Some(_) => (),
                 None => thread::sleep(time::Duration::from_millis(10)),
             }
