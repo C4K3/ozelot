@@ -4,10 +4,11 @@ use errors::{Result, ResultExt};
 
 use std::fmt::Write;
 
-use openssl::hash::{self, MessageDigest};
 use openssl::rand;
 use openssl::rsa::{Padding, Rsa};
 use openssl::pkey::Private;
+
+use sha1::{Sha1, Digest};
 
 use serde_json::{self, Value};
 
@@ -129,8 +130,9 @@ pub fn post_sha1(server_id: &str,
 
 /// Calculate a Minecraft-style sha1
 pub fn sha1(data: &[u8]) -> String {
-    let mut digest =
-        hash::hash(MessageDigest::sha1(), data).expect("yggdrasil::sha1 error");
+    let mut hasher = Sha1::new();
+    hasher.input(data);
+    let mut digest = hasher.result();
 
     let mut negative = false;
 

@@ -93,6 +93,7 @@ extern crate curl;
 extern crate flate2;
 extern crate netbuf;
 extern crate openssl;
+extern crate sha1;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
