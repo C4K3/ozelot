@@ -13,6 +13,7 @@ use std::fmt;
 use std::io::Read;
 
 use openssl::rsa::Rsa;
+use openssl::pkey::Private;
 
 /* See packets.clj for information about this include */
 include!("./.serverbound-enum.generated.rs");
@@ -33,7 +34,7 @@ impl Handshake {
 }
 
 impl EncryptionResponse {
-    pub fn get_decrypted_shared_secret(&self, key: &Rsa) -> Result<[u8; 16]> {
+    pub fn get_decrypted_shared_secret(&self, key: &Rsa<Private>) -> Result<[u8; 16]> {
         let tmp = utils::rsa_decrypt(key, &self.shared_secret)?;
         if tmp.len() != 16 {
             bail!("Decrypted shared secret was not 16 bytes long");
@@ -44,7 +45,7 @@ impl EncryptionResponse {
         }
         Ok(ret)
     }
-    pub fn get_decrypted_verify_token(&self, key: &Rsa) -> Result<Vec<u8>> {
+    pub fn get_decrypted_verify_token(&self, key: &Rsa<Private>) -> Result<Vec<u8>> {
         utils::rsa_decrypt(key, &self.verify_token)
     }
 }
