@@ -96,7 +96,7 @@ pub enum ClientboundPacket {
 
 impl Packet for ClientboundPacket {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
-    pub fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {
+    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {
         let packet_id = read_varint(r)?;
         match state {
         &ClientState::Handshake => {
@@ -211,7 +211,7 @@ impl Packet for ClientboundPacket {
         }
     }
     /// Returns the packet's name
-    pub fn get_packet_name(&self) -> &str {
+    fn get_packet_name(&self) -> &str {
         match self {
         &ClientboundPacket::StatusResponse(..) => "StatusResponse",
         &ClientboundPacket::StatusPong(..) => "StatusPong",
@@ -303,7 +303,7 @@ impl Packet for ClientboundPacket {
         }
     }
     /// Returns the connection state in which the packet can be sent
-    pub fn get_clientstate(&self) -> ClientState {
+    fn get_clientstate(&self) -> ClientState {
         match self {
         &ClientboundPacket::StatusResponse(..) => ClientState::Status,
         &ClientboundPacket::StatusPong(..) => ClientState::Status,
@@ -395,7 +395,7 @@ impl Packet for ClientboundPacket {
         }
     }
     /// Returns the ID of the packet
-    pub fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i32 {
         match self {
         &ClientboundPacket::StatusResponse(..) => 0,
         &ClientboundPacket::StatusPong(..) => 1,
@@ -487,7 +487,7 @@ impl Packet for ClientboundPacket {
         }
     }
     /// Serializes the packet into Vec<u8>. You usually won't need to use this.
-    pub fn to_u8(&self) -> Result<Vec<u8>> {
+    fn to_u8(&self) -> Result<Vec<u8>> {
         match self {
         &ClientboundPacket::StatusResponse(ref x) => x.to_u8(),
         &ClientboundPacket::StatusPong(ref x) => x.to_u8(),

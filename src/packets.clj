@@ -100,7 +100,7 @@
 ;; Create the parse function for the Packet trait for the given packets
 (defn enum-fn-deserialize [packets]
   (long-str "    /// Deserializes a Read type into a packet. You usually won't need to use this."
-            "    pub fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {"
+            "    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {"
             "        let packet_id = read_varint(r)?;"
             (enum-fn-deserialize-state packets)
             "    }"))
@@ -108,7 +108,7 @@
 ;; Create the get_packet_name function for the Packet trait for the given packets
 (defn enum-fn-get-packet-name [packets packet-type]
   (long-str "    /// Returns the packet's name"
-            "    pub fn get_packet_name(&self) -> &str {"
+            "    fn get_packet_name(&self) -> &str {"
             "        match self {"
             (apply str
                    (for [{name :name} packets]
@@ -120,7 +120,7 @@
 ;; Create the get_state function for the Packet trait for the given packets
 (defn enum-fn-get-state [packets packet-type]
   (long-str "    /// Returns the connection state in which the packet can be sent"
-            "    pub fn get_clientstate(&self) -> ClientState {"
+            "    fn get_clientstate(&self) -> ClientState {"
             "        match self {"
             (apply str
                    (for [{name :name state :state} packets]
@@ -132,7 +132,7 @@
 ;; Create the get_id function for the Packet trait for the given packets
 (defn enum-fn-get-id [packets packet-type]
   (long-str "    /// Returns the ID of the packet"
-            "    pub fn get_id(&self) -> i32 {"
+            "    fn get_id(&self) -> i32 {"
             "        match self {"
             (apply str
                    (for  [{name :name id :id} packets]
@@ -144,7 +144,7 @@
 ;; Create the to_u8 function for the Packet trait for the given packets
 (defn enum-fn-to-u8 [packets packet-type]
   (long-str "    /// Serializes the packet into Vec<u8>. You usually won't need to use this."
-            "    pub fn to_u8(&self) -> Result<Vec<u8>> {"
+            "    fn to_u8(&self) -> Result<Vec<u8>> {"
             "        match self {"
             (apply str
                    (for [{name :name} packets]

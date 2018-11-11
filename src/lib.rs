@@ -119,6 +119,7 @@ mod tests;
 
 pub use client::Client;
 pub use server::Server;
+pub use connection::Packet;
 
 use std::fmt;
 
