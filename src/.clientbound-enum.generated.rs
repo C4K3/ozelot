@@ -95,7 +95,7 @@ pub enum ClientboundPacket {
 }
 
 impl Packet for ClientboundPacket {
-    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {
+    pub fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {
         let packet_id = read_varint(r)?;
         match state {
         &ClientState::Handshake => {
@@ -209,7 +209,7 @@ impl Packet for ClientboundPacket {
 
         }
     }
-    fn get_packet_name(&self) -> &str {
+    pub fn get_packet_name(&self) -> &str {
         match self {
         &ClientboundPacket::StatusResponse(..) => "StatusResponse",
         &ClientboundPacket::StatusPong(..) => "StatusPong",
@@ -300,7 +300,7 @@ impl Packet for ClientboundPacket {
 
         }
     }
-    fn get_clientstate(&self) -> ClientState {
+    pub fn get_clientstate(&self) -> ClientState {
         match self {
         &ClientboundPacket::StatusResponse(..) => ClientState::Status,
         &ClientboundPacket::StatusPong(..) => ClientState::Status,
@@ -391,7 +391,7 @@ impl Packet for ClientboundPacket {
 
         }
     }
-    fn get_id(&self) -> i32 {
+    pub fn get_id(&self) -> i32 {
         match self {
         &ClientboundPacket::StatusResponse(..) => 0,
         &ClientboundPacket::StatusPong(..) => 1,
@@ -482,7 +482,7 @@ impl Packet for ClientboundPacket {
 
         }
     }
-    fn to_u8(&self) -> Result<Vec<u8>> {
+    pub fn to_u8(&self) -> Result<Vec<u8>> {
         match self {
         &ClientboundPacket::StatusResponse(ref x) => x.to_u8(),
         &ClientboundPacket::StatusPong(ref x) => x.to_u8(),

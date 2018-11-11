@@ -99,14 +99,14 @@
 
 ;; Create the parse function for the Packet trait for the given packets
 (defn enum-fn-deserialize [packets]
-  (long-str "    fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {"
+  (long-str "    pub fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {"
             "        let packet_id = read_varint(r)?;"
             (enum-fn-deserialize-state packets)
             "    }"))
 
 ;; Create the get_packet_name function for the Packet trait for the given packets
 (defn enum-fn-get-packet-name [packets packet-type]
-  (long-str "    fn get_packet_name(&self) -> &str {"
+  (long-str "    pub fn get_packet_name(&self) -> &str {"
             "        match self {"
             (apply str
                    (for [{name :name} packets]
@@ -117,7 +117,7 @@
 
 ;; Create the get_state function for the Packet trait for the given packets
 (defn enum-fn-get-state [packets packet-type]
-  (long-str "    fn get_clientstate(&self) -> ClientState {"
+  (long-str "    pub fn get_clientstate(&self) -> ClientState {"
             "        match self {"
             (apply str
                    (for [{name :name state :state} packets]
@@ -128,7 +128,7 @@
 
 ;; Create the get_id function for the Packet trait for the given packets
 (defn enum-fn-get-id [packets packet-type]
-  (long-str "    fn get_id(&self) -> i32 {"
+  (long-str "    pub fn get_id(&self) -> i32 {"
             "        match self {"
             (apply str
                    (for  [{name :name id :id} packets]
@@ -139,7 +139,7 @@
 
 ;; Create the to_u8 function for the Packet trait for the given packets
 (defn enum-fn-to-u8 [packets packet-type]
-  (long-str "    fn to_u8(&self) -> Result<Vec<u8>> {"
+  (long-str "    pub fn to_u8(&self) -> Result<Vec<u8>> {"
             "        match self {"
             (apply str
                    (for [{name :name} packets]
@@ -233,7 +233,7 @@
 (defn fn-deserialize [packet packet-type]
   (let [{name :name fields :fields automatic-serialize :automatic-serialize} packet]
     (format
-      (long-str "    fn deserialize<R: Read>(r: &mut R) -> Result<%sPacket> {"
+      (long-str "    pub fn deserialize<R: Read>(r: &mut R) -> Result<%sPacket> {"
                 "        Ok(%sPacket::%s(%s {"
                 (read-fields-str fields)
                 "        }))"
@@ -243,7 +243,7 @@
 ;; Create the to_u8 function for a packet
 (defn fn-to-u8 [{name :name fields :fields automatic-serialize :automatic-serialize}]
   (if (nil? automatic-serialize)
-    (long-str "    fn to_u8(&self) -> Result<Vec<u8>> {"
+    (long-str "    pub fn to_u8(&self) -> Result<Vec<u8>> {"
               "        let mut ret = Vec::new();"
               "        write_varint(&Self::PACKET_ID, &mut ret)?;"
               (write-fields-str fields)
