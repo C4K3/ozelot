@@ -1,6 +1,6 @@
 //! [(Link to repository page.)](https://github.com/C4K3/Ozelot)
 //!
-//! This is a library made for interacting with the Minecraft protocl
+//! This is a library made for interacting with the Minecraft protocol
 //! (MCMODERN only, not MCPE.)
 //!
 //! It is mostly a low-level library, its goals are to
