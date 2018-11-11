@@ -9,12 +9,14 @@ pub struct StatusResponse {
 
 impl StatusResponse {
     const PACKET_ID: i32 = 0;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::StatusResponse(StatusResponse {
             json: read_String(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -40,12 +42,14 @@ pub struct StatusPong {
 
 impl StatusPong {
     const PACKET_ID: i32 = 1;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::StatusPong(StatusPong {
             id: read_u64(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -71,12 +75,14 @@ pub struct LoginDisconnect {
 
 impl LoginDisconnect {
     const PACKET_ID: i32 = 0;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::LoginDisconnect(LoginDisconnect {
             raw_chat: read_String(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -104,6 +110,7 @@ pub struct EncryptionRequest {
 
 impl EncryptionRequest {
     const PACKET_ID: i32 = 1;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EncryptionRequest(EncryptionRequest {
             server_id: read_String(r)?,
@@ -112,6 +119,7 @@ impl EncryptionRequest {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -148,6 +156,7 @@ pub struct LoginSuccess {
 
 impl LoginSuccess {
     const PACKET_ID: i32 = 2;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::LoginSuccess(LoginSuccess {
             uuid: read_uuid_str(r)?,
@@ -155,6 +164,7 @@ impl LoginSuccess {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -185,12 +195,14 @@ pub struct SetCompression {
 
 impl SetCompression {
     const PACKET_ID: i32 = 3;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetCompression(SetCompression {
             threshold: read_varint(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -227,6 +239,7 @@ pub struct SpawnObject {
 
 impl SpawnObject {
     const PACKET_ID: i32 = 0;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnObject(SpawnObject {
             entity_id: read_varint(r)?,
@@ -244,6 +257,7 @@ impl SpawnObject {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -328,6 +342,7 @@ pub struct SpawnExperienceOrb {
 
 impl SpawnExperienceOrb {
     const PACKET_ID: i32 = 1;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnExperienceOrb(SpawnExperienceOrb {
             entity_id: read_varint(r)?,
@@ -338,6 +353,7 @@ impl SpawnExperienceOrb {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -387,6 +403,7 @@ pub struct SpawnGlobalEntity {
 
 impl SpawnGlobalEntity {
     const PACKET_ID: i32 = 2;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnGlobalEntity(SpawnGlobalEntity {
             entity_id: read_varint(r)?,
@@ -397,6 +414,7 @@ impl SpawnGlobalEntity {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -454,6 +472,7 @@ pub struct SpawnMob {
 
 impl SpawnMob {
     const PACKET_ID: i32 = 3;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnMob(SpawnMob {
             entity_id: read_varint(r)?,
@@ -472,6 +491,7 @@ impl SpawnMob {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -561,6 +581,7 @@ pub struct SpawnPainting {
 
 impl SpawnPainting {
     const PACKET_ID: i32 = 4;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPainting(SpawnPainting {
             entity_id: read_varint(r)?,
@@ -571,6 +592,7 @@ impl SpawnPainting {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -623,6 +645,7 @@ pub struct SpawnPlayer {
 
 impl SpawnPlayer {
     const PACKET_ID: i32 = 5;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPlayer(SpawnPlayer {
             entity_id: read_varint(r)?,
@@ -636,6 +659,7 @@ impl SpawnPlayer {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -697,6 +721,7 @@ pub struct ClientboundAnimation {
 
 impl ClientboundAnimation {
     const PACKET_ID: i32 = 6;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundAnimation(ClientboundAnimation {
             entity_id: read_varint(r)?,
@@ -704,6 +729,7 @@ impl ClientboundAnimation {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -754,12 +780,14 @@ pub struct BlockBreakAnimation {
 
 impl BlockBreakAnimation {
     const PACKET_ID: i32 = 8;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockBreakAnimation(BlockBreakAnimation {
             entity_id: read_varint(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -787,6 +815,7 @@ pub struct UpdateBlockEntity {
 
 impl UpdateBlockEntity {
     const PACKET_ID: i32 = 9;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateBlockEntity(UpdateBlockEntity {
             position: read_position(r)?,
@@ -795,6 +824,7 @@ impl UpdateBlockEntity {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -833,6 +863,7 @@ pub struct BlockAction {
 
 impl BlockAction {
     const PACKET_ID: i32 = 10;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockAction(BlockAction {
             position: read_position(r)?,
@@ -842,6 +873,7 @@ impl BlockAction {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -883,6 +915,7 @@ pub struct BlockChange {
 
 impl BlockChange {
     const PACKET_ID: i32 = 11;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockChange(BlockChange {
             position: read_position(r)?,
@@ -890,6 +923,7 @@ impl BlockChange {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -920,12 +954,14 @@ pub struct BossBar {
 
 impl BossBar {
     const PACKET_ID: i32 = 12;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BossBar(BossBar {
             data: read_bytearray_to_end(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -951,12 +987,14 @@ pub struct ServerDifficulty {
 
 impl ServerDifficulty {
     const PACKET_ID: i32 = 13;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ServerDifficulty(ServerDifficulty {
             difficulty: read_u8(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1003,6 +1041,7 @@ pub struct ChatMessage {
 
 impl ChatMessage {
     const PACKET_ID: i32 = 15;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChatMessage(ChatMessage {
             chat: read_String(r)?,
@@ -1010,6 +1049,7 @@ impl ChatMessage {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1072,6 +1112,7 @@ pub struct ClientboundConfirmTransaction {
 
 impl ClientboundConfirmTransaction {
     const PACKET_ID: i32 = 17;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundConfirmTransaction(ClientboundConfirmTransaction {
             window_id: read_u8(r)?,
@@ -1080,6 +1121,7 @@ impl ClientboundConfirmTransaction {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1115,12 +1157,14 @@ pub struct ClientboundCloseWindow {
 
 impl ClientboundCloseWindow {
     const PACKET_ID: i32 = 18;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundCloseWindow(ClientboundCloseWindow {
             window_id: read_u8(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1187,6 +1231,7 @@ pub struct WindowItems {
 
 impl WindowItems {
     const PACKET_ID: i32 = 20;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WindowItems(WindowItems {
             window_id: read_u8(r)?,
@@ -1194,6 +1239,7 @@ impl WindowItems {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1226,6 +1272,7 @@ pub struct WindowProperty {
 
 impl WindowProperty {
     const PACKET_ID: i32 = 21;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WindowProperty(WindowProperty {
             window_id: read_u8(r)?,
@@ -1234,6 +1281,7 @@ impl WindowProperty {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1271,6 +1319,7 @@ pub struct SetSlot {
 
 impl SetSlot {
     const PACKET_ID: i32 = 22;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetSlot(SetSlot {
             window_id: read_u8(r)?,
@@ -1279,6 +1328,7 @@ impl SetSlot {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1315,6 +1365,7 @@ pub struct SetCooldown {
 
 impl SetCooldown {
     const PACKET_ID: i32 = 23;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetCooldown(SetCooldown {
             item_id: read_varint(r)?,
@@ -1322,6 +1373,7 @@ impl SetCooldown {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1353,6 +1405,7 @@ pub struct ClientboundPluginMessage {
 
 impl ClientboundPluginMessage {
     const PACKET_ID: i32 = 24;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundPluginMessage(ClientboundPluginMessage {
             channel: read_String(r)?,
@@ -1360,6 +1413,7 @@ impl ClientboundPluginMessage {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1396,6 +1450,7 @@ pub struct NamedSoundEffect {
 
 impl NamedSoundEffect {
     const PACKET_ID: i32 = 25;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::NamedSoundEffect(NamedSoundEffect {
             sound_name: read_String(r)?,
@@ -1408,6 +1463,7 @@ impl NamedSoundEffect {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1463,12 +1519,14 @@ pub struct PlayDisconnect {
 
 impl PlayDisconnect {
     const PACKET_ID: i32 = 26;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayDisconnect(PlayDisconnect {
             reason: read_String(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1495,6 +1553,7 @@ pub struct EntityStatus {
 
 impl EntityStatus {
     const PACKET_ID: i32 = 27;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityStatus(EntityStatus {
             entity_id: read_i32(r)?,
@@ -1502,6 +1561,7 @@ impl EntityStatus {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1588,6 +1648,7 @@ pub struct UnloadChunk {
 
 impl UnloadChunk {
     const PACKET_ID: i32 = 29;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UnloadChunk(UnloadChunk {
             chunk_x: read_i32(r)?,
@@ -1595,6 +1656,7 @@ impl UnloadChunk {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1626,6 +1688,7 @@ pub struct ChangeGameState {
 
 impl ChangeGameState {
     const PACKET_ID: i32 = 30;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChangeGameState(ChangeGameState {
             action: read_u8(r)?,
@@ -1633,6 +1696,7 @@ impl ChangeGameState {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1663,12 +1727,14 @@ pub struct KeepAlive {
 
 impl KeepAlive {
     const PACKET_ID: i32 = 31;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::KeepAlive(KeepAlive {
             id: read_i64(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1694,12 +1760,14 @@ pub struct ChunkData {
 
 impl ChunkData {
     const PACKET_ID: i32 = 32;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChunkData(ChunkData {
             data: read_bytearray_to_end(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1728,6 +1796,7 @@ pub struct Effect {
 
 impl Effect {
     const PACKET_ID: i32 = 33;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Effect(Effect {
             effect_id: read_i32(r)?,
@@ -1737,6 +1806,7 @@ impl Effect {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1858,6 +1928,7 @@ pub struct JoinGame {
 
 impl JoinGame {
     const PACKET_ID: i32 = 35;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::JoinGame(JoinGame {
             entity_id: read_i32(r)?,
@@ -1870,6 +1941,7 @@ impl JoinGame {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1925,12 +1997,14 @@ pub struct Map {
 
 impl Map {
     const PACKET_ID: i32 = 36;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Map(Map {
             data: read_bytearray_to_end(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1956,12 +2030,14 @@ pub struct Entity {
 
 impl Entity {
     const PACKET_ID: i32 = 37;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Entity(Entity {
             entity_id: read_varint(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -1991,6 +2067,7 @@ pub struct EntityRelativeMove {
 
 impl EntityRelativeMove {
     const PACKET_ID: i32 = 38;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityRelativeMove(EntityRelativeMove {
             entity_id: read_varint(r)?,
@@ -2001,6 +2078,7 @@ impl EntityRelativeMove {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2052,6 +2130,7 @@ pub struct EntityLookRelativeMove {
 
 impl EntityLookRelativeMove {
     const PACKET_ID: i32 = 39;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLookRelativeMove(EntityLookRelativeMove {
             entity_id: read_varint(r)?,
@@ -2064,6 +2143,7 @@ impl EntityLookRelativeMove {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2122,6 +2202,7 @@ pub struct EntityLook {
 
 impl EntityLook {
     const PACKET_ID: i32 = 40;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLook(EntityLook {
             entity_id: read_varint(r)?,
@@ -2131,6 +2212,7 @@ impl EntityLook {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2175,6 +2257,7 @@ pub struct ClientboundVehicleMove {
 
 impl ClientboundVehicleMove {
     const PACKET_ID: i32 = 41;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundVehicleMove(ClientboundVehicleMove {
             x: read_f64(r)?,
@@ -2185,6 +2268,7 @@ impl ClientboundVehicleMove {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2230,12 +2314,14 @@ pub struct OpenSignEditor {
 
 impl OpenSignEditor {
     const PACKET_ID: i32 = 42;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::OpenSignEditor(OpenSignEditor {
             position: read_position(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2262,6 +2348,7 @@ pub struct CraftRecipeResponse {
 
 impl CraftRecipeResponse {
     const PACKET_ID: i32 = 43;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CraftRecipeResponse(CraftRecipeResponse {
             window_id: read_u8(r)?,
@@ -2269,6 +2356,7 @@ impl CraftRecipeResponse {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2301,6 +2389,7 @@ pub struct PlayerAbilities {
 
 impl PlayerAbilities {
     const PACKET_ID: i32 = 44;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerAbilities(PlayerAbilities {
             flags: read_u8(r)?,
@@ -2309,6 +2398,7 @@ impl PlayerAbilities {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2379,12 +2469,14 @@ pub struct PlayerListItem {
 
 impl PlayerListItem {
     const PACKET_ID: i32 = 46;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListItem(PlayerListItem {
             data: read_bytearray_to_end(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2416,6 +2508,7 @@ pub struct PlayerPositionAndLook {
 
 impl PlayerPositionAndLook {
     const PACKET_ID: i32 = 47;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerPositionAndLook(PlayerPositionAndLook {
             x: read_f64(r)?,
@@ -2428,6 +2521,7 @@ impl PlayerPositionAndLook {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2484,6 +2578,7 @@ pub struct UseBed {
 
 impl UseBed {
     const PACKET_ID: i32 = 48;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UseBed(UseBed {
             entity_id: read_varint(r)?,
@@ -2491,6 +2586,7 @@ impl UseBed {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2561,12 +2657,14 @@ pub struct DestroyEntities {
 
 impl DestroyEntities {
     const PACKET_ID: i32 = 50;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DestroyEntities(DestroyEntities {
             entity_ids: read_prefixed_varintarray(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2593,6 +2691,7 @@ pub struct RemoveEntityEffect {
 
 impl RemoveEntityEffect {
     const PACKET_ID: i32 = 51;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::RemoveEntityEffect(RemoveEntityEffect {
             entity_id: read_varint(r)?,
@@ -2600,6 +2699,7 @@ impl RemoveEntityEffect {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2631,6 +2731,7 @@ pub struct ResourcePackSend {
 
 impl ResourcePackSend {
     const PACKET_ID: i32 = 52;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ResourcePackSend(ResourcePackSend {
             url: read_String(r)?,
@@ -2638,6 +2739,7 @@ impl ResourcePackSend {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2671,6 +2773,7 @@ pub struct Respawn {
 
 impl Respawn {
     const PACKET_ID: i32 = 53;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Respawn(Respawn {
             dimension: read_i32(r)?,
@@ -2680,6 +2783,7 @@ impl Respawn {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2721,6 +2825,7 @@ pub struct EntityHeadLook {
 
 impl EntityHeadLook {
     const PACKET_ID: i32 = 54;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityHeadLook(EntityHeadLook {
             entity_id: read_varint(r)?,
@@ -2728,6 +2833,7 @@ impl EntityHeadLook {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2778,12 +2884,14 @@ pub struct WorldBorder {
 
 impl WorldBorder {
     const PACKET_ID: i32 = 56;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WorldBorder(WorldBorder {
             data: read_bytearray_to_end(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2809,12 +2917,14 @@ pub struct Camera {
 
 impl Camera {
     const PACKET_ID: i32 = 57;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Camera(Camera {
             entity_id: read_varint(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2840,12 +2950,14 @@ pub struct ClientboundHeldItemChange {
 
 impl ClientboundHeldItemChange {
     const PACKET_ID: i32 = 58;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundHeldItemChange(ClientboundHeldItemChange {
             slot: read_u8(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2872,6 +2984,7 @@ pub struct DisplayScoreboard {
 
 impl DisplayScoreboard {
     const PACKET_ID: i32 = 59;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DisplayScoreboard(DisplayScoreboard {
             position: read_u8(r)?,
@@ -2879,6 +2992,7 @@ impl DisplayScoreboard {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2910,6 +3024,7 @@ pub struct EntityMetadata {
 
 impl EntityMetadata {
     const PACKET_ID: i32 = 60;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityMetadata(EntityMetadata {
             entity_id: read_varint(r)?,
@@ -2917,6 +3032,7 @@ impl EntityMetadata {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2948,6 +3064,7 @@ pub struct AttachEntity {
 
 impl AttachEntity {
     const PACKET_ID: i32 = 61;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::AttachEntity(AttachEntity {
             attached_entity_id: read_i32(r)?,
@@ -2955,6 +3072,7 @@ impl AttachEntity {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -2988,6 +3106,7 @@ pub struct EntityVelocity {
 
 impl EntityVelocity {
     const PACKET_ID: i32 = 62;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityVelocity(EntityVelocity {
             entity_id: read_varint(r)?,
@@ -2997,6 +3116,7 @@ impl EntityVelocity {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3039,6 +3159,7 @@ pub struct EntityEquipment {
 
 impl EntityEquipment {
     const PACKET_ID: i32 = 63;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEquipment(EntityEquipment {
             entity_id: read_varint(r)?,
@@ -3047,6 +3168,7 @@ impl EntityEquipment {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3084,6 +3206,7 @@ pub struct SetExperience {
 
 impl SetExperience {
     const PACKET_ID: i32 = 64;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetExperience(SetExperience {
             experience: read_f32(r)?,
@@ -3092,6 +3215,7 @@ impl SetExperience {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3129,6 +3253,7 @@ pub struct UpdateHealth {
 
 impl UpdateHealth {
     const PACKET_ID: i32 = 65;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateHealth(UpdateHealth {
             health: read_f32(r)?,
@@ -3137,6 +3262,7 @@ impl UpdateHealth {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3208,6 +3334,7 @@ pub struct SetPassengers {
 
 impl SetPassengers {
     const PACKET_ID: i32 = 67;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetPassengers(SetPassengers {
             entity_id: read_varint(r)?,
@@ -3215,6 +3342,7 @@ impl SetPassengers {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3245,12 +3373,14 @@ pub struct Teams {
 
 impl Teams {
     const PACKET_ID: i32 = 68;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Teams(Teams {
             data: read_bytearray_to_end(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3311,12 +3441,14 @@ pub struct SpawnPosition {
 
 impl SpawnPosition {
     const PACKET_ID: i32 = 70;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPosition(SpawnPosition {
             position: read_position(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3343,6 +3475,7 @@ pub struct TimeUpdate {
 
 impl TimeUpdate {
     const PACKET_ID: i32 = 71;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::TimeUpdate(TimeUpdate {
             world_age: read_i64(r)?,
@@ -3350,6 +3483,7 @@ impl TimeUpdate {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3416,6 +3550,7 @@ pub struct SoundEffect {
 
 impl SoundEffect {
     const PACKET_ID: i32 = 73;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SoundEffect(SoundEffect {
             sound_id: read_varint(r)?,
@@ -3428,6 +3563,7 @@ impl SoundEffect {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3484,6 +3620,7 @@ pub struct PlayerListHeaderFooter {
 
 impl PlayerListHeaderFooter {
     const PACKET_ID: i32 = 74;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListHeaderFooter(PlayerListHeaderFooter {
             header: read_String(r)?,
@@ -3491,6 +3628,7 @@ impl PlayerListHeaderFooter {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3523,6 +3661,7 @@ pub struct CollectItem {
 
 impl CollectItem {
     const PACKET_ID: i32 = 75;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CollectItem(CollectItem {
             collected_entity_id: read_varint(r)?,
@@ -3531,6 +3670,7 @@ impl CollectItem {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3572,6 +3712,7 @@ pub struct EntityTeleport {
 
 impl EntityTeleport {
     const PACKET_ID: i32 = 76;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityTeleport(EntityTeleport {
             entity_id: read_varint(r)?,
@@ -3584,6 +3725,7 @@ impl EntityTeleport {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3639,12 +3781,14 @@ pub struct Advancements {
 
 impl Advancements {
     const PACKET_ID: i32 = 77;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Advancements(Advancements {
             data: read_bytearray_to_end(r)?,
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3671,6 +3815,7 @@ pub struct EntityProperties {
 
 impl EntityProperties {
     const PACKET_ID: i32 = 78;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityProperties(EntityProperties {
             entity_id: read_varint(r)?,
@@ -3678,6 +3823,7 @@ impl EntityProperties {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
@@ -3712,6 +3858,7 @@ pub struct EntityEffect {
 
 impl EntityEffect {
     const PACKET_ID: i32 = 79;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEffect(EntityEffect {
             entity_id: read_varint(r)?,
@@ -3722,6 +3869,7 @@ impl EntityEffect {
 
         }))
     }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
