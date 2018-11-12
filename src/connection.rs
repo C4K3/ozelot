@@ -19,10 +19,15 @@ use openssl::symm;
 
 /// Trait for the two enums ClientboundPacket and ServerboundPacket
 pub trait Packet: Sized {
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
     fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self>;
+    /// Returns the packet's name
     fn get_packet_name(&self) -> &str;
+    /// Returns the connection state in which the packet can be sent
     fn get_clientstate(&self) -> ClientState;
+    /// Returns the ID of the packet
     fn get_id(&self) -> i32;
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     fn to_u8(&self) -> Result<Vec<u8>>;
 }
 

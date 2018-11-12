@@ -47,7 +47,6 @@ pub enum ServerboundPacket {
 }
 
 impl Packet for ServerboundPacket {
-    /// Deserializes a Read type into a packet. You usually won't need to use this.
     fn deserialize<R: Read>(r: &mut R, state: &ClientState) -> Result<Self> {
         let packet_id = read_varint(r)?;
         match state {
@@ -116,7 +115,6 @@ impl Packet for ServerboundPacket {
 
         }
     }
-    /// Returns the packet's name
     fn get_packet_name(&self) -> &str {
         match self {
         &ServerboundPacket::Handshake(..) => "Handshake",
@@ -160,7 +158,6 @@ impl Packet for ServerboundPacket {
 
         }
     }
-    /// Returns the connection state in which the packet can be sent
     fn get_clientstate(&self) -> ClientState {
         match self {
         &ServerboundPacket::Handshake(..) => ClientState::Handshake,
@@ -204,7 +201,6 @@ impl Packet for ServerboundPacket {
 
         }
     }
-    /// Returns the ID of the packet
     fn get_id(&self) -> i32 {
         match self {
         &ServerboundPacket::Handshake(..) => 0,
@@ -248,7 +244,6 @@ impl Packet for ServerboundPacket {
 
         }
     }
-    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
     fn to_u8(&self) -> Result<Vec<u8>> {
         match self {
         &ServerboundPacket::Handshake(ref x) => x.to_u8(),
