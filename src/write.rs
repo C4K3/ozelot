@@ -60,31 +60,46 @@ pub fn write_i64<W: Write>(val: &i64, writer: &mut W) -> Result<()> {
 
 /// Write a single i32 to the Writer, as a varint
 pub fn write_varint<W: Write>(val: &i32, writer: &mut W) -> Result<()> {
-    /* Define some helpful values for dealing with varints */
     let msb: u8 = 0b10000000;
-    let mask: u32 = !(msb as u32);
+    let mask: i32 = 0b01111111;
 
-    /* Make the value unsigned to avoid weird signed behavior when bit-shifting */
-    let mut val = *val as u32;
-
-    let mut vec: Vec<u8> = Vec::new();
+    let mut val = *val;
     for _ in 0..5 {
-        /* Get the last 7 bits and cast to an u8.
-         * Also right-shift the value to advance further. */
-        let mut tmp = (val & mask) as u8;
-        val >>= 7;
+        let tmp = (val & mask) as u8;
+        val &= !mask;
+        val = val.rotate_right(7);
 
-        /* If there's still something to write, set the most significant bit and continue */
         if val != 0 {
-            tmp |= msb;
-            vec.push(tmp);
+            writer.write(&[tmp | msb])?;
         } else {
-            vec.push(tmp);
-            break;
+            writer.write(&[tmp])?;
+            return Ok(());
         }
     }
 
-    Ok(writer.write_all(&vec)?)
+    panic!("Internal error in write_varint, loop ended");
+}
+
+/// Write a single i64 to the Writer, as a Minecraft-style varlong
+pub fn write_varlong<W: Write>(val: &i64, writer: &mut W) -> Result<()> {
+    let msb: u8 = 0b10000000;
+    let mask: i64 = 0b01111111;
+
+    let mut val = *val;
+    for _ in 0..10 {
+        let tmp = (val & mask) as u8;
+        val &= !mask;
+        val = val.rotate_right(7);
+
+        if val != 0 {
+            writer.write(&[tmp | msb])?;
+        } else {
+            writer.write(&[tmp])?;
+            return Ok(());
+        }
+    }
+
+    panic!("Internal error in write_varlong, loop ended");
 }
 
 /// Write a single f32 to the Writer

@@ -87,7 +87,7 @@ pub fn read_String<R: Read>(reader: &mut R) -> Result<String> {
     Ok(ret)
 }
 
-/// Read a Minecraft-style varint, which currently fits into a i32
+/// Read a Minecraft-style varint, which currently fits into an i32
 pub fn read_varint<R: Read>(reader: &mut R) -> Result<i32> {
     let mut result = 0;
 
@@ -110,6 +110,31 @@ pub fn read_varint<R: Read>(reader: &mut R) -> Result<i32> {
     }
 
     panic!("read_varint reached end of loop, which should not be possible");
+}
+
+/// Read a Minecraft-style varlong, which currently fits into an i64
+pub fn read_varlong<R: Read>(reader: &mut R) -> Result<i64> {
+    let mut result = 0;
+
+    let msb: u8 = 0b10000000;
+    let mask: u8 = !msb;
+
+    for i in 0..10 {
+        let read = reader.read_u8()?;
+
+        result |= ((read & mask) as i64) << (7 * i);
+
+        /* The last (10th) byte is only allowed to have the LSB set */
+        if i == 9 && ((read & (!0x1)) != 0) {
+            bail!("VarLong is too long, last byte: {}", read);
+        }
+
+        if (read & msb) == 0 {
+            return Ok(result);
+        }
+    }
+
+    panic!("read_varlong reached end of loop, which should not be possible");
 }
 
 /// Read length-prefixed bytearray where the length is given as a varint

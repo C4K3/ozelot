@@ -85,6 +85,30 @@ fn varint_too_large() {
 }
 
 #[test]
+fn varlong() {
+    read_and_write!(0, &[0], read_varlong, write_varlong);
+    read_and_write!(1, &[1], read_varlong, write_varlong);
+    read_and_write!(2, &[2], read_varlong, write_varlong);
+    read_and_write!(127, &[127], read_varlong, write_varlong);
+    read_and_write!(128, &[128, 1], read_varlong, write_varlong);
+    read_and_write!(255, &[255, 1], read_varlong, write_varlong);
+    read_and_write!(300, &[(1 << 7) | 44, 2], read_varlong, write_varlong);
+    read_and_write!(2147483647, &[255, 255, 255, 255, 7], read_varlong, write_varlong);
+    read_and_write!(9223372036854775807, &[255, 255, 255, 255, 255, 255, 255, 255, 127], read_varlong, write_varlong);
+    read_and_write!(-1, &[255, 255, 255, 255, 255, 255, 255, 255, 255, 1], read_varlong, write_varlong);
+    read_and_write!(-2147483648, &[128, 128, 128, 128, 248, 255, 255, 255, 255, 1], read_varlong, write_varlong);
+    read_and_write!(-9223372036854775808, &[128, 128, 128, 128, 128, 128, 128, 128, 128, 1], read_varlong, write_varlong);
+}
+
+#[test]
+fn varlong_too_large() {
+    let mut cursor = Cursor::new([128, 128, 128, 128, 128, 128, 128, 128, 128, 2]);
+    assert!(read_varlong(&mut cursor).is_err());
+    let mut cursor = Cursor::new([128, 128, 128, 128, 128, 128, 128, 128, 128, 128]);
+    assert!(read_varlong(&mut cursor).is_err());
+}
+
+#[test]
 fn position() {
     read_and_write!((0, 63, 0),
                     &[0, 0, 0, 0, 0xfc, 0, 0, 0],
