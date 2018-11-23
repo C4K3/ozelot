@@ -127,3 +127,90 @@ fn position() {
                     read_position,
                     write_position);
 }
+
+#[test]
+fn uuid_str_without_dashes() {
+        let mut binary = vec![32];
+        for _ in 0..32 {
+            binary.push(48); /* Ascii 0 */
+        }
+        let mut cursor = Cursor::new(&binary);
+        assert_eq!(read_uuid_str(&mut cursor).unwrap(), 0);
+        let mut tmp = Vec::new();
+        write_uuid_str(&0, &mut tmp).unwrap();
+        assert_eq!(&tmp, &binary);
+
+        let mut binary = vec![32];
+        for i in 0..10 {
+            binary.push(48 + i); /* Ascii 0 - 10 */
+        }
+        for i in 0..6 {
+            binary.push(97 + i); /* Ascii a - f */
+        }
+        for i in 0..10 {
+            binary.push(48 + i); /* Ascii 0 - 10 */
+        }
+        for i in 0..6 {
+            binary.push(97 + i); /* Ascii a - f */
+        }
+        let mut cursor = Cursor::new(&binary);
+        assert_eq!(read_uuid_str(&mut cursor).unwrap(), 1512366075204170929049582354406559215);
+        let mut tmp = Vec::new();
+        write_uuid_str(&1512366075204170929049582354406559215, &mut tmp).unwrap();
+        assert_eq!(&tmp, &binary);
+}
+
+#[test]
+fn uuid_str_with_dashes() {
+        let mut binary = vec![36];
+        for _ in 0..8 {
+            binary.push(48); /* Ascii 0 */
+        }
+        binary.push(45); /* Ascii - */
+        for _ in 0..4 {
+            binary.push(48); /* Ascii 0 */
+        }
+        binary.push(45); /* Ascii - */
+        for _ in 0..4 {
+            binary.push(48); /* Ascii 0 */
+        }
+        binary.push(45); /* Ascii - */
+        for _ in 0..4 {
+            binary.push(48); /* Ascii 0 */
+        }
+        binary.push(45); /* Ascii - */
+        for _ in 0..12 {
+            binary.push(48); /* Ascii 0 */
+        }
+        let mut cursor = Cursor::new(&binary);
+        assert_eq!(read_uuid_str(&mut cursor).unwrap(), 0);
+        let mut tmp = Vec::new();
+        write_uuid_str_dashes(&0, &mut tmp).unwrap();
+        assert_eq!(&tmp, &binary);
+
+        let mut binary = vec![36];
+        for i in 0..8 {
+            binary.push(48 + i); /* Ascii 0 .. */
+        }
+        binary.push(45); /* Ascii - */
+        for i in 0..4 {
+            binary.push(97 + i); /* Ascii a .. */
+        }
+        binary.push(45); /* Ascii - */
+        for i in 0..4 {
+            binary.push(48 + i); /* Ascii 0 .. */
+        }
+        binary.push(45); /* Ascii - */
+        for i in 0..4 {
+            binary.push(99 + i); /* Ascii c .. */
+        }
+        binary.push(45); /* Ascii - */
+        for _ in 0..12 {
+            binary.push(57); /* Ascii 9 */
+        }
+        let mut cursor = Cursor::new(&binary);
+        assert_eq!(read_uuid_str(&mut cursor).unwrap(), 1512366085766797629701178291595614617);
+        let mut tmp = Vec::new();
+        write_uuid_str_dashes(&1512366085766797629701178291595614617, &mut tmp).unwrap();
+        assert_eq!(&tmp, &binary);
+}

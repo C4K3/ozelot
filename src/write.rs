@@ -1,6 +1,5 @@
 //! Functions for serializing  datatypes used by the protocol
 use errors::Result;
-use u128;
 
 use std::io::Write;
 
@@ -51,6 +50,11 @@ pub fn write_i32<W: Write>(val: &i32, writer: &mut W) -> Result<()> {
 /// Write a single unsigned 64-bit int to the Writer
 pub fn write_u64<W: Write>(val: &u64, writer: &mut W) -> Result<()> {
     Ok(writer.write_u64::<BigEndian>(*val)?)
+}
+
+/// Write a single unsigned 128-bit int to the Writer
+pub fn write_u128<W: Write>(val: &u128, writer: &mut W) -> Result<()> {
+    Ok(writer.write_u128::<BigEndian>(*val)?)
 }
 
 /// Write a single i64 to the Writer
@@ -154,33 +158,30 @@ pub fn write_bytearray_to_end<W: Write>(val: &Vec<u8>,
     write_bytearray(val, writer)
 }
 
-/// Write a uuid (u128) in raw format, i.e. as 16 bytes
-pub fn write_uuid<W: Write>(val: &u128, writer: &mut W) -> Result<()> {
-    let &u128(x, y) = val;
-    write_u64(&x, writer)?;
-    write_u64(&y, writer)
-}
-
 /// Write a uuid (u128) in hexadecimal string format, without dashes
 pub fn write_uuid_str<W: Write>(val: &u128, writer: &mut W) -> Result<()> {
     /* The string length */
-    writer.write_all(&[36])?;
-    write_uuid_str_dashes(val, writer)
+    writer.write_all(&[32])?;
+    Ok(write!(writer, "{:032x}", val)?)
 }
 
 /// Write a uuid (u128) in hexadecimal string format with dashes
 pub fn write_uuid_str_dashes<W: Write>(val: &u128,
                                        writer: &mut W)
                                        -> Result<()> {
-    let &u128(x, y) = val;
     /* A uuid in dashes is represented by 5 groups that are 8-4-4-4-12
      * hexadecimal digits each, meaning 32-16-16-16-48 bits each.
      * Number each of these groups a-b-c-d-e */
-    let a = x >> 32;
-    let b = (x >> 16) & 0xffff;
-    let c = x & 0xffff;
-    let d = y >> 48;
-    let e = y & 0xffffffffffff;
+    let mask_4: u128 = 0xffff;
+    let mask_8: u128 = 0xffffffff;
+    let mask_12: u128 = 0xffffffffffff;
+
+    let a = (val >> 96) & mask_8;
+    let b = (val >> 80) & mask_4;
+    let c = (val >> 64) & mask_4;
+    let d = (val >> 48) & mask_4;
+    let e = val & mask_12;
+    writer.write_all(&[36])?;
     Ok(write!(writer, "{:08x}-{:04x}-{:04x}-{:04x}-{:012x}", a, b, c, d, e)?)
 }
 

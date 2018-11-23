@@ -243,7 +243,7 @@ impl SpawnObject {
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnObject(SpawnObject {
             entity_id: read_varint(r)?,
-            object_uuid: read_uuid(r)?,
+            object_uuid: read_u128(r)?,
             object_type: read_u8(r)?,
             x: read_f64(r)?,
             y: read_f64(r)?,
@@ -262,7 +262,7 @@ impl SpawnObject {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
-        write_uuid(&self.object_uuid, &mut ret)?;
+        write_u128(&self.object_uuid, &mut ret)?;
         write_u8(&self.object_type, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
         write_f64(&self.y, &mut ret)?;
@@ -476,7 +476,7 @@ impl SpawnMob {
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnMob(SpawnMob {
             entity_id: read_varint(r)?,
-            uuid: read_uuid(r)?,
+            uuid: read_u128(r)?,
             mob_type: read_varint(r)?,
             x: read_f64(r)?,
             y: read_f64(r)?,
@@ -496,7 +496,7 @@ impl SpawnMob {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
-        write_uuid(&self.uuid, &mut ret)?;
+        write_u128(&self.uuid, &mut ret)?;
         write_varint(&self.mob_type, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
         write_f64(&self.y, &mut ret)?;
@@ -585,7 +585,7 @@ impl SpawnPainting {
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPainting(SpawnPainting {
             entity_id: read_varint(r)?,
-            uuid: read_uuid(r)?,
+            uuid: read_u128(r)?,
             title: read_String(r)?,
             center_location: read_position(r)?,
             direction: read_u8(r)?,
@@ -597,7 +597,7 @@ impl SpawnPainting {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
-        write_uuid(&self.uuid, &mut ret)?;
+        write_u128(&self.uuid, &mut ret)?;
         write_String(&self.title, &mut ret)?;
         write_position(&self.center_location, &mut ret)?;
         write_u8(&self.direction, &mut ret)?;
@@ -649,7 +649,7 @@ impl SpawnPlayer {
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPlayer(SpawnPlayer {
             entity_id: read_varint(r)?,
-            uuid: read_uuid(r)?,
+            uuid: read_u128(r)?,
             x: read_f64(r)?,
             y: read_f64(r)?,
             z: read_f64(r)?,
@@ -664,7 +664,7 @@ impl SpawnPlayer {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
-        write_uuid(&self.uuid, &mut ret)?;
+        write_u128(&self.uuid, &mut ret)?;
         write_f64(&self.x, &mut ret)?;
         write_f64(&self.y, &mut ret)?;
         write_f64(&self.z, &mut ret)?;

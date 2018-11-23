@@ -7,7 +7,7 @@ use connection::Packet;
 use errors::Result;
 use read::*;
 use write::*;
-use {ClientState, u128, utils};
+use {ClientState, utils};
 
 use std::fmt;
 use std::io::Read;

@@ -172,7 +172,7 @@
  :fields [{:name "hand" :type "i32" :read "varint" :getter "Get which arm was used as a raw varint enum"}]}
 {:name "Spectate"
  :id 30
- :fields [{:name "target" :type "u128" :read "uuid" :getter "Get the uuid of the selected target"}]}
+ :fields [{:name "target" :type "u128" :getter "Get the uuid of the selected target"}]}
 {:name "PlayerBlockPlacement"
  :id 31
  :fields [{:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the location of the placed block"}
@@ -213,7 +213,7 @@
  [{:name "SpawnObject"
    :id 0
    :fields [{:name "entity_id" :type "i32" :getter "Get the ID of the created object" :read "varint"}
-            {:name "object_uuid" :type "u128" :getter "Get the UUID of the created object" :read "uuid"}
+            {:name "object_uuid" :type "u128" :getter "Get the UUID of the created object"}
             {:name "object_type" :type "u8"}
             {:name "x" :type "f64" :getter "Get the X coordinate"}
             {:name "y" :type "f64" :getter "Get the Y coordinate"}
@@ -241,7 +241,7 @@
   {:name "SpawnMob"
    :id 3
    :fields [{:name "entity_id" :type "i32" :getter "Get the ID of the mob" :read "varint"}
-            {:name "uuid" :type "u128" :getter "Get the UUID of the mob" :read "uuid"}
+            {:name "uuid" :type "u128" :getter "Get the UUID of the mob"}
             {:name "mob_type" :type "i32" :getter "Get the type ID of the mob" :read "varint"}
             {:name "x" :type "f64" :getter "Get the X coordinate"}
             {:name "y" :type "f64" :getter "Get the Y coordinate"}
@@ -256,14 +256,14 @@
   {:name "SpawnPainting"
    :id 4
    :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID of the painting" :read "varint"}
-            {:name "uuid" :type "u128" :getter "Get the UUID of the painting" :read "uuid"}
+            {:name "uuid" :type "u128" :getter "Get the UUID of the painting"}
             {:name "title" :type "String" :getter "Get the title of the painting"}
             {:name "center_location" :type "(i32, i32, i32)" :read "position"}
             {:name "direction" :type "u8" :getter "The direction in which the painting faces"}]}
   {:name "SpawnPlayer"
    :id 5
    :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID of the player" :read "varint"}
-            {:name "uuid" :type "u128" :getter "Get the UUID of the player" :read "uuid"}
+            {:name "uuid" :type "u128" :getter "Get the UUID of the player"}
             {:name "x" :type "f64" :getter "Get the X coordinate"}
             {:name "y" :type "f64" :getter "Get the Y coordinate"}
             {:name "z" :type "f64" :getter "Get the Z coordinate"}

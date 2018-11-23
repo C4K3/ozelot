@@ -10,7 +10,7 @@ categories = ["games"]
 license = "CC0-1.0"
 
 [dependencies]
-byteorder = "1"
+byteorder = { version = "1", features = ["i128"] }
 flate2 = "1"
 netbuf = "0.4"
 openssl = "0.10"

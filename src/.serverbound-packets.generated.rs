@@ -1463,7 +1463,7 @@ impl Spectate {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::Spectate(Spectate {
-            target: read_uuid(r)?,
+            target: read_u128(r)?,
 
         }))
     }
@@ -1471,7 +1471,7 @@ impl Spectate {
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
-        write_uuid(&self.target, &mut ret)?;
+        write_u128(&self.target, &mut ret)?;
 
         Ok(ret)
     }

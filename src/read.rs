@@ -1,6 +1,5 @@
 //! Functions for deserializing datatypes used by the protocol
 use errors::{Result, ResultExt};
-use u128;
 
 use std::io::Read;
 
@@ -56,6 +55,11 @@ pub fn read_i64<R: Read>(reader: &mut R) -> Result<i64> {
 /// Read a single u64 from the Reader
 pub fn read_u64<R: Read>(reader: &mut R) -> Result<u64> {
     Ok(reader.read_u64::<BigEndian>()?)
+}
+
+/// Read a single u128 from the Reader
+pub fn read_u128<R: Read>(reader: &mut R) -> Result<u128> {
+    Ok(reader.read_u128::<BigEndian>()?)
 }
 
 /// Read a single f32 from the Reader
@@ -155,23 +159,12 @@ pub fn read_prefixed_varintarray<R: Read>(reader: &mut R) -> Result<Vec<i32>> {
     Ok(tmp)
 }
 
-/// Read a uuid encoded as 16 bytes
-pub fn read_uuid<R: Read>(reader: &mut R) -> Result<u128> {
-    let a = read_u64(reader)?;
-    let b = read_u64(reader)?;
-    Ok(u128(a, b))
-}
-
 /// Read a uuid encoded as a string
 ///
 /// Either with or without dashes.
 pub fn read_uuid_str<R: Read>(reader: &mut R) -> Result<u128> {
     let tmp = read_String(reader)?.replace("-", "");
-    let a = u64::from_str_radix(&tmp[..16], 16)
-        .chain_err(|| "Invalid hex in first half of uuid_str")?;
-    let b = u64::from_str_radix(&tmp[16..], 16)
-        .chain_err(|| "Invalid hex in second half of uuid_str")?;
-    Ok(u128(a, b))
+    u128::from_str_radix(&tmp, 16).chain_err(|| "Invalid UUID, hex string could not be parsed")
 }
 
 /// Read a bytearray to the end of the reader
