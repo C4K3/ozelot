@@ -74,9 +74,9 @@ pub fn write_varint<W: Write>(val: &i32, writer: &mut W) -> Result<()> {
         val = val.rotate_right(7);
 
         if val != 0 {
-            writer.write(&[tmp | msb])?;
+            writer.write_all(&[tmp | msb])?;
         } else {
-            writer.write(&[tmp])?;
+            writer.write_all(&[tmp])?;
             return Ok(());
         }
     }
@@ -96,9 +96,9 @@ pub fn write_varlong<W: Write>(val: &i64, writer: &mut W) -> Result<()> {
         val = val.rotate_right(7);
 
         if val != 0 {
-            writer.write(&[tmp | msb])?;
+            writer.write_all(&[tmp | msb])?;
         } else {
-            writer.write(&[tmp])?;
+            writer.write_all(&[tmp])?;
             return Ok(());
         }
     }
