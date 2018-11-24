@@ -170,7 +170,7 @@ pub fn read_uuid_str<R: Read>(reader: &mut R) -> Result<u128> {
 /// Read a bytearray to the end of the reader
 pub fn read_bytearray_to_end<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
     let mut tmp = Vec::new();
-    reader.read_to_end(&mut tmp)?;
+    let _: usize = reader.read_to_end(&mut tmp)?;
     Ok(tmp)
 }
 

@@ -38,7 +38,7 @@ impl Statistics {
         let count = read_varint(r)?;
         let mut tmp = BTreeMap::new();
         for _ in 0..count {
-            tmp.insert(read_String(r)?, read_varint(r)?);
+            let _: Option<i32> = tmp.insert(read_String(r)?, read_varint(r)?);
         }
         Ok(ClientboundPacket::Statistics(Statistics {
                                              values: tmp,

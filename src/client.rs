@@ -69,9 +69,9 @@ impl Client {
                                                     port,
                                                     2);
         let loginstart = serverbound::LoginStart::new(username.to_string());
-        client.send(handshake)?;
+        let _: usize = client.send(handshake)?;
         client.set_clientstate(ClientState::Login);
-        client.send(loginstart)?;
+        let _: usize = client.send(loginstart)?;
 
         /* Now we wait for the PlayerAbilities packet from the server */
         'wait: loop {
@@ -140,9 +140,9 @@ impl Client {
                                                     2);
         let loginstart =
             serverbound::LoginStart::new(auth.selectedProfile.name.clone());
-        client.send(handshake)?;
+        let _: usize = client.send(handshake)?;
         client.set_clientstate(ClientState::Login);
-        client.send(loginstart)?;
+        let _: usize = client.send(loginstart)?;
 
         /* Here we wait for a LoginSuccess/EncryptionRequest packet */
         'wait: loop {
@@ -172,7 +172,7 @@ impl Client {
                                 &p.get_public_key(),
                                 &shared_secret,
                                 &p.get_verify_token())?;
-                    client.send(encryptionresponse)?;
+                    let _: usize = client.send(encryptionresponse)?;
                     client.enable_encryption(&shared_secret);
 
                     break 'wait;
@@ -324,7 +324,7 @@ impl Client {
                 },
                 &Some(ClientboundPacket::KeepAlive(ref p)) => {
                     let keepalive = serverbound::KeepAlive::new(*p.get_id());
-                    self.send(keepalive)?;
+                    let _: usize = self.send(keepalive)?;
                 },
                 _ => (),
             }

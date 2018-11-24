@@ -88,12 +88,20 @@
 //!     thread::sleep(Duration::from_millis(50));
 //! }
 //! ```
+#![warn(unused_results,
+        unused_extern_crates,
+        unused_import_braces,
+        unused_qualifications,
+        variant_size_differences,
+        trivial_casts,
+        trivial_numeric_casts,
+        )]
+
 extern crate byteorder;
 extern crate curl;
 extern crate flate2;
 extern crate netbuf;
 extern crate openssl;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]

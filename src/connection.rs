@@ -106,7 +106,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
                 let mut compressed = Vec::new();
                 write_varint(&(uncompressed_length as i32), &mut compressed)?;
                 let mut compressor = ZlibEncoder::new(compressed, Compression::default());
-                compressor.write(&tmp)?;
+                compressor.write_all(&tmp)?;
                 let compressed = compressor.finish()?;
 
                 write_varint(&(compressed.len() as i32), &mut out)?;
@@ -235,7 +235,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// You MUST be sure that client.update_inbuf() has been called before this,
     /// this function will not attempt to read from the TcpStream, only from the
     /// internal buffer.
-    pub fn read_packet(&mut self) -> Result<Option<I>> {
+    pub(crate) fn read_packet(&mut self) -> Result<Option<I>> {
         if let None = self.packet_len {
             self.read_length()?;
         }
