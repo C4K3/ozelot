@@ -95,6 +95,7 @@
         variant_size_differences,
         trivial_casts,
         trivial_numeric_casts,
+        unreachable_pub,
         )]
 
 extern crate byteorder;

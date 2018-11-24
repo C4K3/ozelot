@@ -32,7 +32,7 @@ pub trait Packet: Sized {
 }
 
 /// Represents a single MC connection, either as client or server
-pub struct Connection<I: Packet, O: Packet> {
+pub(crate) struct Connection<I: Packet, O: Packet> {
     stream: TcpStream,
     clientstate: ClientState,
     /* The buffer for incoming packets */
@@ -60,7 +60,7 @@ pub struct Connection<I: Packet, O: Packet> {
     out_type: PhantomData<O>,
 }
 impl<I: Packet, O: Packet> Connection<I, O> {
-    pub fn from_tcpstream(stream: TcpStream) -> Result<Self> {
+    pub(crate) fn from_tcpstream(stream: TcpStream) -> Result<Self> {
         let conn = Connection {
             stream: stream,
             clientstate: ClientState::Handshake,
@@ -82,7 +82,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
         Ok(conn)
     }
 
-    pub fn connect_tcp(host: &str, port: u16) -> Result<Self> {
+    pub(crate) fn connect_tcp(host: &str, port: u16) -> Result<Self> {
         let stream = TcpStream::connect(&format!("{}:{}", host, port))?;
         Ok(Connection::from_tcpstream(stream)?)
     }
@@ -92,7 +92,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// This adds the packet to the outgoing buffer, and sends as much as is
     /// possible. Returns the length of the outgoing buffer. If this is greater
     /// than 0, you will need to call write() to send the remaining data.
-    pub fn send(&mut self, packet: &O) -> Result<usize> {
+    pub(crate) fn send(&mut self, packet: &O) -> Result<usize> {
         let tmp = packet.to_u8()?;
         let uncompressed_length = tmp.len();
         let mut out = Vec::with_capacity(uncompressed_length);
@@ -153,19 +153,19 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// Write from the outgoing buffer to the TcpStream
     ///
     /// Returns the amount of bytes written.
-    pub fn write(&mut self) -> Result<usize> {
+    pub(crate) fn write(&mut self) -> Result<usize> {
         return Ok(self.out_buf.write_to(&mut self.stream)?);
     }
 
     /// Attempt to close this connection.
     ///
     /// All future sends and reads to this connection will fail
-    pub fn close(&mut self) -> Result<()> {
+    pub(crate) fn close(&mut self) -> Result<()> {
         Ok(self.stream.shutdown(Shutdown::Both)?)
     }
 
     /// Change the client state of this connection
-    pub fn set_clientstate(&mut self, new_state: ClientState) {
+    pub(crate) fn set_clientstate(&mut self, new_state: ClientState) {
         self.clientstate = new_state;
     }
 
@@ -173,7 +173,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     ///
     /// It is an error to enable encryption if encryption has already been
     /// enabled.
-    pub fn enable_encryption(&mut self, key: &[u8; 16]) {
+    pub(crate) fn enable_encryption(&mut self, key: &[u8; 16]) {
         let out_cipher =
             symm::Crypter::new(symm::Cipher::aes_128_cfb8(),
                                symm::Mode::Encrypt,
@@ -195,7 +195,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     ///
     /// It is generally an error to enable compression if compression has
     /// already been enabled.
-    pub fn enable_compression(&mut self, threshold: usize) {
+    pub(crate) fn enable_compression(&mut self, threshold: usize) {
         self.compression = Some(threshold);
     }
 
@@ -205,7 +205,7 @@ impl<I: Packet, O: Packet> Connection<I, O> {
     /// know for sure you need to call this, then you do not need to call this.
     /// I.e. if you're just using client.read(), then you do not need to call
     /// this function.
-    pub fn update_inbuf(&mut self) -> Result<()> {
+    pub(crate) fn update_inbuf(&mut self) -> Result<()> {
         if let Some(ref mut enc) = self.in_encryption {
             let mut enc_buf = Buf::new();
             let n = match enc_buf.read_from(&mut self.stream) {
