@@ -183,7 +183,7 @@ fn uuid_str_with_dashes() {
             binary.push(48); /* Ascii 0 */
         }
         let mut cursor = Cursor::new(&binary);
-        assert_eq!(read_uuid_str(&mut cursor).unwrap(), 0);
+        assert_eq!(read_uuid_str_dashes(&mut cursor).unwrap(), 0);
         let mut tmp = Vec::new();
         write_uuid_str_dashes(&0, &mut tmp).unwrap();
         assert_eq!(&tmp, &binary);
@@ -209,7 +209,7 @@ fn uuid_str_with_dashes() {
             binary.push(57); /* Ascii 9 */
         }
         let mut cursor = Cursor::new(&binary);
-        assert_eq!(read_uuid_str(&mut cursor).unwrap(), 1512366085766797629701178291595614617);
+        assert_eq!(read_uuid_str_dashes(&mut cursor).unwrap(), 1512366085766797629701178291595614617);
         let mut tmp = Vec::new();
         write_uuid_str_dashes(&1512366085766797629701178291595614617, &mut tmp).unwrap();
         assert_eq!(&tmp, &binary);

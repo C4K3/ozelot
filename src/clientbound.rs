@@ -50,21 +50,51 @@ impl ClientboundTabComplete {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&ClientboundTabComplete::PACKET_ID, &mut ret)?;
+
+        write_varint(&self.transaction_id, &mut ret)?;
+        write_varint(&self.start, &mut ret)?;
+        write_varint(&self.length, &mut ret)?;
         write_varint(&(self.matches.len() as i32), &mut ret)?;
-        for value in &self.matches {
-            write_String(value, &mut ret)?;
+        for (match_, tooltip) in &self.matches {
+            write_String(match_, &mut ret)?;
+            match tooltip {
+                Some(x) => {
+                    write_bool(&true, &mut ret)?;
+                    write_String(x, &mut ret)?;
+                },
+                None => {
+                    write_bool(&false, &mut ret)?;
+                },
+            }
         }
+
         Ok(ret)
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        let transaction_id = read_varint(r)?;
+        let start = read_varint(r)?;
+        let length = read_varint(r)?;
+
         let count = read_varint(r)?;
-        let mut tmp = Vec::with_capacity(count as usize);
+        let mut matches: Vec<(String, Option<String>)> = Vec::with_capacity(count as usize);
+
         for _ in 0..count {
-            tmp.push(read_String(r)?);
+            let match_ = read_String(r)?;
+            let has_tooltip = read_bool(r)?;
+            let tooltip = if has_tooltip {
+                Some(read_String(r)?)
+            } else {
+                None
+            };
+            matches.push((match_, tooltip));
         }
+
         Ok(ClientboundPacket::ClientboundTabComplete(ClientboundTabComplete {
-                                                         matches: tmp,
-                                                     }))
+            transaction_id,
+            start,
+            length,
+            matches,
+        }))
     }
 }
 
@@ -197,17 +227,12 @@ impl Particle {
         write_f32(&self.offset_z, &mut ret)?;
         write_f32(&self.particle_data, &mut ret)?;
         write_i32(&self.count, &mut ret)?;
-        if let Some(x) = self.id {
-            write_varint(&x, &mut ret)?;
-        }
-        if let Some(x) = self.crack_data {
-            write_varint(&x, &mut ret)?;
-        }
+        write_bytearray_to_end(&self.data, &mut ret)?;
         Ok(ret)
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let particle_id = read_i32(r)?;
-        let long_distance = read_bool(r)?;
+        let use_long_distance = read_bool(r)?;
         let x = read_f32(r)?;
         let y = read_f32(r)?;
         let z = read_f32(r)?;
@@ -216,28 +241,20 @@ impl Particle {
         let offset_z = read_f32(r)?;
         let particle_data = read_f32(r)?;
         let count = read_i32(r)?;
-        let id = match particle_id {
-            36 | 37 | 38 => Some(read_varint(r)?),
-            _ => None,
-        };
-        let crack_data = match particle_id {
-            36 | 37 => Some(read_varint(r)?),
-            _ => None,
-        };
+        let data = read_bytearray_to_end(r)?;
         Ok(ClientboundPacket::Particle(Particle {
-                                           particle_id: particle_id,
-                                           use_long_distance: long_distance,
-                                           x: x,
-                                           y: y,
-                                           z: z,
-                                           offset_x: offset_x,
-                                           offset_y: offset_y,
-                                           offset_z: offset_z,
-                                           particle_data: particle_data,
-                                           count: count,
-                                           id: id,
-                                           crack_data: crack_data,
-                                       }))
+            particle_id,
+            use_long_distance,
+            x,
+            y,
+            z,
+            offset_x,
+            offset_y,
+            offset_z,
+            particle_data,
+            count,
+            data,
+        }))
     }
 }
 
@@ -390,37 +407,105 @@ impl PlayerAbilities {
     }
 }
 
+impl FacePlayer {
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::PACKET_ID, &mut ret)?;
+        write_varint(&self.feet_or_eyes, &mut ret)?;
+        write_f64(&self.x, &mut ret)?;
+        write_f64(&self.y, &mut ret)?;
+        write_f64(&self.z, &mut ret)?;
+
+        if let (Some(id), Some(feet_or_eyes)) = (self.entity_id, self.entity_feet_or_eyes) {
+            write_bool(&true, &mut ret)?;
+            write_varint(&id, &mut ret)?;
+            write_varint(&feet_or_eyes, &mut ret)?;
+        } else {
+            write_bool(&false, &mut ret)?;
+        }
+
+        Ok(ret)
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        let feet_or_eyes = read_varint(r)?;
+        let x = read_f64(r)?;
+        let y = read_f64(r)?;
+        let z = read_f64(r)?;
+        let is_entity = read_bool(r)?;
+        let entity_id = if is_entity {
+            Some(read_varint(r)?)
+        } else {
+            None
+        };
+        let entity_feet_or_eyes = if is_entity {
+            Some(read_varint(r)?)
+        } else {
+            None
+        };
+
+        Ok(ClientboundPacket::FacePlayer(FacePlayer {
+            feet_or_eyes,
+            x,
+            y,
+            z,
+            entity_id,
+            entity_feet_or_eyes,
+                                                   }))
+    }
+}
+
 impl UnlockRecipes {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.action, &mut ret)?;
         write_bool(&self.crafting_book_open, &mut ret)?;
-        write_bool(&self.filter_craftable, &mut ret)?;
-        write_prefixed_varintarray(&self.recipes, &mut ret)?;
+        write_bool(&self.crafting_book_filter, &mut ret)?;
+        write_bool(&self.smelting_book_open, &mut ret)?;
+        write_bool(&self.smelting_book_filter, &mut ret)?;
+        write_varint(&(self.recipes.len() as i32), &mut ret)?;
+        for x in &self.recipes {
+            write_String(x, &mut ret)?;
+        }
         if self.action == 0 {
-            write_prefixed_varintarray(&self.recipes2, &mut ret)?;
+            write_varint(&(self.recipes2.len() as i32), &mut ret)?;
+            for x in &self.recipes2 {
+                write_String(x, &mut ret)?;
+            }
         }
         Ok(ret)
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let action = read_varint(r)?;
         let crafting_book_open = read_bool(r)?;
-        let filter_craftable = read_bool(r)?;
-        let recipes = read_prefixed_varintarray(r)?;
-        let recipes2 = if let 0 = action {
-            read_prefixed_varintarray(r)?
-        } else {
-            Vec::new()
-        };
+        let crafting_book_filter = read_bool(r)?;
+        let smelting_book_open = read_bool(r)?;
+        let smelting_book_filter = read_bool(r)?;
+
+        let count1 = read_varint(r)? as usize;
+        let mut recipes = Vec::with_capacity(count1);
+        for _ in 0..count1 {
+            recipes.push(read_String(r)?);
+        }
+
+        let mut recipes2 = Vec::new();
+        if action == 0 {
+            let count2 = read_varint(r)? as usize;
+            recipes2.reserve(count2);
+            for _ in 0..count2 {
+                recipes2.push(read_String(r)?);
+            }
+        }
 
         Ok(ClientboundPacket::UnlockRecipes(UnlockRecipes {
-                                                action,
-                                                crafting_book_open,
-                                                filter_craftable,
-                                                recipes,
-                                                recipes2,
-                                            }))
+            action,
+            crafting_book_open,
+            crafting_book_filter,
+            smelting_book_open,
+            smelting_book_filter,
+            recipes,
+            recipes2,
+        }))
     }
 }
 
@@ -456,5 +541,51 @@ impl SelectAdvancementTab {
         Ok(ClientboundPacket::SelectAdvancementTab(SelectAdvancementTab {
                                                        identifier,
                                                    }))
+    }
+}
+
+impl StopSound {
+    fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::PACKET_ID, &mut ret)?;
+        write_u8(&self.flags, &mut ret)?;
+
+        let should_write_source = (self.flags & 0x1) != 0;
+        let should_write_sound = (self.flags & 0x2) != 0;
+
+        if should_write_source != self.source.is_some() {
+            bail!("Value of flags does not match value of source in StopSound");
+        }
+        if should_write_sound != self.sound.is_some() {
+            bail!("Value of flags does not match value of sound in StopSound");
+        }
+
+        if let Some(ref x) = self.source {
+            write_varint(x, &mut ret)?;
+        }
+        if let Some(ref x) = self.sound {
+            write_String(x, &mut ret)?;
+        }
+
+        Ok(ret)
+    }
+    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
+        let flags = read_u8(r)?;
+        let source = if (flags & 0x1) != 0 {
+            Some(read_varint(r)?)
+        } else {
+            None
+        };
+        let sound = if (flags & 0x2) != 0 {
+            Some(read_String(r)?)
+        } else {
+            None
+        };
+
+        Ok(ClientboundPacket::StopSound(StopSound {
+            flags,
+            source,
+            sound,
+        }))
     }
 }

@@ -61,41 +61,6 @@ impl StatusRequest {
     }
 }
 
-impl TabComplete {
-    fn to_u8(&self) -> Result<Vec<u8>> {
-        let mut ret = Vec::new();
-        write_varint(&TabComplete::PACKET_ID, &mut ret)?;
-        write_String(&self.text, &mut ret)?;
-        write_bool(&self.assume_command, &mut ret)?;
-        match self.looked_at_block {
-            Some(x) => {
-                write_bool(&true, &mut ret)?;
-                write_position(&x, &mut ret)?;
-            },
-            None => {
-                write_bool(&false, &mut ret)?;
-            },
-        }
-        Ok(ret)
-    }
-    fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
-        let text = read_String(r)?;
-        let assume_command = read_bool(r)?;
-        let has_position = read_bool(r)?;
-        let looked_at_block = if has_position {
-            Some(read_position(r)?)
-        } else {
-            None
-        };
-
-        Ok(ServerboundPacket::TabComplete(TabComplete {
-                                              text: text,
-                                              assume_command: assume_command,
-                                              looked_at_block: looked_at_block,
-                                          }))
-    }
-}
-
 impl UseEntity {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
@@ -151,32 +116,36 @@ impl UseEntity {
     }
 }
 
-impl CraftingBookData {
+impl RecipeBookData {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
 
-        if let Some(x) = self.displayed_recipe {
+        if let Some(ref x) = self.displayed_recipe {
             write_varint(&0, &mut ret)?;
-            write_i32(&x, &mut ret)?;
-        } else if let Some((book_open, filter)) = self.crafting_book_status {
+            write_String(x, &mut ret)?;
+        } else if let Some((a, b, c, d)) = self.recipe_book_states {
             write_varint(&1, &mut ret)?;
-            write_bool(&book_open, &mut ret)?;
-            write_bool(&filter, &mut ret)?;
+            write_bool(&a, &mut ret)?;
+            write_bool(&b, &mut ret)?;
+            write_bool(&c, &mut ret)?;
+            write_bool(&d, &mut ret)?;
+        } else {
+            bail!("Invalid RecipeBookData packet");
         }
         Ok(ret)
     }
     fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
-        let typee = read_varint(r)?;
-        let (recipe, status) = match typee {
-            0 => (Some(read_i32(r)?), None),
-            1 => (None, Some((read_bool(r)?, read_bool(r)?))),
-            _ => bail!("CraftingBookData got invalid type {}", typee),
+        let type_ = read_varint(r)?;
+        let (displayed_recipe, recipe_book_states) = match type_ {
+            0 => (Some(read_String(r)?), None),
+            1 => (None, Some((read_bool(r)?, read_bool(r)?, read_bool(r)?, read_bool(r)?))),
+            _ => bail!("CraftingBookData got invalid type {}", type_),
         };
-        Ok(ServerboundPacket::CraftingBookData(CraftingBookData {
-                                                   displayed_recipe: recipe,
-                                                   crafting_book_status: status,
-                                               }))
+        Ok(ServerboundPacket::RecipeBookData(RecipeBookData{
+            displayed_recipe,
+            recipe_book_states,
+        }))
     }
 }
 

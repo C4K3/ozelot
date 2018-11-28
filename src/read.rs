@@ -159,10 +159,14 @@ pub fn read_prefixed_varintarray<R: Read>(reader: &mut R) -> Result<Vec<i32>> {
     Ok(tmp)
 }
 
-/// Read a uuid encoded as a string
-///
-/// Either with or without dashes.
+/// Read a uuid encoded as a string without dashes
 pub fn read_uuid_str<R: Read>(reader: &mut R) -> Result<u128> {
+    let tmp = read_String(reader)?;
+    u128::from_str_radix(&tmp, 16).chain_err(|| "Invalid UUID, hex string could not be parsed")
+}
+
+/// Read a uuid encoded as a string with dashes
+pub fn read_uuid_str_dashes<R: Read>(reader: &mut R) -> Result<u128> {
     let tmp = read_String(reader)?.replace("-", "");
     u128::from_str_radix(&tmp, 16).chain_err(|| "Invalid UUID, hex string could not be parsed")
 }
