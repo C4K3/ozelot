@@ -621,7 +621,7 @@ impl SpawnMob {
 pub struct SpawnPainting {
     entity_id: i32,
     uuid: u128,
-    title: String,
+    title: i32,
     center_location: (i32, i32, i32),
     direction: u8,
 }
@@ -633,7 +633,7 @@ impl SpawnPainting {
         Ok(ClientboundPacket::SpawnPainting(SpawnPainting {
             entity_id: read_varint(r)?,
             uuid: read_u128(r)?,
-            title: read_String(r)?,
+            title: read_varint(r)?,
             center_location: read_position(r)?,
             direction: read_u8(r)?,
 
@@ -645,13 +645,13 @@ impl SpawnPainting {
         write_varint(&Self::PACKET_ID, &mut ret)?;
         write_varint(&self.entity_id, &mut ret)?;
         write_u128(&self.uuid, &mut ret)?;
-        write_String(&self.title, &mut ret)?;
+        write_varint(&self.title, &mut ret)?;
         write_position(&self.center_location, &mut ret)?;
         write_u8(&self.direction, &mut ret)?;
 
         Ok(ret)
     }
-    pub fn new(entity_id: i32, uuid: u128, title: String, center_location: (i32, i32, i32), direction: u8) -> ClientboundPacket {
+    pub fn new(entity_id: i32, uuid: u128, title: i32, center_location: (i32, i32, i32), direction: u8) -> ClientboundPacket {
         ClientboundPacket::SpawnPainting(SpawnPainting {
             entity_id: entity_id,
             uuid: uuid,
@@ -666,8 +666,8 @@ impl SpawnPainting {
     }    /// Get the UUID of the painting
     pub fn get_uuid(&self) -> &u128 {
         &self.uuid
-    }    /// Get the title of the painting
-    pub fn get_title(&self) -> &String {
+    }    /// Get an id corresponding to the specific painting (see wiki.vg for a mapping of ids to paintings)
+    pub fn get_title(&self) -> &i32 {
         &self.title
     }    /// get the center_location field (UNDOCUMENTED)
     pub fn get_center_location(&self) -> &(i32, i32, i32) {

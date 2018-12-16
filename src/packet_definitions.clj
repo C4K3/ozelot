@@ -318,7 +318,7 @@
    :id 4
    :fields [{:name "entity_id" :type "i32" :getter "Get the entity ID of the painting" :read "varint"}
             {:name "uuid" :type "u128" :getter "Get the UUID of the painting"}
-            {:name "title" :type "String" :getter "Get the title of the painting"}
+            {:name "title" :type "i32" :getter "Get an id corresponding to the specific painting (see wiki.vg for a mapping of ids to paintings)" :read "varint"}
             {:name "center_location" :type "(i32, i32, i32)" :read "position"}
             {:name "direction" :type "u8" :getter "The direction in which the painting faces"}]}
   {:name "SpawnPlayer"
