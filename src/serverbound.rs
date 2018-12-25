@@ -48,6 +48,17 @@ impl EncryptionResponse {
     pub fn get_decrypted_verify_token(&self, key: &Rsa<Private>) -> Result<Vec<u8>> {
         utils::rsa_decrypt(key, &self.verify_token)
     }
+    /// Create the EncryptionResponse packet from the unencrypted shared secret
+    /// and verify token, and the server's public key in DER format.
+    pub fn new_unencrypted(key: &[u8],
+                           shared_secret: &[u8],
+                           verify_token: &[u8])
+                           -> Result<ServerboundPacket> {
+        let ss_encrypted = utils::rsa_encrypt(key, shared_secret)?;
+        let verify_encrypted = utils::rsa_encrypt(key, verify_token)?;
+
+        Ok(EncryptionResponse::new(ss_encrypted, verify_encrypted))
+    }
 }
 
 impl StatusRequest {
@@ -175,16 +186,3 @@ impl AdvancementTab {
     }
 }
 
-impl EncryptionResponse {
-    /// Create the EncryptionResponse packet from the unencrypted shared secret
-    /// and verify token, and the server's public key in DER format.
-    pub fn new_unencrypted(key: &[u8],
-                           shared_secret: &[u8],
-                           verify_token: &[u8])
-                           -> Result<ServerboundPacket> {
-        let ss_encrypted = utils::rsa_encrypt(key, shared_secret)?;
-        let verify_encrypted = utils::rsa_encrypt(key, verify_token)?;
-
-        Ok(EncryptionResponse::new(ss_encrypted, verify_encrypted))
-    }
-}
