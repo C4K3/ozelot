@@ -226,6 +226,6 @@ pub fn write_position<W: Write>(pos: &(i32, i32, i32),
         panic!("write_position: Z is out of range");
     }
 
-    let val = ((x & 0x3ffffff) << 38) | ((y & 0xfff) << 26) | (z & 0x3ffffff);
+    let val = ((x & 0x3ffffff) << 38) | ((z & 0x3ffffff) << 12) | (y & 0xfff);
     write_u64(&val, writer)
 }
