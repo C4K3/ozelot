@@ -111,19 +111,19 @@ fn varlong_too_large() {
 #[test]
 fn position() {
     read_and_write!((0, 63, 0),
-                    &[0, 0, 0, 0, 0xfc, 0, 0, 0],
+                    &[0, 0, 0, 0, 0, 0, 0, 0x3f],
                     read_position,
                     write_position);
     read_and_write!((32374, 72, 29283),
-                    &[0x00, 0x1f, 0x9d, 0x81, 0x20, 0x00, 0x72, 0x63],
+                    &[0x00, 0x1f, 0x9d, 0x80, 0x07, 0x26, 0x30, 0x48],
                     read_position,
                     write_position);
     read_and_write!((-32374, -72, 29283),
-                    &[0xff, 0xe0, 0x62, 0xbe, 0xe0, 0x00, 0x72, 0x63],
+                    &[0xff, 0xe0, 0x62, 0x80, 0x07, 0x26, 0x3f, 0xb8],
                     read_position,
                     write_position);
     read_and_write!((-109, 64, -120),
-                    &[0xff, 0xff, 0xe4, 0xc1, 0x03, 0xff, 0xff, 0x88],
+                    &[0xff, 0xff, 0xe4, 0xff, 0xff, 0xf8, 0x80, 0x40],
                     read_position,
                     write_position);
 }
