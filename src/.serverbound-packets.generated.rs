@@ -298,12 +298,45 @@ impl QueryBlockNBT {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct SetDifficulty {
+    new_difficulty: u8,
+}
+
+impl SetDifficulty {
+    const PACKET_ID: i32 = 2;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
+    pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
+        Ok(ServerboundPacket::SetDifficulty(SetDifficulty {
+            new_difficulty: read_u8(r)?,
+
+        }))
+    }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
+    pub fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::PACKET_ID, &mut ret)?;
+        write_u8(&self.new_difficulty, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(new_difficulty: u8) -> ServerboundPacket {
+        ServerboundPacket::SetDifficulty(SetDifficulty {
+            new_difficulty: new_difficulty,
+        })
+    }
+    /// Get the new difficulty
+    pub fn get_new_difficulty(&self) -> &u8 {
+        &self.new_difficulty
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct ChatMessage {
     message: String,
 }
 
 impl ChatMessage {
-    const PACKET_ID: i32 = 2;
+    const PACKET_ID: i32 = 3;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ChatMessage(ChatMessage {
@@ -336,7 +369,7 @@ pub struct ClientStatus {
 }
 
 impl ClientStatus {
-    const PACKET_ID: i32 = 3;
+    const PACKET_ID: i32 = 4;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ClientStatus(ClientStatus {
@@ -374,7 +407,7 @@ pub struct ClientSettings {
 }
 
 impl ClientSettings {
-    const PACKET_ID: i32 = 4;
+    const PACKET_ID: i32 = 5;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ClientSettings(ClientSettings {
@@ -438,7 +471,7 @@ pub struct TabComplete {
 }
 
 impl TabComplete {
-    const PACKET_ID: i32 = 5;
+    const PACKET_ID: i32 = 6;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::TabComplete(TabComplete {
@@ -479,7 +512,7 @@ pub struct ConfirmTransaction {
 }
 
 impl ConfirmTransaction {
-    const PACKET_ID: i32 = 6;
+    const PACKET_ID: i32 = 7;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ConfirmTransaction(ConfirmTransaction {
@@ -525,7 +558,7 @@ pub struct EnchantItem {
 }
 
 impl EnchantItem {
-    const PACKET_ID: i32 = 7;
+    const PACKET_ID: i32 = 8;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::EnchantItem(EnchantItem {
@@ -569,7 +602,7 @@ pub struct ClickWindow {
 }
 
 impl ClickWindow {
-    const PACKET_ID: i32 = 8;
+    const PACKET_ID: i32 = 9;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ClickWindow(ClickWindow {
@@ -632,7 +665,7 @@ pub struct CloseWindow {
 }
 
 impl CloseWindow {
-    const PACKET_ID: i32 = 9;
+    const PACKET_ID: i32 = 10;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::CloseWindow(CloseWindow {
@@ -666,7 +699,7 @@ pub struct PluginMessage {
 }
 
 impl PluginMessage {
-    const PACKET_ID: i32 = 10;
+    const PACKET_ID: i32 = 11;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PluginMessage(PluginMessage {
@@ -705,7 +738,7 @@ pub struct EditBook {
 }
 
 impl EditBook {
-    const PACKET_ID: i32 = 11;
+    const PACKET_ID: i32 = 12;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::EditBook(EditBook {
@@ -739,7 +772,7 @@ pub struct QueryEntityNBT {
 }
 
 impl QueryEntityNBT {
-    const PACKET_ID: i32 = 12;
+    const PACKET_ID: i32 = 13;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::QueryEntityNBT(QueryEntityNBT {
@@ -781,7 +814,7 @@ pub struct UseEntity {
 }
 
 impl UseEntity {
-    const PACKET_ID: i32 = 13;
+    const PACKET_ID: i32 = 14;
 
 
     pub fn new_raw(target: i32, action: i32, location: Option<(f32, f32, f32)>, hand: Option<i32>) -> ServerboundPacket {
@@ -813,7 +846,7 @@ pub struct KeepAlive {
 }
 
 impl KeepAlive {
-    const PACKET_ID: i32 = 14;
+    const PACKET_ID: i32 = 15;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::KeepAlive(KeepAlive {
@@ -841,16 +874,16 @@ impl KeepAlive {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Player {
-    on_ground: bool,
+pub struct LockDifficulty {
+    locked: bool,
 }
 
-impl Player {
-    const PACKET_ID: i32 = 15;
+impl LockDifficulty {
+    const PACKET_ID: i32 = 16;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
-        Ok(ServerboundPacket::Player(Player {
-            on_ground: read_bool(r)?,
+        Ok(ServerboundPacket::LockDifficulty(LockDifficulty {
+            locked: read_bool(r)?,
 
         }))
     }
@@ -858,18 +891,18 @@ impl Player {
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
-        write_bool(&self.on_ground, &mut ret)?;
+        write_bool(&self.locked, &mut ret)?;
 
         Ok(ret)
     }
-    pub fn new(on_ground: bool) -> ServerboundPacket {
-        ServerboundPacket::Player(Player {
-            on_ground: on_ground,
+    pub fn new(locked: bool) -> ServerboundPacket {
+        ServerboundPacket::LockDifficulty(LockDifficulty {
+            locked: locked,
         })
     }
-    /// Get whether on the ground
-    pub fn get_on_ground(&self) -> &bool {
-        &self.on_ground
+    /// Get whether or not the difficulty is locked
+    pub fn get_locked(&self) -> &bool {
+        &self.locked
     }
 }
 
@@ -882,7 +915,7 @@ pub struct PlayerPosition {
 }
 
 impl PlayerPosition {
-    const PACKET_ID: i32 = 16;
+    const PACKET_ID: i32 = 17;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerPosition(PlayerPosition {
@@ -938,7 +971,7 @@ pub struct PlayerPositionAndLook {
 }
 
 impl PlayerPositionAndLook {
-    const PACKET_ID: i32 = 17;
+    const PACKET_ID: i32 = 18;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerPositionAndLook(PlayerPositionAndLook {
@@ -1003,7 +1036,7 @@ pub struct PlayerLook {
 }
 
 impl PlayerLook {
-    const PACKET_ID: i32 = 18;
+    const PACKET_ID: i32 = 19;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerLook(PlayerLook {
@@ -1043,6 +1076,39 @@ impl PlayerLook {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct Player {
+    on_ground: bool,
+}
+
+impl Player {
+    const PACKET_ID: i32 = 20;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
+    pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
+        Ok(ServerboundPacket::Player(Player {
+            on_ground: read_bool(r)?,
+
+        }))
+    }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
+    pub fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::PACKET_ID, &mut ret)?;
+        write_bool(&self.on_ground, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(on_ground: bool) -> ServerboundPacket {
+        ServerboundPacket::Player(Player {
+            on_ground: on_ground,
+        })
+    }
+    /// Get whether on the ground
+    pub fn get_on_ground(&self) -> &bool {
+        &self.on_ground
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct VehicleMove {
     x: f64,
     y: f64,
@@ -1052,7 +1118,7 @@ pub struct VehicleMove {
 }
 
 impl VehicleMove {
-    const PACKET_ID: i32 = 19;
+    const PACKET_ID: i32 = 21;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::VehicleMove(VehicleMove {
@@ -1110,7 +1176,7 @@ pub struct SteerBoat {
 }
 
 impl SteerBoat {
-    const PACKET_ID: i32 = 20;
+    const PACKET_ID: i32 = 22;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::SteerBoat(SteerBoat {
@@ -1149,7 +1215,7 @@ pub struct PickItem {
 }
 
 impl PickItem {
-    const PACKET_ID: i32 = 21;
+    const PACKET_ID: i32 = 23;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PickItem(PickItem {
@@ -1184,7 +1250,7 @@ pub struct CraftRecipeRequest {
 }
 
 impl CraftRecipeRequest {
-    const PACKET_ID: i32 = 22;
+    const PACKET_ID: i32 = 24;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::CraftRecipeRequest(CraftRecipeRequest {
@@ -1231,7 +1297,7 @@ pub struct PlayerAbilities {
 }
 
 impl PlayerAbilities {
-    const PACKET_ID: i32 = 23;
+    const PACKET_ID: i32 = 25;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerAbilities(PlayerAbilities {
@@ -1278,7 +1344,7 @@ pub struct PlayerDigging {
 }
 
 impl PlayerDigging {
-    const PACKET_ID: i32 = 24;
+    const PACKET_ID: i32 = 26;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerDigging(PlayerDigging {
@@ -1325,7 +1391,7 @@ pub struct EntityAction {
 }
 
 impl EntityAction {
-    const PACKET_ID: i32 = 25;
+    const PACKET_ID: i32 = 27;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::EntityAction(EntityAction {
@@ -1372,7 +1438,7 @@ pub struct SteerVehicle {
 }
 
 impl SteerVehicle {
-    const PACKET_ID: i32 = 26;
+    const PACKET_ID: i32 = 28;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::SteerVehicle(SteerVehicle {
@@ -1418,7 +1484,7 @@ pub struct RecipeBookData {
 }
 
 impl RecipeBookData {
-    const PACKET_ID: i32 = 27;
+    const PACKET_ID: i32 = 29;
 
 
     pub fn new_raw(displayed_recipe: Option<String>, recipe_book_states: Option<(bool, bool, bool, bool)>) -> ServerboundPacket {
@@ -1442,7 +1508,7 @@ pub struct NameItem {
 }
 
 impl NameItem {
-    const PACKET_ID: i32 = 28;
+    const PACKET_ID: i32 = 30;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::NameItem(NameItem {
@@ -1475,7 +1541,7 @@ pub struct ResourcePackStatus {
 }
 
 impl ResourcePackStatus {
-    const PACKET_ID: i32 = 29;
+    const PACKET_ID: i32 = 31;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::ResourcePackStatus(ResourcePackStatus {
@@ -1508,7 +1574,7 @@ pub struct AdvancementTab {
 }
 
 impl AdvancementTab {
-    const PACKET_ID: i32 = 30;
+    const PACKET_ID: i32 = 32;
 
 
     pub fn new_raw(tab_id: Option<String>) -> ServerboundPacket {
@@ -1528,7 +1594,7 @@ pub struct SelectTrade {
 }
 
 impl SelectTrade {
-    const PACKET_ID: i32 = 31;
+    const PACKET_ID: i32 = 33;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::SelectTrade(SelectTrade {
@@ -1562,7 +1628,7 @@ pub struct SetBeaconEffect {
 }
 
 impl SetBeaconEffect {
-    const PACKET_ID: i32 = 32;
+    const PACKET_ID: i32 = 34;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::SetBeaconEffect(SetBeaconEffect {
@@ -1601,7 +1667,7 @@ pub struct HeldItemChange {
 }
 
 impl HeldItemChange {
-    const PACKET_ID: i32 = 33;
+    const PACKET_ID: i32 = 35;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::HeldItemChange(HeldItemChange {
@@ -1637,7 +1703,7 @@ pub struct UpdateCommandBlock {
 }
 
 impl UpdateCommandBlock {
-    const PACKET_ID: i32 = 34;
+    const PACKET_ID: i32 = 36;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::UpdateCommandBlock(UpdateCommandBlock {
@@ -1690,7 +1756,7 @@ pub struct UpdateCommandBlockMinecart {
 }
 
 impl UpdateCommandBlockMinecart {
-    const PACKET_ID: i32 = 35;
+    const PACKET_ID: i32 = 37;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::UpdateCommandBlockMinecart(UpdateCommandBlockMinecart {
@@ -1736,7 +1802,7 @@ pub struct CreativeInventoryAction {
 }
 
 impl CreativeInventoryAction {
-    const PACKET_ID: i32 = 36;
+    const PACKET_ID: i32 = 38;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::CreativeInventoryAction(CreativeInventoryAction {
@@ -1770,6 +1836,60 @@ impl CreativeInventoryAction {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct UpdateJigsawBlock {
+    location: (i32, i32, i32),
+    attachment_type: String,
+    target_pool: String,
+    final_state: String,
+}
+
+impl UpdateJigsawBlock {
+    const PACKET_ID: i32 = 39;
+    /// Deserializes a Read type into a packet. You usually won't need to use this.
+    pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
+        Ok(ServerboundPacket::UpdateJigsawBlock(UpdateJigsawBlock {
+            location: read_position(r)?,
+            attachment_type: read_String(r)?,
+            target_pool: read_String(r)?,
+            final_state: read_String(r)?,
+
+        }))
+    }
+    /// Serializes the packet into Vec<u8>. You usually won't need to use this.
+    pub fn to_u8(&self) -> Result<Vec<u8>> {
+        let mut ret = Vec::new();
+        write_varint(&Self::PACKET_ID, &mut ret)?;
+        write_position(&self.location, &mut ret)?;
+        write_String(&self.attachment_type, &mut ret)?;
+        write_String(&self.target_pool, &mut ret)?;
+        write_String(&self.final_state, &mut ret)?;
+
+        Ok(ret)
+    }
+    pub fn new(location: (i32, i32, i32), attachment_type: String, target_pool: String, final_state: String) -> ServerboundPacket {
+        ServerboundPacket::UpdateJigsawBlock(UpdateJigsawBlock {
+            location: location,
+            attachment_type: attachment_type,
+            target_pool: target_pool,
+            final_state: final_state,
+        })
+    }
+    /// Get the block entity location
+    pub fn get_location(&self) -> &(i32, i32, i32) {
+        &self.location
+    }    /// Get the attachment type identifier
+    pub fn get_attachment_type(&self) -> &String {
+        &self.attachment_type
+    }    /// Get the target pool identifier
+    pub fn get_target_pool(&self) -> &String {
+        &self.target_pool
+    }    /// get the final_state field (UNDOCUMENTED)
+    pub fn get_final_state(&self) -> &String {
+        &self.final_state
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct UpdateStructureBlock {
     location: (i32, i32, i32),
     action: i32,
@@ -1790,7 +1910,7 @@ pub struct UpdateStructureBlock {
 }
 
 impl UpdateStructureBlock {
-    const PACKET_ID: i32 = 37;
+    const PACKET_ID: i32 = 40;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::UpdateStructureBlock(UpdateStructureBlock {
@@ -1917,7 +2037,7 @@ pub struct UpdateSign {
 }
 
 impl UpdateSign {
-    const PACKET_ID: i32 = 38;
+    const PACKET_ID: i32 = 41;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::UpdateSign(UpdateSign {
@@ -1974,7 +2094,7 @@ pub struct Animation {
 }
 
 impl Animation {
-    const PACKET_ID: i32 = 39;
+    const PACKET_ID: i32 = 42;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::Animation(Animation {
@@ -2007,7 +2127,7 @@ pub struct Spectate {
 }
 
 impl Spectate {
-    const PACKET_ID: i32 = 40;
+    const PACKET_ID: i32 = 43;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::Spectate(Spectate {
@@ -2036,25 +2156,27 @@ impl Spectate {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PlayerBlockPlacement {
+    hand: i32,
     location: (i32, i32, i32),
     face: i32,
-    hand: i32,
     x: f32,
     y: f32,
     z: f32,
+    inside_block: bool,
 }
 
 impl PlayerBlockPlacement {
-    const PACKET_ID: i32 = 41;
+    const PACKET_ID: i32 = 44;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::PlayerBlockPlacement(PlayerBlockPlacement {
+            hand: read_varint(r)?,
             location: read_position(r)?,
             face: read_varint(r)?,
-            hand: read_varint(r)?,
             x: read_f32(r)?,
             y: read_f32(r)?,
             z: read_f32(r)?,
+            inside_block: read_bool(r)?,
 
         }))
     }
@@ -2062,34 +2184,36 @@ impl PlayerBlockPlacement {
     pub fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
         write_varint(&Self::PACKET_ID, &mut ret)?;
+        write_varint(&self.hand, &mut ret)?;
         write_position(&self.location, &mut ret)?;
         write_varint(&self.face, &mut ret)?;
-        write_varint(&self.hand, &mut ret)?;
         write_f32(&self.x, &mut ret)?;
         write_f32(&self.y, &mut ret)?;
         write_f32(&self.z, &mut ret)?;
+        write_bool(&self.inside_block, &mut ret)?;
 
         Ok(ret)
     }
-    pub fn new(location: (i32, i32, i32), face: i32, hand: i32, x: f32, y: f32, z: f32) -> ServerboundPacket {
+    pub fn new(hand: i32, location: (i32, i32, i32), face: i32, x: f32, y: f32, z: f32, inside_block: bool) -> ServerboundPacket {
         ServerboundPacket::PlayerBlockPlacement(PlayerBlockPlacement {
+            hand: hand,
             location: location,
             face: face,
-            hand: hand,
             x: x,
             y: y,
             z: z,
+            inside_block: inside_block,
         })
     }
-    /// Get the location of the placed block
+    /// Get the hand from which the block was placed as a raw varint enum
+    pub fn get_hand(&self) -> &i32 {
+        &self.hand
+    }    /// Get the location of the placed block
     pub fn get_location(&self) -> &(i32, i32, i32) {
         &self.location
     }    /// Get the face of the block as a raw varint enum
     pub fn get_face(&self) -> &i32 {
         &self.face
-    }    /// Get the hand from which the block was placed as a raw varint enum
-    pub fn get_hand(&self) -> &i32 {
-        &self.hand
     }    /// Get the X position of the crosshair on the block
     pub fn get_x(&self) -> &f32 {
         &self.x
@@ -2099,6 +2223,9 @@ impl PlayerBlockPlacement {
     }    /// Get the Z position of the crosshair on the block
     pub fn get_z(&self) -> &f32 {
         &self.z
+    }    /// True when the player's head is inside of a block
+    pub fn get_inside_block(&self) -> &bool {
+        &self.inside_block
     }
 }
 
@@ -2108,7 +2235,7 @@ pub struct UseItem {
 }
 
 impl UseItem {
-    const PACKET_ID: i32 = 42;
+    const PACKET_ID: i32 = 45;
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ServerboundPacket> {
         Ok(ServerboundPacket::UseItem(UseItem {

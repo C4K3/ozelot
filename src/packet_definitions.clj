@@ -507,7 +507,7 @@
           {:name "sky_light_mask" :type "i32" :getter "Get the sky light mask" :read "varint"}
           {:name "block_light_mask" :type "i32" :getter "Get the block light mask" :read "varint"}
           {:name "empty_sky_light_mask" :type "i32" :getter "Get the empty sky light mask" :read "varint"}
-          {:name "empty_block_light_mask" :type "i33" :getter "Get the empty block light mask" :read "varint"}
+          {:name "empty_block_light_mask" :type "i32" :getter "Get the empty block light mask" :read "varint"}
           {:name "data" :type "Vec<u8>" :read "bytearray_to_end" :getter "Get the light data"}]}
 {:name "JoinGame"
  :id 38
