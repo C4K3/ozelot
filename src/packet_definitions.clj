@@ -38,14 +38,17 @@
       :id 1
       :fields [{:name "transaction_id" :type "i32" :read "varint" :getter "Get the transaction ID"}
                {:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the X/Y/Z coords position"}]}
-    {:name "ChatMessage"
+     {:name "SetDifficulty"
       :id 2
+      :fields [{:name "new_difficulty" :type "u8" :getter "Get the new difficulty"}]}
+     {:name "ChatMessage"
+      :id 3
       :fields [{:name "message" :type "String" :getter "Get the chat message (not json)"}]}
      {:name "ClientStatus"
-      :id 3
+      :id 4
       :fields [{:name "action" :type "i32" :read "varint" :getter "Get the action ID varint enum"}]}
      {:name "ClientSettings"
-      :id 4
+      :id 5
       :fields [{:name "locale" :type "String" :getter "Get the client's locale"}
                {:name "view_distance" :type "u8" :getter "Get the client's view distance in chunks"}
                {:name "chat_mode" :type "i32" :read "varint" :getter "Get the client's chat mode as varint enum"}
@@ -53,20 +56,20 @@
                {:name "displayed_skin_parts" :type "u8" :getter "Get the displayed skin parts as a raw bit mask"}
                {:name "main_hand" :type "i32" :read "varint" :getter "Get the player's main hand as a varint enum"}]}
      {:name "TabComplete"
-      :id 5
+      :id 6
       :fields [{:name "transaction_id" :type "i32" :read "varint" :getter "Get the transaction ID"}
                {:name "text" :type "String" :getter "Get the text behind the cursor"}]}
      {:name "ConfirmTransaction"
-      :id 6
+      :id 7
       :fields [{:name "window_id" :type "u8" :getter "Get the window id"}
                {:name "id" :type "i16" :getter "Get the action number"}
                {:name "accepted" :type "bool" :getter "Get whether the action was accepted"}]}
      {:name "EnchantItem"
-      :id 7
+      :id 8
       :fields [{:name "window_id" :type "u8" :getter "Get the window id"}
                {:name "enchantment" :type "i8" :getter "Get the position of the chosen enchantment"}]}
      {:name "ClickWindow"
-      :id 8
+      :id 9
       :fields [{:name "window_id" :type "u8" :getter "Get the window id"}
                {:name "slot_id" :type "i16" :getter "Get the clicked slot number"}
                {:name "button" :type "i8" :getter "Get the button clicked byte enum"}
@@ -74,40 +77,40 @@
                {:name "mode" :type "i32" :read "varint" :getter "Get the action/mode"}
                {:name "slot" :type "Vec<u8>" :read "bytearray" :getter "Get the raw unprocessed slot data"}]}
      {:name "CloseWindow"
-      :id 9
+      :id 10
       :fields [{:name "window_id" :type "u8" :getter "Get the window id"}]}
      {:name "PluginMessage"
-      :id 10
+      :id 11
       :fields [{:name "channel" :type "String" :getter "Get the channel"}
                {:name "data" :type "Vec<u8>" :read "bytearray" :getter "Get the data"}]}
      {:name "EditBook"
-      :id 11
+      :id 12
       :fields [{:name "data" :type "Vec<u8>" :read "bytearray_to_end" :getter "Get the raw data contained in this packet. The first field in the packet is NBT slot data, and therefore we cannot parse the remaining data without parsing the NBT."}]}
      {:name "QueryEntityNBT"
-      :id 12
+      :id 13
       :fields [{:name "transaction_id" :type "i32" :read "varint" :getter "Get the transaction ID"}
                {:name "entity_id" :type "i32" :read "varint" :getter "Get the entity ID"}]}
      {:name "UseEntity"
-      :id 13
+      :id 14
       :automatic-serialize false
       :fields [{:name "target" :type "i32" :read "varint" :getter "Get the target eid"}
                {:name "action" :type "i32" :read "varint" :getter "Get the action type varint enum"}
                {:name "location" :type "Option<(f32, f32, f32)>" :getter "Get the target location (if any)"}
                {:name "hand" :type "Option<i32>" :getter "Get the hand used as a varint enum (if any)"}]}
      {:name "KeepAlive"
-      :id 14
-      :fields [{:name "id" :type "i64" :getter "Get the keep alive ID"}]}
-      {:name "Player"
       :id 15
-      :fields [{:name "on_ground" :type "bool" :getter "Get whether on the ground"}]}
-     {:name "PlayerPosition"
+      :fields [{:name "id" :type "i64" :getter "Get the keep alive ID"}]}
+     {:name "LockDifficulty"
       :id 16
+      :fields [{:name "locked" :type "bool" :getter "Get whether or not the difficulty is locked"}]}
+     {:name "PlayerPosition"
+      :id 17
       :fields [{:name "x" :type "f64" :getter "Get the X coordinate"}
                {:name "y" :type "f64" :getter "Get the Y coordinate (feet)"}
                {:name "z" :type "f64" :getter "Get the Z coordinate"}
                {:name "on_ground" :type "bool" :getter "Get whether on the ground"}]}
      {:name "PlayerPositionAndLook"
-      :id 17
+      :id 18
       :fields [{:name "x" :type "f64" :getter "Get the X coordinate"}
                {:name "y" :type "f64" :getter "Get the Y coordinate"}
                {:name "z" :type "f64" :getter "Get the Z coordinate"}
@@ -115,91 +118,100 @@
                {:name "pitch" :type "f32" :getter "Get the pitch"}
                {:name "on_ground" :type "bool" :getter "Get whether on the ground"}]}
      {:name "PlayerLook"
-      :id 18
+      :id 19
       :fields [{:name "yaw" :type "f32" :getter "Get the yaw"}
                {:name "pitch" :type "f32" :getter "Get the pitch"}
                {:name "on_ground" :type "bool" :getter "Get whether on the ground"}]}
+     {:name "Player"
+      :id 20
+      :fields [{:name "on_ground" :type "bool" :getter "Get whether on the ground"}]}
      {:name "VehicleMove"
-      :id 19
+      :id 21
       :fields [{:name "x" :type "f64" :getter "Get the (absolute) X coordinate"}
                {:name "y" :type "f64" :getter "Get the (absolute) Y coordinate"}
                {:name "z" :type "f64" :getter "Get the (absolute) Z coordinate"}
                {:name "yaw" :type "f32" :getter "Get the (absolute) yaw"}
                {:name "pitch" :type "f32" :getter "Get the (absolute) pitch"}]}
      {:name "SteerBoat"
-      :id 20
+      :id 22
       :fields [{:name "right" :type "bool" :getter "Get whether the right paddle is turning"}
                {:name "left" :type "bool" :getter "Get whether the left paddle is turning"}]}
      {:name "PickItem"
-      :id 21
+      :id 23
       :fields [{:name "slot_to_use" :type "i32" :read "varint" :getter "Get the slot to use"}]}
      {:name "CraftRecipeRequest"
-      :id 22
+      :id 24
       :fields [{:name "window_id" :type "u8" :getter "Get the window ID"}
                {:name "recipe" :type "i32" :getter "Get the recipe ID" :read "varint"}
                {:name "make_all" :type "bool" :getter "Get if shift was down when the item was clicked"}]}
      {:name "PlayerAbilities"
-      :id 23
+      :id 25
       :fields [{:name "flags" :type "u8" :getter "Get the raw player abilities bit mask"}
                {:name "flying_speed" :type "f32" :getter "Get the player's flying speed"}
                {:name "walking_speed" :type "f32" :getter "Get the player's walking speed"}]}
      {:name "PlayerDigging"
-      :id 24
+      :id 26
       :fields [{:name "status" :type "i32" :read "varint" :getter "Get the status as a raw varint enum"}
                {:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the location of the block"}
                {:name "face" :type "u8" :getter "Get the face of the block being hit as a raw byte enum"}]}
 {:name "EntityAction"
- :id 25
+ :id 27
  :fields [{:name "entity_id" :type "i32" :read "varint" :getter "Get the player's eid"}
           {:name "action" :type "i32" :read "varint" :getter "Get the action as a raw varint enum"}
           {:name "jump_boost" :type "i32" :read "varint" :getter "Get the jump boost, used if the player is riding a horse"}]}
 {:name "SteerVehicle"
- :id 26
+ :id 28
  :fields [{:name "sideways" :type "f32" :getter "Get the sideways movement, positiev is to the left of the player"}
           {:name "forward" :type "f32" :getter "Get the forward movement"}
           {:name "flags" :type "u8" :getter "Get the raw flags byte enum"}]}
 {:name "RecipeBookData"
-:id 27
+:id 29
 :automatic-serialize false
 :fields [{:name "displayed_recipe" :type "Option<String>" :getter "Get the displayed recipe if packet is type 0"}
          {:name "recipe_book_states" :type "Option<(bool, bool, bool, bool)>" :getter "Get whether crafting recipe book is open, crafting recipe filter is active, smelting recipe book is open, and smelting recipe filter is active if packet is type 1."}]}
 {:name "NameItem"
- :id 28
+ :id 30
  :fields [{:name "name" :type "String" :getter "Get the new name of the item"}]}
 {:name "ResourcePackStatus"
- :id 29
+ :id 31
  :fields [{:name "result" :type "i32" :read "varint" :getter "Get the result as a raw varint enum"}]}
 {:name "AdvancementTab"
- :id 30
+ :id 32
  :automatic-serialize false
  :fields [{:name "tab_id" :type "Option<String>" :getter "Get Some(Tab ID) if the action was to open a tab, and None else"}]}
 {:name "SelectTrade"
- :id 31
+ :id 33
  :fields [{:name "selected_slot" :type "i32" :read "varint" :getter "Get the selected slot in the players inventory."}]}
 {:name "SetBeaconEffect"
- :id 32
+ :id 34
  :fields [{:name "primary_effect" :type "i32" :read "varint" :getter "Get the potion ID of the primary effect."}
           {:name "secondary_effect" :type "i32" :read "varint" :getter "Get the potion ID of the secondary effect."}]}
 {:name "HeldItemChange"
- :id 33
+ :id 35
  :fields [{:name "slot" :type "i16" :getter "Get the slot the player has selected"}]}
 {:name "UpdateCommandBlock"
- :id 34
+ :id 36
  :fields [{:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the position"}
           {:name "command" :type "String" :getter "Get the new string"}
 	  {:name "mode" :type "i32" :read "varint" :getter "Get the mode (enum)"}
 	  {:name "flags" :type "u8" :getter "Get the bitarray of flags"}]}
 {:name "UpdateCommandBlockMinecart"
- :id 35
+ :id 37
  :fields [{:name "id" :type "i32" :read "varint" :getter "Get the entity ID"}
           {:name "command" :type "String" :getter "Get the new string"}
 	  {:name "track_output" :type "bool" :getter "Get whether to store the output of the previous command"}]}
 {:name "CreativeInventoryAction"
- :id 36
+ :id 38
  :fields [{:name "slot_id" :type "i16" :getter "Get the inventory slot number"}
           {:name "slot" :type "Vec<u8>" :read "bytearray" :getter "Get the raw unprocessed slot data"}]}
+{:name "UpdateJigsawBlock"
+ :id 39
+ :fields [{:name "location" :type "(i32, i32, i32)" :getter "Get the block entity location" :read "position"}
+         {:name "attachment_type" :type "String" :getter "Get the attachment type identifier"}
+         {:name "target_pool" :type "String" :getter "Get the target pool identifier"}
+         {:name "final_state" :type "String"}]}
 {:name "UpdateStructureBlock"
- :id 37
+ :id 40
  :fields [{:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the block entity position"}
           {:name "action" :type "i32" :read "varint" :getter "Get the action (enum)"}
 	  {:name "mode" :type "i32" :read "varint" :getter "Get the mode (enum)"}
@@ -217,28 +229,29 @@
 	  {:name "seed" :type "i64" :read "varlong" :getter "Get the seed"}
 	  {:name "flags" :type "u8" :getter "Get the flags bitarray"}]}	  
 {:name "UpdateSign"
- :id 38
+ :id 41
  :fields [{:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the block coordinates"}
           {:name "line1" :type "String" :getter "Get line 1"}
           {:name "line2" :type "String" :getter "Get line 2"}
           {:name "line3" :type "String" :getter "Get line 3"}
           {:name "line4" :type "String" :getter "Get line 4"}]}
 {:name "Animation"
- :id 39
+ :id 42
  :fields [{:name "hand" :type "i32" :read "varint" :getter "Get which arm was used as a raw varint enum"}]}
 {:name "Spectate"
- :id 40
+ :id 43
  :fields [{:name "target" :type "u128" :getter "Get the uuid of the selected target"}]}
 {:name "PlayerBlockPlacement"
- :id 41
- :fields [{:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the location of the placed block"}
+ :id 44
+ :fields [{:name "hand" :type "i32" :read "varint" :getter "Get the hand from which the block was placed as a raw varint enum"}
+          {:name "location" :type "(i32, i32, i32)" :read "position" :getter "Get the location of the placed block"}
           {:name "face" :type "i32" :read "varint" :getter "Get the face of the block as a raw varint enum"}
-          {:name "hand" :type "i32" :read "varint" :getter "Get the hand from which the block was placed as a raw varint enum"}
           {:name "x" :type "f32" :getter "Get the X position of the crosshair on the block"}
           {:name "y" :type "f32" :getter "Get the Y position of the crosshair on the block"}
-          {:name "z" :type "f32" :getter "Get the Z position of the crosshair on the block"}]}
+          {:name "z" :type "f32" :getter "Get the Z position of the crosshair on the block"}
+          {:name "inside_block" :type "bool" :getter "True when the player's head is inside of a block"}]}
 {:name "UseItem"
- :id 42
+ :id 45
  :fields [{:name "hand" :type "i32" :read "varint" :getter "Get which hand contained the used item as a raw varint enum"}]}]}
 :clientbound
 {"Handshake" []
