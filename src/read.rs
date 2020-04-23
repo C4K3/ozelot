@@ -187,8 +187,8 @@ pub fn read_bytearray<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
 pub fn read_position<R: Read>(reader: &mut R) -> Result<(i32, i32, i32)> {
     let val = read_u64(reader)?;
     let mut x = (val >> 38) as i32;
-    let mut y = ((val >> 26) & 0xfff) as i32;
-    let mut z = (val << 38 >> 38) as i32;
+    let mut y = (val & 0xfff) as i32;
+    let mut z = (val << 26 >> 38) as i32;
     if x >= 1 << 25 {
         x -= 1 << 26;
     }

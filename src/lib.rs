@@ -133,7 +133,7 @@ pub use connection::Packet;
 use std::fmt;
 
 /// The protocol version supported by this version of ozelot
-pub const PROTOCOL_VERSION: i32 = 404;
+pub const PROTOCOL_VERSION: i32 = 578;
 
 /// This tracks which state of play the client is in. The value of this changes
 /// the meaning of the different packet ids.

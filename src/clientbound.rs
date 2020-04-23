@@ -135,39 +135,6 @@ impl MultiBlockChange {
     }
 }
 
-impl OpenWindow {
-    fn to_u8(&self) -> Result<Vec<u8>> {
-        let mut ret = Vec::new();
-        write_varint(&OpenWindow::PACKET_ID, &mut ret)?;
-        write_u8(&self.window_id, &mut ret)?;
-        write_String(&self.window_type, &mut ret)?;
-        write_String(&self.window_title, &mut ret)?;
-        write_u8(&self.number_of_slots, &mut ret)?;
-        if let Some(entity_id) = self.entity_id {
-            write_i32(&entity_id, &mut ret)?;
-        }
-        Ok(ret)
-    }
-    fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
-        let window_id = read_u8(r)?;
-        let window_type = read_String(r)?;
-        let window_title = read_String(r)?;
-        let number_of_slots = read_u8(r)?;
-        let entity_id = match &*window_type {
-            "EntityHorse" => Some(read_i32(r)?),
-            _ => None,
-        };
-
-        Ok(ClientboundPacket::OpenWindow(OpenWindow {
-                                             window_id: window_id,
-                                             window_type: window_type,
-                                             window_title: window_title,
-                                             number_of_slots: number_of_slots,
-                                             entity_id: entity_id,
-                                         }))
-    }
-}
-
 impl Explosion {
     fn to_u8(&self) -> Result<Vec<u8>> {
         let mut ret = Vec::new();
@@ -219,9 +186,9 @@ impl Particle {
         write_varint(&Particle::PACKET_ID, &mut ret)?;
         write_i32(&self.particle_id, &mut ret)?;
         write_bool(&self.use_long_distance, &mut ret)?;
-        write_f32(&self.x, &mut ret)?;
-        write_f32(&self.y, &mut ret)?;
-        write_f32(&self.z, &mut ret)?;
+        write_f64(&self.x, &mut ret)?;
+        write_f64(&self.y, &mut ret)?;
+        write_f64(&self.z, &mut ret)?;
         write_f32(&self.offset_x, &mut ret)?;
         write_f32(&self.offset_y, &mut ret)?;
         write_f32(&self.offset_z, &mut ret)?;
@@ -233,9 +200,9 @@ impl Particle {
     fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         let particle_id = read_i32(r)?;
         let use_long_distance = read_bool(r)?;
-        let x = read_f32(r)?;
-        let y = read_f32(r)?;
-        let z = read_f32(r)?;
+        let x = read_f64(r)?;
+        let y = read_f64(r)?;
+        let z = read_f64(r)?;
         let offset_x = read_f32(r)?;
         let offset_y = read_f32(r)?;
         let offset_z = read_f32(r)?;
