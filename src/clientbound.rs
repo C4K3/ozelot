@@ -311,8 +311,8 @@ impl UpdateScore {
         let action = read_u8(r)?;
         let objective_name = read_String(r)?;
         let value = match action {
-            1 => Some(read_varint(r)?),
-            _ => None,
+            1 => None,
+            _ => Some(read_varint(r)?),
         };
         Ok(ClientboundPacket::UpdateScore(UpdateScore {
                                               name: name,
