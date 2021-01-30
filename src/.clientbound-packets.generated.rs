@@ -12,7 +12,7 @@ impl StatusResponse {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::StatusResponse(StatusResponse {
-            json: read_String(r)?,
+            json: read_String(r).chain_err(|| "while reading field json")?,
 
         }))
     }
@@ -45,7 +45,7 @@ impl StatusPong {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::StatusPong(StatusPong {
-            id: read_u64(r)?,
+            id: read_u64(r).chain_err(|| "while reading field id")?,
 
         }))
     }
@@ -78,7 +78,7 @@ impl LoginDisconnect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::LoginDisconnect(LoginDisconnect {
-            raw_chat: read_String(r)?,
+            raw_chat: read_String(r).chain_err(|| "while reading field raw_chat")?,
 
         }))
     }
@@ -113,9 +113,9 @@ impl EncryptionRequest {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EncryptionRequest(EncryptionRequest {
-            server_id: read_String(r)?,
-            public_key: read_prefixed_bytearray(r)?,
-            verify_token: read_prefixed_bytearray(r)?,
+            server_id: read_String(r).chain_err(|| "while reading field server_id")?,
+            public_key: read_prefixed_bytearray(r).chain_err(|| "while reading field public_key")?,
+            verify_token: read_prefixed_bytearray(r).chain_err(|| "while reading field verify_token")?,
 
         }))
     }
@@ -159,8 +159,8 @@ impl LoginSuccess {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::LoginSuccess(LoginSuccess {
-            uuid: read_uuid_str_dashes(r)?,
-            username: read_String(r)?,
+            uuid: read_uuid_str_dashes(r).chain_err(|| "while reading field uuid")?,
+            username: read_String(r).chain_err(|| "while reading field username")?,
 
         }))
     }
@@ -198,7 +198,7 @@ impl SetCompression {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetCompression(SetCompression {
-            threshold: read_varint(r)?,
+            threshold: read_varint(r).chain_err(|| "while reading field threshold")?,
 
         }))
     }
@@ -233,9 +233,9 @@ impl LoginPluginRequest {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::LoginPluginRequest(LoginPluginRequest {
-            id: read_varint(r)?,
-            identifier: read_String(r)?,
-            data: read_bytearray_to_end(r)?,
+            id: read_varint(r).chain_err(|| "while reading field id")?,
+            identifier: read_String(r).chain_err(|| "while reading field identifier")?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -289,18 +289,18 @@ impl SpawnObject {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnObject(SpawnObject {
-            entity_id: read_varint(r)?,
-            object_uuid: read_u128(r)?,
-            object_type: read_varint(r)?,
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
-            pitch: read_i8(r)?,
-            yaw: read_i8(r)?,
-            data: read_i32(r)?,
-            velocity_x: read_i16(r)?,
-            velocity_y: read_i16(r)?,
-            velocity_z: read_i16(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            object_uuid: read_u128(r).chain_err(|| "while reading field object_uuid")?,
+            object_type: read_varint(r).chain_err(|| "while reading field object_type")?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
+            pitch: read_i8(r).chain_err(|| "while reading field pitch")?,
+            yaw: read_i8(r).chain_err(|| "while reading field yaw")?,
+            data: read_i32(r).chain_err(|| "while reading field data")?,
+            velocity_x: read_i16(r).chain_err(|| "while reading field velocity_x")?,
+            velocity_y: read_i16(r).chain_err(|| "while reading field velocity_y")?,
+            velocity_z: read_i16(r).chain_err(|| "while reading field velocity_z")?,
 
         }))
     }
@@ -392,11 +392,11 @@ impl SpawnExperienceOrb {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnExperienceOrb(SpawnExperienceOrb {
-            entity_id: read_varint(r)?,
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
-            count: read_i16(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
+            count: read_i16(r).chain_err(|| "while reading field count")?,
 
         }))
     }
@@ -453,11 +453,11 @@ impl SpawnGlobalEntity {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnGlobalEntity(SpawnGlobalEntity {
-            entity_id: read_varint(r)?,
-            entity_type: read_u8(r)?,
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            entity_type: read_u8(r).chain_err(|| "while reading field entity_type")?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
 
         }))
     }
@@ -521,18 +521,18 @@ impl SpawnMob {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnMob(SpawnMob {
-            entity_id: read_varint(r)?,
-            uuid: read_u128(r)?,
-            mob_type: read_varint(r)?,
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
-            yaw: read_i8(r)?,
-            pitch: read_i8(r)?,
-            head_pitch: read_i8(r)?,
-            velocity_x: read_i16(r)?,
-            velocity_y: read_i16(r)?,
-            velocity_z: read_i16(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            uuid: read_u128(r).chain_err(|| "while reading field uuid")?,
+            mob_type: read_varint(r).chain_err(|| "while reading field mob_type")?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
+            yaw: read_i8(r).chain_err(|| "while reading field yaw")?,
+            pitch: read_i8(r).chain_err(|| "while reading field pitch")?,
+            head_pitch: read_i8(r).chain_err(|| "while reading field head_pitch")?,
+            velocity_x: read_i16(r).chain_err(|| "while reading field velocity_x")?,
+            velocity_y: read_i16(r).chain_err(|| "while reading field velocity_y")?,
+            velocity_z: read_i16(r).chain_err(|| "while reading field velocity_z")?,
 
         }))
     }
@@ -624,11 +624,11 @@ impl SpawnPainting {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPainting(SpawnPainting {
-            entity_id: read_varint(r)?,
-            uuid: read_u128(r)?,
-            title: read_varint(r)?,
-            center_location: read_position(r)?,
-            direction: read_u8(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            uuid: read_u128(r).chain_err(|| "while reading field uuid")?,
+            title: read_varint(r).chain_err(|| "while reading field title")?,
+            center_location: read_position(r).chain_err(|| "while reading field center_location")?,
+            direction: read_u8(r).chain_err(|| "while reading field direction")?,
 
         }))
     }
@@ -687,13 +687,13 @@ impl SpawnPlayer {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPlayer(SpawnPlayer {
-            entity_id: read_varint(r)?,
-            uuid: read_u128(r)?,
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
-            yaw: read_i8(r)?,
-            pitch: read_i8(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            uuid: read_u128(r).chain_err(|| "while reading field uuid")?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
+            yaw: read_i8(r).chain_err(|| "while reading field yaw")?,
+            pitch: read_i8(r).chain_err(|| "while reading field pitch")?,
 
         }))
     }
@@ -757,8 +757,8 @@ impl ClientboundAnimation {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundAnimation(ClientboundAnimation {
-            entity_id: read_varint(r)?,
-            animation: read_u8(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            animation: read_u8(r).chain_err(|| "while reading field animation")?,
 
         }))
     }
@@ -819,10 +819,10 @@ impl AcknowledgePlayerDigging {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::AcknowledgePlayerDigging(AcknowledgePlayerDigging {
-            location: read_position(r)?,
-            block: read_varint(r)?,
-            status: read_varint(r)?,
-            successful: read_bool(r)?,
+            location: read_position(r).chain_err(|| "while reading field location")?,
+            block: read_varint(r).chain_err(|| "while reading field block")?,
+            status: read_varint(r).chain_err(|| "while reading field status")?,
+            successful: read_bool(r).chain_err(|| "while reading field successful")?,
 
         }))
     }
@@ -872,9 +872,9 @@ impl BlockBreakAnimation {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockBreakAnimation(BlockBreakAnimation {
-            entity_id: read_varint(r)?,
-            location: read_position(r)?,
-            destroy_stage: read_u8(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            location: read_position(r).chain_err(|| "while reading field location")?,
+            destroy_stage: read_u8(r).chain_err(|| "while reading field destroy_stage")?,
 
         }))
     }
@@ -919,9 +919,9 @@ impl UpdateBlockEntity {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateBlockEntity(UpdateBlockEntity {
-            position: read_position(r)?,
-            action: read_u8(r)?,
-            nbt: read_bytearray_to_end(r)?,
+            position: read_position(r).chain_err(|| "while reading field position")?,
+            action: read_u8(r).chain_err(|| "while reading field action")?,
+            nbt: read_bytearray_to_end(r).chain_err(|| "while reading field nbt")?,
 
         }))
     }
@@ -967,10 +967,10 @@ impl BlockAction {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockAction(BlockAction {
-            position: read_position(r)?,
-            action_id: read_u8(r)?,
-            action_param: read_u8(r)?,
-            block_type: read_varint(r)?,
+            position: read_position(r).chain_err(|| "while reading field position")?,
+            action_id: read_u8(r).chain_err(|| "while reading field action_id")?,
+            action_param: read_u8(r).chain_err(|| "while reading field action_param")?,
+            block_type: read_varint(r).chain_err(|| "while reading field block_type")?,
 
         }))
     }
@@ -1019,8 +1019,8 @@ impl BlockChange {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BlockChange(BlockChange {
-            position: read_position(r)?,
-            new_block: read_varint(r)?,
+            position: read_position(r).chain_err(|| "while reading field position")?,
+            new_block: read_varint(r).chain_err(|| "while reading field new_block")?,
 
         }))
     }
@@ -1058,7 +1058,7 @@ impl BossBar {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::BossBar(BossBar {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -1092,8 +1092,8 @@ impl ServerDifficulty {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ServerDifficulty(ServerDifficulty {
-            difficulty: read_u8(r)?,
-            difficulty_locked: read_bool(r)?,
+            difficulty: read_u8(r).chain_err(|| "while reading field difficulty")?,
+            difficulty_locked: read_bool(r).chain_err(|| "while reading field difficulty_locked")?,
 
         }))
     }
@@ -1132,8 +1132,8 @@ impl ChatMessage {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChatMessage(ChatMessage {
-            chat: read_String(r)?,
-            position: read_u8(r)?,
+            chat: read_String(r).chain_err(|| "while reading field chat")?,
+            position: read_u8(r).chain_err(|| "while reading field position")?,
 
         }))
     }
@@ -1236,7 +1236,7 @@ impl DeclareCommands {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DeclareCommands(DeclareCommands {
-            raw_data: read_bytearray_to_end(r)?,
+            raw_data: read_bytearray_to_end(r).chain_err(|| "while reading field raw_data")?,
 
         }))
     }
@@ -1271,9 +1271,9 @@ impl ClientboundConfirmTransaction {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundConfirmTransaction(ClientboundConfirmTransaction {
-            window_id: read_u8(r)?,
-            action_id: read_i16(r)?,
-            accepted: read_bool(r)?,
+            window_id: read_u8(r).chain_err(|| "while reading field window_id")?,
+            action_id: read_i16(r).chain_err(|| "while reading field action_id")?,
+            accepted: read_bool(r).chain_err(|| "while reading field accepted")?,
 
         }))
     }
@@ -1316,7 +1316,7 @@ impl ClientboundCloseWindow {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundCloseWindow(ClientboundCloseWindow {
-            window_id: read_u8(r)?,
+            window_id: read_u8(r).chain_err(|| "while reading field window_id")?,
 
         }))
     }
@@ -1350,8 +1350,8 @@ impl WindowItems {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WindowItems(WindowItems {
-            window_id: read_u8(r)?,
-            slots: read_bytearray_to_end(r)?,
+            window_id: read_u8(r).chain_err(|| "while reading field window_id")?,
+            slots: read_bytearray_to_end(r).chain_err(|| "while reading field slots")?,
 
         }))
     }
@@ -1391,9 +1391,9 @@ impl WindowProperty {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WindowProperty(WindowProperty {
-            window_id: read_u8(r)?,
-            property: read_i16(r)?,
-            new_value: read_i16(r)?,
+            window_id: read_u8(r).chain_err(|| "while reading field window_id")?,
+            property: read_i16(r).chain_err(|| "while reading field property")?,
+            new_value: read_i16(r).chain_err(|| "while reading field new_value")?,
 
         }))
     }
@@ -1438,9 +1438,9 @@ impl SetSlot {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetSlot(SetSlot {
-            window_id: read_u8(r)?,
-            slot_id: read_i16(r)?,
-            slot_data: read_bytearray_to_end(r)?,
+            window_id: read_u8(r).chain_err(|| "while reading field window_id")?,
+            slot_id: read_i16(r).chain_err(|| "while reading field slot_id")?,
+            slot_data: read_bytearray_to_end(r).chain_err(|| "while reading field slot_data")?,
 
         }))
     }
@@ -1484,8 +1484,8 @@ impl SetCooldown {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetCooldown(SetCooldown {
-            item_id: read_varint(r)?,
-            cooldown: read_varint(r)?,
+            item_id: read_varint(r).chain_err(|| "while reading field item_id")?,
+            cooldown: read_varint(r).chain_err(|| "while reading field cooldown")?,
 
         }))
     }
@@ -1524,8 +1524,8 @@ impl ClientboundPluginMessage {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundPluginMessage(ClientboundPluginMessage {
-            channel: read_String(r)?,
-            data: read_bytearray_to_end(r)?,
+            channel: read_String(r).chain_err(|| "while reading field channel")?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -1569,13 +1569,13 @@ impl NamedSoundEffect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::NamedSoundEffect(NamedSoundEffect {
-            sound_name: read_String(r)?,
-            sound_category: read_varint(r)?,
-            x: read_i32(r)?,
-            y: read_i32(r)?,
-            z: read_i32(r)?,
-            volume: read_f32(r)?,
-            pitch: read_f32(r)?,
+            sound_name: read_String(r).chain_err(|| "while reading field sound_name")?,
+            sound_category: read_varint(r).chain_err(|| "while reading field sound_category")?,
+            x: read_i32(r).chain_err(|| "while reading field x")?,
+            y: read_i32(r).chain_err(|| "while reading field y")?,
+            z: read_i32(r).chain_err(|| "while reading field z")?,
+            volume: read_f32(r).chain_err(|| "while reading field volume")?,
+            pitch: read_f32(r).chain_err(|| "while reading field pitch")?,
 
         }))
     }
@@ -1638,7 +1638,7 @@ impl PlayDisconnect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayDisconnect(PlayDisconnect {
-            reason: read_String(r)?,
+            reason: read_String(r).chain_err(|| "while reading field reason")?,
 
         }))
     }
@@ -1672,8 +1672,8 @@ impl EntityStatus {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityStatus(EntityStatus {
-            entity_id: read_i32(r)?,
-            status: read_u8(r)?,
+            entity_id: read_i32(r).chain_err(|| "while reading field entity_id")?,
+            status: read_u8(r).chain_err(|| "while reading field status")?,
 
         }))
     }
@@ -1767,8 +1767,8 @@ impl UnloadChunk {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UnloadChunk(UnloadChunk {
-            chunk_x: read_i32(r)?,
-            chunk_z: read_i32(r)?,
+            chunk_x: read_i32(r).chain_err(|| "while reading field chunk_x")?,
+            chunk_z: read_i32(r).chain_err(|| "while reading field chunk_z")?,
 
         }))
     }
@@ -1807,8 +1807,8 @@ impl ChangeGameState {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChangeGameState(ChangeGameState {
-            action: read_u8(r)?,
-            value: read_f32(r)?,
+            action: read_u8(r).chain_err(|| "while reading field action")?,
+            value: read_f32(r).chain_err(|| "while reading field value")?,
 
         }))
     }
@@ -1848,9 +1848,9 @@ impl OpenHorseWindow {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::OpenHorseWindow(OpenHorseWindow {
-            window_id: read_u8(r)?,
-            number_of_slots: read_i32(r)?,
-            entity_id: read_i32(r)?,
+            window_id: read_u8(r).chain_err(|| "while reading field window_id")?,
+            number_of_slots: read_i32(r).chain_err(|| "while reading field number_of_slots")?,
+            entity_id: read_i32(r).chain_err(|| "while reading field entity_id")?,
 
         }))
     }
@@ -1893,7 +1893,7 @@ impl KeepAlive {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::KeepAlive(KeepAlive {
-            id: read_i64(r)?,
+            id: read_i64(r).chain_err(|| "while reading field id")?,
 
         }))
     }
@@ -1926,7 +1926,7 @@ impl ChunkData {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ChunkData(ChunkData {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -1962,10 +1962,10 @@ impl Effect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Effect(Effect {
-            effect_id: read_i32(r)?,
-            location: read_position(r)?,
-            data: read_i32(r)?,
-            disable_relative_volume: read_bool(r)?,
+            effect_id: read_i32(r).chain_err(|| "while reading field effect_id")?,
+            location: read_position(r).chain_err(|| "while reading field location")?,
+            data: read_i32(r).chain_err(|| "while reading field data")?,
+            disable_relative_volume: read_bool(r).chain_err(|| "while reading field disable_relative_volume")?,
 
         }))
     }
@@ -2089,13 +2089,13 @@ impl UpdateLight {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateLight(UpdateLight {
-            chunk_x: read_varint(r)?,
-            chunk_z: read_varint(r)?,
-            sky_light_mask: read_varint(r)?,
-            block_light_mask: read_varint(r)?,
-            empty_sky_light_mask: read_varint(r)?,
-            empty_block_light_mask: read_varint(r)?,
-            data: read_bytearray_to_end(r)?,
+            chunk_x: read_varint(r).chain_err(|| "while reading field chunk_x")?,
+            chunk_z: read_varint(r).chain_err(|| "while reading field chunk_z")?,
+            sky_light_mask: read_varint(r).chain_err(|| "while reading field sky_light_mask")?,
+            block_light_mask: read_varint(r).chain_err(|| "while reading field block_light_mask")?,
+            empty_sky_light_mask: read_varint(r).chain_err(|| "while reading field empty_sky_light_mask")?,
+            empty_block_light_mask: read_varint(r).chain_err(|| "while reading field empty_block_light_mask")?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -2166,15 +2166,15 @@ impl JoinGame {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::JoinGame(JoinGame {
-            entity_id: read_i32(r)?,
-            gamemode: read_u8(r)?,
-            dimension: read_i32(r)?,
-            hashed_seed: read_i64(r)?,
-            max_players: read_u8(r)?,
-            level_type: read_String(r)?,
-            view_distance: read_varint(r)?,
-            reduced_debug: read_bool(r)?,
-            enable_respawn_screen: read_bool(r)?,
+            entity_id: read_i32(r).chain_err(|| "while reading field entity_id")?,
+            gamemode: read_u8(r).chain_err(|| "while reading field gamemode")?,
+            dimension: read_i32(r).chain_err(|| "while reading field dimension")?,
+            hashed_seed: read_i64(r).chain_err(|| "while reading field hashed_seed")?,
+            max_players: read_u8(r).chain_err(|| "while reading field max_players")?,
+            level_type: read_String(r).chain_err(|| "while reading field level_type")?,
+            view_distance: read_varint(r).chain_err(|| "while reading field view_distance")?,
+            reduced_debug: read_bool(r).chain_err(|| "while reading field reduced_debug")?,
+            enable_respawn_screen: read_bool(r).chain_err(|| "while reading field enable_respawn_screen")?,
 
         }))
     }
@@ -2247,7 +2247,7 @@ impl Map {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Map(Map {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -2280,7 +2280,7 @@ impl TradeList {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::TradeList(TradeList {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -2317,11 +2317,11 @@ impl EntityRelativeMove {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityRelativeMove(EntityRelativeMove {
-            entity_id: read_varint(r)?,
-            x: read_i16(r)?,
-            y: read_i16(r)?,
-            z: read_i16(r)?,
-            on_ground: read_bool(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            x: read_i16(r).chain_err(|| "while reading field x")?,
+            y: read_i16(r).chain_err(|| "while reading field y")?,
+            z: read_i16(r).chain_err(|| "while reading field z")?,
+            on_ground: read_bool(r).chain_err(|| "while reading field on_ground")?,
 
         }))
     }
@@ -2380,13 +2380,13 @@ impl EntityLookRelativeMove {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLookRelativeMove(EntityLookRelativeMove {
-            entity_id: read_varint(r)?,
-            x: read_i16(r)?,
-            y: read_i16(r)?,
-            z: read_i16(r)?,
-            yaw: read_i8(r)?,
-            pitch: read_i8(r)?,
-            on_ground: read_bool(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            x: read_i16(r).chain_err(|| "while reading field x")?,
+            y: read_i16(r).chain_err(|| "while reading field y")?,
+            z: read_i16(r).chain_err(|| "while reading field z")?,
+            yaw: read_i8(r).chain_err(|| "while reading field yaw")?,
+            pitch: read_i8(r).chain_err(|| "while reading field pitch")?,
+            on_ground: read_bool(r).chain_err(|| "while reading field on_ground")?,
 
         }))
     }
@@ -2452,10 +2452,10 @@ impl EntityLook {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityLook(EntityLook {
-            entity_id: read_varint(r)?,
-            yaw: read_i8(r)?,
-            pitch: read_i8(r)?,
-            on_ground: read_bool(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            yaw: read_i8(r).chain_err(|| "while reading field yaw")?,
+            pitch: read_i8(r).chain_err(|| "while reading field pitch")?,
+            on_ground: read_bool(r).chain_err(|| "while reading field on_ground")?,
 
         }))
     }
@@ -2503,7 +2503,7 @@ impl Entity {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Entity(Entity {
-            entity_id: read_varint(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
 
         }))
     }
@@ -2540,11 +2540,11 @@ impl ClientboundVehicleMove {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundVehicleMove(ClientboundVehicleMove {
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
-            yaw: read_i8(r)?,
-            pitch: read_i8(r)?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
+            yaw: read_i8(r).chain_err(|| "while reading field yaw")?,
+            pitch: read_i8(r).chain_err(|| "while reading field pitch")?,
 
         }))
     }
@@ -2597,7 +2597,7 @@ impl OpenBook {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::OpenBook(OpenBook {
-            hand: read_varint(r)?,
+            hand: read_varint(r).chain_err(|| "while reading field hand")?,
 
         }))
     }
@@ -2632,9 +2632,9 @@ impl OpenWindow {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::OpenWindow(OpenWindow {
-            window_id: read_varint(r)?,
-            window_type: read_varint(r)?,
-            window_title: read_String(r)?,
+            window_id: read_varint(r).chain_err(|| "while reading field window_id")?,
+            window_type: read_varint(r).chain_err(|| "while reading field window_type")?,
+            window_title: read_String(r).chain_err(|| "while reading field window_title")?,
 
         }))
     }
@@ -2677,7 +2677,7 @@ impl OpenSignEditor {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::OpenSignEditor(OpenSignEditor {
-            position: read_position(r)?,
+            position: read_position(r).chain_err(|| "while reading field position")?,
 
         }))
     }
@@ -2711,8 +2711,8 @@ impl CraftRecipeResponse {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CraftRecipeResponse(CraftRecipeResponse {
-            window_id: read_u8(r)?,
-            recipe: read_varint(r)?,
+            window_id: read_u8(r).chain_err(|| "while reading field window_id")?,
+            recipe: read_varint(r).chain_err(|| "while reading field recipe")?,
 
         }))
     }
@@ -2752,9 +2752,9 @@ impl PlayerAbilities {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerAbilities(PlayerAbilities {
-            flags: read_u8(r)?,
-            flying_speed: read_f32(r)?,
-            fov: read_f32(r)?,
+            flags: read_u8(r).chain_err(|| "while reading field flags")?,
+            flying_speed: read_f32(r).chain_err(|| "while reading field flying_speed")?,
+            fov: read_f32(r).chain_err(|| "while reading field fov")?,
 
         }))
     }
@@ -2832,7 +2832,7 @@ impl PlayerListItem {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListItem(PlayerListItem {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -2916,13 +2916,13 @@ impl PlayerPositionAndLook {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerPositionAndLook(PlayerPositionAndLook {
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
-            yaw: read_f32(r)?,
-            pitch: read_f32(r)?,
-            flags: read_u8(r)?,
-            teleport_id: read_varint(r)?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
+            yaw: read_f32(r).chain_err(|| "while reading field yaw")?,
+            pitch: read_f32(r).chain_err(|| "while reading field pitch")?,
+            flags: read_u8(r).chain_err(|| "while reading field flags")?,
+            teleport_id: read_varint(r).chain_err(|| "while reading field teleport_id")?,
 
         }))
     }
@@ -3035,7 +3035,7 @@ impl DestroyEntities {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DestroyEntities(DestroyEntities {
-            entity_ids: read_prefixed_varintarray(r)?,
+            entity_ids: read_prefixed_varintarray(r).chain_err(|| "while reading field entity_ids")?,
 
         }))
     }
@@ -3069,8 +3069,8 @@ impl RemoveEntityEffect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::RemoveEntityEffect(RemoveEntityEffect {
-            entity_id: read_varint(r)?,
-            effect_id: read_u8(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            effect_id: read_u8(r).chain_err(|| "while reading field effect_id")?,
 
         }))
     }
@@ -3109,8 +3109,8 @@ impl ResourcePackSend {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ResourcePackSend(ResourcePackSend {
-            url: read_String(r)?,
-            hash: read_String(r)?,
+            url: read_String(r).chain_err(|| "while reading field url")?,
+            hash: read_String(r).chain_err(|| "while reading field hash")?,
 
         }))
     }
@@ -3151,10 +3151,10 @@ impl Respawn {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Respawn(Respawn {
-            dimension: read_i32(r)?,
-            hashed_seed: read_i64(r)?,
-            gamemode: read_u8(r)?,
-            level_type: read_String(r)?,
+            dimension: read_i32(r).chain_err(|| "while reading field dimension")?,
+            hashed_seed: read_i64(r).chain_err(|| "while reading field hashed_seed")?,
+            gamemode: read_u8(r).chain_err(|| "while reading field gamemode")?,
+            level_type: read_String(r).chain_err(|| "while reading field level_type")?,
 
         }))
     }
@@ -3203,8 +3203,8 @@ impl EntityHeadLook {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityHeadLook(EntityHeadLook {
-            entity_id: read_varint(r)?,
-            head_yaw: read_i8(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            head_yaw: read_i8(r).chain_err(|| "while reading field head_yaw")?,
 
         }))
     }
@@ -3262,7 +3262,7 @@ impl WorldBorder {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::WorldBorder(WorldBorder {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -3295,7 +3295,7 @@ impl Camera {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Camera(Camera {
-            entity_id: read_varint(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
 
         }))
     }
@@ -3328,7 +3328,7 @@ impl ClientboundHeldItemChange {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::ClientboundHeldItemChange(ClientboundHeldItemChange {
-            slot: read_u8(r)?,
+            slot: read_u8(r).chain_err(|| "while reading field slot")?,
 
         }))
     }
@@ -3362,8 +3362,8 @@ impl UpdateViewPosition {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateViewPosition(UpdateViewPosition {
-            chunk_x: read_varint(r)?,
-            chunk_z: read_varint(r)?,
+            chunk_x: read_varint(r).chain_err(|| "while reading field chunk_x")?,
+            chunk_z: read_varint(r).chain_err(|| "while reading field chunk_z")?,
 
         }))
     }
@@ -3401,7 +3401,7 @@ impl UpdateViewDistance {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateViewDistance(UpdateViewDistance {
-            view_distance: read_varint(r)?,
+            view_distance: read_varint(r).chain_err(|| "while reading field view_distance")?,
 
         }))
     }
@@ -3435,8 +3435,8 @@ impl DisplayScoreboard {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DisplayScoreboard(DisplayScoreboard {
-            position: read_u8(r)?,
-            name: read_String(r)?,
+            position: read_u8(r).chain_err(|| "while reading field position")?,
+            name: read_String(r).chain_err(|| "while reading field name")?,
 
         }))
     }
@@ -3475,8 +3475,8 @@ impl EntityMetadata {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityMetadata(EntityMetadata {
-            entity_id: read_varint(r)?,
-            metadata: read_bytearray_to_end(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            metadata: read_bytearray_to_end(r).chain_err(|| "while reading field metadata")?,
 
         }))
     }
@@ -3515,8 +3515,8 @@ impl AttachEntity {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::AttachEntity(AttachEntity {
-            attached_entity_id: read_i32(r)?,
-            holding_entity_id: read_i32(r)?,
+            attached_entity_id: read_i32(r).chain_err(|| "while reading field attached_entity_id")?,
+            holding_entity_id: read_i32(r).chain_err(|| "while reading field holding_entity_id")?,
 
         }))
     }
@@ -3557,10 +3557,10 @@ impl EntityVelocity {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityVelocity(EntityVelocity {
-            entity_id: read_varint(r)?,
-            x_velocity: read_i16(r)?,
-            y_velocity: read_i16(r)?,
-            z_velocity: read_i16(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            x_velocity: read_i16(r).chain_err(|| "while reading field x_velocity")?,
+            y_velocity: read_i16(r).chain_err(|| "while reading field y_velocity")?,
+            z_velocity: read_i16(r).chain_err(|| "while reading field z_velocity")?,
 
         }))
     }
@@ -3610,9 +3610,9 @@ impl EntityEquipment {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEquipment(EntityEquipment {
-            entity_id: read_varint(r)?,
-            slot_enum: read_varint(r)?,
-            slot_data: read_bytearray_to_end(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            slot_enum: read_varint(r).chain_err(|| "while reading field slot_enum")?,
+            slot_data: read_bytearray_to_end(r).chain_err(|| "while reading field slot_data")?,
 
         }))
     }
@@ -3657,9 +3657,9 @@ impl SetExperience {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetExperience(SetExperience {
-            experience: read_f32(r)?,
-            level: read_varint(r)?,
-            total_experience: read_varint(r)?,
+            experience: read_f32(r).chain_err(|| "while reading field experience")?,
+            level: read_varint(r).chain_err(|| "while reading field level")?,
+            total_experience: read_varint(r).chain_err(|| "while reading field total_experience")?,
 
         }))
     }
@@ -3704,9 +3704,9 @@ impl UpdateHealth {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::UpdateHealth(UpdateHealth {
-            health: read_f32(r)?,
-            food: read_varint(r)?,
-            saturation: read_f32(r)?,
+            health: read_f32(r).chain_err(|| "while reading field health")?,
+            food: read_varint(r).chain_err(|| "while reading field food")?,
+            saturation: read_f32(r).chain_err(|| "while reading field saturation")?,
 
         }))
     }
@@ -3785,8 +3785,8 @@ impl SetPassengers {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SetPassengers(SetPassengers {
-            entity_id: read_varint(r)?,
-            passengers: read_prefixed_varintarray(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            passengers: read_prefixed_varintarray(r).chain_err(|| "while reading field passengers")?,
 
         }))
     }
@@ -3824,7 +3824,7 @@ impl Teams {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Teams(Teams {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -3892,7 +3892,7 @@ impl SpawnPosition {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SpawnPosition(SpawnPosition {
-            position: read_position(r)?,
+            position: read_position(r).chain_err(|| "while reading field position")?,
 
         }))
     }
@@ -3926,8 +3926,8 @@ impl TimeUpdate {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::TimeUpdate(TimeUpdate {
-            world_age: read_i64(r)?,
-            time_of_day: read_i64(r)?,
+            world_age: read_i64(r).chain_err(|| "while reading field world_age")?,
+            time_of_day: read_i64(r).chain_err(|| "while reading field time_of_day")?,
 
         }))
     }
@@ -3999,11 +3999,11 @@ impl EntitySoundEffect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntitySoundEffect(EntitySoundEffect {
-            sound_id: read_varint(r)?,
-            sound_category: read_varint(r)?,
-            entity_id: read_varint(r)?,
-            volume: read_f32(r)?,
-            pitch: read_f32(r)?,
+            sound_id: read_varint(r).chain_err(|| "while reading field sound_id")?,
+            sound_category: read_varint(r).chain_err(|| "while reading field sound_category")?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            volume: read_f32(r).chain_err(|| "while reading field volume")?,
+            pitch: read_f32(r).chain_err(|| "while reading field pitch")?,
 
         }))
     }
@@ -4062,13 +4062,13 @@ impl SoundEffect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::SoundEffect(SoundEffect {
-            sound_id: read_varint(r)?,
-            sound_category: read_varint(r)?,
-            x: read_i32(r)?,
-            y: read_i32(r)?,
-            z: read_i32(r)?,
-            volume: read_f32(r)?,
-            pitch: read_f32(r)?,
+            sound_id: read_varint(r).chain_err(|| "while reading field sound_id")?,
+            sound_category: read_varint(r).chain_err(|| "while reading field sound_category")?,
+            x: read_i32(r).chain_err(|| "while reading field x")?,
+            y: read_i32(r).chain_err(|| "while reading field y")?,
+            z: read_i32(r).chain_err(|| "while reading field z")?,
+            volume: read_f32(r).chain_err(|| "while reading field volume")?,
+            pitch: read_f32(r).chain_err(|| "while reading field pitch")?,
 
         }))
     }
@@ -4162,8 +4162,8 @@ impl PlayerListHeaderFooter {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::PlayerListHeaderFooter(PlayerListHeaderFooter {
-            header: read_String(r)?,
-            footer: read_String(r)?,
+            header: read_String(r).chain_err(|| "while reading field header")?,
+            footer: read_String(r).chain_err(|| "while reading field footer")?,
 
         }))
     }
@@ -4202,8 +4202,8 @@ impl NBTQueryResponse {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::NBTQueryResponse(NBTQueryResponse {
-            transaction_id: read_varint(r)?,
-            nbt: read_bytearray_to_end(r)?,
+            transaction_id: read_varint(r).chain_err(|| "while reading field transaction_id")?,
+            nbt: read_bytearray_to_end(r).chain_err(|| "while reading field nbt")?,
 
         }))
     }
@@ -4243,9 +4243,9 @@ impl CollectItem {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::CollectItem(CollectItem {
-            collected_entity_id: read_varint(r)?,
-            collector_entity_id: read_varint(r)?,
-            item_count: read_varint(r)?,
+            collected_entity_id: read_varint(r).chain_err(|| "while reading field collected_entity_id")?,
+            collector_entity_id: read_varint(r).chain_err(|| "while reading field collector_entity_id")?,
+            item_count: read_varint(r).chain_err(|| "while reading field item_count")?,
 
         }))
     }
@@ -4294,13 +4294,13 @@ impl EntityTeleport {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityTeleport(EntityTeleport {
-            entity_id: read_varint(r)?,
-            x: read_f64(r)?,
-            y: read_f64(r)?,
-            z: read_f64(r)?,
-            yaw: read_i8(r)?,
-            pitch: read_i8(r)?,
-            on_ground: read_bool(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            x: read_f64(r).chain_err(|| "while reading field x")?,
+            y: read_f64(r).chain_err(|| "while reading field y")?,
+            z: read_f64(r).chain_err(|| "while reading field z")?,
+            yaw: read_i8(r).chain_err(|| "while reading field yaw")?,
+            pitch: read_i8(r).chain_err(|| "while reading field pitch")?,
+            on_ground: read_bool(r).chain_err(|| "while reading field on_ground")?,
 
         }))
     }
@@ -4363,7 +4363,7 @@ impl Advancements {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Advancements(Advancements {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -4397,8 +4397,8 @@ impl EntityProperties {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityProperties(EntityProperties {
-            entity_id: read_varint(r)?,
-            data: read_bytearray_to_end(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -4440,11 +4440,11 @@ impl EntityEffect {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::EntityEffect(EntityEffect {
-            entity_id: read_varint(r)?,
-            effect_id: read_u8(r)?,
-            amplifier: read_i8(r)?,
-            duration: read_varint(r)?,
-            flags: read_u8(r)?,
+            entity_id: read_varint(r).chain_err(|| "while reading field entity_id")?,
+            effect_id: read_u8(r).chain_err(|| "while reading field effect_id")?,
+            amplifier: read_i8(r).chain_err(|| "while reading field amplifier")?,
+            duration: read_varint(r).chain_err(|| "while reading field duration")?,
+            flags: read_u8(r).chain_err(|| "while reading field flags")?,
 
         }))
     }
@@ -4497,7 +4497,7 @@ impl DeclareRecipes {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::DeclareRecipes(DeclareRecipes {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }
@@ -4530,7 +4530,7 @@ impl Tags {
     /// Deserializes a Read type into a packet. You usually won't need to use this.
     pub fn deserialize<R: Read>(r: &mut R) -> Result<ClientboundPacket> {
         Ok(ClientboundPacket::Tags(Tags {
-            data: read_bytearray_to_end(r)?,
+            data: read_bytearray_to_end(r).chain_err(|| "while reading field data")?,
 
         }))
     }

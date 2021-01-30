@@ -226,13 +226,15 @@
   (apply str
          (map
            (fn [{name :name type :type read :read}]
-             (format "            %s: read_%s(r)?,\n"
+             (format "            %s: read_%s(r).chain_err(|| \"while reading field %s\")?,\n"
                      name
                      ; If :read is specified use that function to read from
                      ; else use the read_:type function
                      (if (nil? read)
                        type
-                       read)))
+                       read)
+                     name
+                     ))
            fields)))
 
 ;; Create the deserialize function for a packet
